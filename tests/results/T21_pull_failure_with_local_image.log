@@ -5,7 +5,7 @@
 
    Proxy target : ghcr.io/berriai/litellm:main-latest
    Proxy port   : 4000   (restart policy: unless-stopped)
-   Linux config : /tmp/litellm-test.M4qqkY/home/.litellm
+   Linux config : /tmp/litellm-test.WMg72J/home/.litellm
 
    Please choose an option:
 
@@ -22,7 +22,7 @@
 [WARN] Continuing anyway - Windows/PowerShell integration may fail.
 [ OK ] WSL2 environment looks good.
 [INFO] [2/9] Installing Docker Engine (docker.io from Ubuntu apt repository)...
-[ OK ] Docker binary already present, skipping apt installation.
+apt-get: docker.io installed (stub)
 [INFO] [3/9] Configuring Iranian Docker Hub mirrors (/etc/docker/daemon.json)...
 [ OK ] Registry mirrors written:
        - https://docker.arvancloud.ir
@@ -37,17 +37,20 @@
 
 
 [ OK ] Collected 1 API key(s):
-         Groq       : gsk_****89ab
+         Groq       : gsk_****9abc
          OpenRouter : <skipped>
          Google AI  : <skipped>
          Cerebras   : <skipped>
          Mistral    : <skipped>
-[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-test.M4qqkY/home/.litellm/master_key.txt
-[INFO] [5/9] Generating LiteLLM configuration: /tmp/litellm-test.M4qqkY/home/.litellm/config.yaml
+[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-test.WMg72J/home/.litellm/master_key.txt
+[INFO] [5/9] Generating LiteLLM configuration: /tmp/litellm-test.WMg72J/home/.litellm/config.yaml
 [ OK ] config.yaml generated (only providers with keys are enabled).
 [INFO] [6/9] Pulling prebuilt LiteLLM image (no build step): ghcr.io/berriai/litellm:main-latest
 [INFO]        This may take several minutes on the first run...
-[ OK ] Image pulled successfully.
+[ OK ]        Image already exists locally (from a previous install).
+Error response from daemon: simulated pull failure (test stub)
+[WARN] Pull failed, but the image already exists locally - continuing with the local copy.
+[WARN] To update it later, fix the connection and run: sudo docker pull ghcr.io/berriai/litellm:main-latest
 [INFO] [7/9] Starting LiteLLM container on port 4000...
 [ OK ] Container 'litellm' started (restart policy: unless-stopped).
 [INFO]        Waiting for LiteLLM to become healthy (up to 60s)...
@@ -70,9 +73,9 @@
     Username  : admin
     Password  : (the Master key below)
 
-  Master key (also saved to)      : /tmp/litellm-test.M4qqkY/home/.litellm/master_key.txt
-  Master key                      : sk-c0502a08d0a15b5be7d0ddd9bbeca4e94a3b57d47a654348df95b26c4ae9d97b
-  LiteLLM config file             : /tmp/litellm-test.M4qqkY/home/.litellm/config.yaml
+  Master key (also saved to)      : /tmp/litellm-test.WMg72J/home/.litellm/master_key.txt
+  Master key                      : sk-133220b2612f6059362f5ea14de2f1c8e23d19cfb5f7492c0560aedd233268aa
+  LiteLLM config file             : /tmp/litellm-test.WMg72J/home/.litellm/config.yaml
   OpenCode config file (Windows)  : /mnt/c/Users/Test User/.config/opencode/opencode.json
   Container name                  : litellm
   Auto-start on WSL boot          : systemd service: litellm.service (enabled)
@@ -86,7 +89,7 @@
     Stop proxy       : sudo docker stop litellm
     Start proxy      : sudo docker start litellm
     Test endpoint    : curl -s http://127.0.0.1:4000/v1/models \
-                         -H "Authorization: Bearer sk-c0502a08d0a15b5be7d0ddd9bbeca4e94a3b57d47a654348df95b26c4ae9d97b"
+                         -H "Authorization: Bearer sk-133220b2612f6059362f5ea14de2f1c8e23d19cfb5f7492c0560aedd233268aa"
     Re-run this tool : bash "/home/user/LiteLLM-OpenCode/LiteLLM.sh"
 
   NEXT STEPS (on WINDOWS):
@@ -100,8 +103,10 @@
 
 [ OK ] Done. Happy coding!
     ok: exit code = 0
-    ok: contains: Docker binary already present, skipping apt installation
-    ok: apt-get never called
+    ok: contains: Image already exists locally
+    ok: contains: continuing with the local copy
+    ok: contains: INSTALLATION COMPLETED SUCCESSFULLY
+    ok: file exists: /mnt/c/Users/Test User/.config/opencode/opencode.json
 
 --- docker-calls.log ---
 service docker restart
@@ -110,11 +115,13 @@ docker info
 docker image inspect ghcr.io/berriai/litellm:main-latest
 docker pull ghcr.io/berriai/litellm:main-latest
 docker ps -a --format {{.Names}}
-docker run -d --name litellm --restart unless-stopped -p 4000:4000 -v /tmp/litellm-test.M4qqkY/home/.litellm/config.yaml:/app/config.yaml:ro -e LITELLM_MASTER_KEY=sk-c0502a08d0a15b5be7d0ddd9bbeca4e94a3b57d47a654348df95b26c4ae9d97b -e UI_USERNAME=admin -e UI_PASSWORD=sk-c0502a08d0a15b5be7d0ddd9bbeca4e94a3b57d47a654348df95b26c4ae9d97b -e GROQ_API_KEY=gsk_predocker_0123456789ab ghcr.io/berriai/litellm:main-latest --config /app/config.yaml --port 4000
+docker run -d --name litellm --restart unless-stopped -p 4000:4000 -v /tmp/litellm-test.WMg72J/home/.litellm/config.yaml:/app/config.yaml:ro -e LITELLM_MASTER_KEY=sk-133220b2612f6059362f5ea14de2f1c8e23d19cfb5f7492c0560aedd233268aa -e UI_USERNAME=admin -e UI_PASSWORD=sk-133220b2612f6059362f5ea14de2f1c8e23d19cfb5f7492c0560aedd233268aa -e GROQ_API_KEY=gsk_localimg_0123456789abc ghcr.io/berriai/litellm:main-latest --config /app/config.yaml --port 4000
 systemctl daemon-reload
 systemctl enable litellm.service
 
 --- apt-calls.log ---
+apt-get update -y
+apt-get install -y docker.io
 
 --- containers.txt ---
 litellm
@@ -158,7 +165,7 @@ general_settings:
       "name": "LiteLLM Proxy (Local)",
       "options": {
         "baseURL": "http://127.0.0.1:4000/v1",
-        "apiKey": "sk-c0502a08d0a15b5be7d0ddd9bbeca4e94a3b57d47a654348df95b26c4ae9d97b"
+        "apiKey": "sk-133220b2612f6059362f5ea14de2f1c8e23d19cfb5f7492c0560aedd233268aa"
       },
       "models": {
         "qwen-2.5-coder-32b": { "name": "Qwen 2.5 Coder 32B (Groq, free)" },

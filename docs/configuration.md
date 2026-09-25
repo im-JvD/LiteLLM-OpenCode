@@ -205,7 +205,26 @@ LITELLM_BOOT_MODE=wslconf bash LiteLLM.sh   # فقط boot command در /etc/wsl.
 
 ---
 
-## ۹. شخصی‌سازی‌های رایج
+## ۹. متغیرهای محیطی نصاب
+
+قبل از اجرای نصاب می‌توانید رفتار آن را با متغیرهای محیطی تنظیم کنید:
+
+| متغیر | پیش‌فرض | کاربرد |
+|---|---|---|
+| `LITELLM_BOOT_MODE` | `auto` | حالت استارت خودکار: `auto` / `systemd` / `wslconf` |
+| `LITELLM_IMAGE` | `ghcr.io/berriai/litellm:main-latest` | ایمیج سفارشی (رجیستری دلخواه) |
+| `LITELLM_GHCR_MIRROR` | خالی | میرور جایگزین ghcr (مثلاً `ghcr.nju.edu.cn`) — فقط وقتی pull مستقیم شکست خورد استفاده می‌شود |
+| `LITELLM_PULL_RETRIES` | `3` | تعداد تلاش مجدد pull قبل از fallback |
+
+نمونه:
+
+```bash
+LITELLM_GHCR_MIRROR=ghcr.nju.edu.cn LITELLM_PULL_RETRIES=5 bash LiteLLM.sh
+```
+
+---
+
+## ۱۰. شخصی‌سازی‌های رایج
 
 ### افزودن مدل جدید
 

@@ -15,7 +15,7 @@
 
    Proxy target : ghcr.io/berriai/litellm:main-latest
    Proxy port   : 4000   (restart policy: unless-stopped)
-   Linux config : /tmp/litellm-e2e-run.BxiFU1/home/.litellm
+   Linux config : /tmp/litellm-e2e-run.1FQuAY/home/.litellm
 
    Please choose an option:
 
@@ -50,10 +50,10 @@ apt-get: docker.io installed (stub)
          Groq       : gsk_****abcd
          OpenRouter : sk-o****abcd
          Google AI  : AIza****89ab
-         Cerebras   : csk_****abcd
+         Cerebras   : csk-****abcd
          Mistral    : sk_e****6789
-[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-e2e-run.BxiFU1/home/.litellm/master_key.txt
-[INFO] [5/9] Generating LiteLLM configuration: /tmp/litellm-e2e-run.BxiFU1/home/.litellm/config.yaml
+[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-e2e-run.1FQuAY/home/.litellm/master_key.txt
+[INFO] [5/9] Generating LiteLLM configuration: /tmp/litellm-e2e-run.1FQuAY/home/.litellm/config.yaml
 [ OK ] config.yaml generated (only providers with keys are enabled).
 [INFO] [6/9] Pulling prebuilt LiteLLM image (no build step): ghcr.io/berriai/litellm:main-latest
 [INFO]        This may take several minutes on the first run...
@@ -80,9 +80,9 @@ apt-get: docker.io installed (stub)
     Username  : admin
     Password  : (the Master key below)
 
-  Master key (also saved to)      : /tmp/litellm-e2e-run.BxiFU1/home/.litellm/master_key.txt
-  Master key                      : sk-3c14ade3f7c7a200e0e26455b7c9932b41178e80b91940736337402372715449
-  LiteLLM config file             : /tmp/litellm-e2e-run.BxiFU1/home/.litellm/config.yaml
+  Master key (also saved to)      : /tmp/litellm-e2e-run.1FQuAY/home/.litellm/master_key.txt
+  Master key                      : sk-fa273ff049642ffadb00a817ad38e3e4e0b018d1280206ad402d5f1581f638df
+  LiteLLM config file             : /tmp/litellm-e2e-run.1FQuAY/home/.litellm/config.yaml
   OpenCode config file (Windows)  : /mnt/c/Users/Test User/.config/opencode/opencode.json
   Container name                  : litellm
   Auto-start on WSL boot          : systemd service: litellm.service (enabled)
@@ -96,7 +96,7 @@ apt-get: docker.io installed (stub)
     Stop proxy       : sudo docker stop litellm
     Start proxy      : sudo docker start litellm
     Test endpoint    : curl -s http://127.0.0.1:4000/v1/models \
-                         -H "Authorization: Bearer sk-3c14ade3f7c7a200e0e26455b7c9932b41178e80b91940736337402372715449"
+                         -H "Authorization: Bearer sk-fa273ff049642ffadb00a817ad38e3e4e0b018d1280206ad402d5f1581f638df"
     Re-run this tool : bash "/home/user/LiteLLM-OpenCode/LiteLLM.sh"
 
   NEXT STEPS (on WINDOWS):
@@ -139,9 +139,9 @@ apt-get: docker.io installed (stub)
     raise e
   File "/tmp/litellm-e2e-venv/lib/python3.11/site-packages/litellm/litellm_core_utils/exception_mapping_utils.py", line 2646, in exception_type
     raise APIConnectionError(
-litellm.exceptions.APIConnectionError: litellm.APIConnectionError: GeminiException - Cannot connect to host generativelanguage.googleapis.com:443 ssl:<ssl.SSLContext object at 0x7f63cd98f5c0> [None]. Received Model Group=gemini-2.0-flash
+litellm.exceptions.APIConnectionError: litellm.APIConnectionError: GeminiException - Cannot connect to host generativelanguage.googleapis.com:443 ssl:<ssl.SSLContext object at 0x7f7d3f2875c0> [None]. Received Model Group=gemini-2.0-flash
 Available Model Group Fallbacks=None LiteLLM Retried: 2 times, LiteLLM Max Retries: 2
-INFO:     127.0.0.1:47670 - "POST /v1/chat/completions HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:49420 - "POST /v1/chat/completions HTTP/1.1" 500 Internal Server Error
 
 [E2E] ===================================================================
 [E2E] E2E RESULT: PASS (all assertions against the REAL proxy passed)

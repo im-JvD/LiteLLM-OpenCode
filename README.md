@@ -38,7 +38,7 @@ bash <(wget -qO- https://raw.githubusercontent.com/im-JvD/LiteLLM-OpenCode/main/
 | 🖥️ منوی تعاملی | گزینهٔ `1` نصب کامل، گزینهٔ `2` حذف کامل |
 | 🐳 نصب داکر بدون تحریم | از مخازن `apt` اوبونتو (`docker.io`) — بدون `get.docker.com` |
 | 🇮🇷 میرورهای ایرانی | ArvanCloud، Liara و IranServer در `/etc/docker/daemon.json` برای رفع خطای 403 |
-| 📦 بدون build | فقط ایمیج آمادهٔ `ghcr.io/berriai/litellm:main-latest` |
+| 📦 بدون build | فقط ایمیج آمادهٔ `ghcr.io/berriai/litellm:main-latest` (با retry خودکار، fallback به ایمیج لوکال و میرور اختیاری ghcr) |
 | 🔑 ۵ کلید API | Groq، OpenRouter، Google AI، Cerebras، Mistral (حداقل یک کلید اجباری) |
 | 🧠 ۷ مدل کدنویسی | ساخت خودکار `config.yaml` فقط بر اساس کلیدهایی که داده‌اید |
 | 🔁 اجرای پایدار | کانتینر با `--restart unless-stopped` روی پورت 4000 |
@@ -47,7 +47,7 @@ bash <(wget -qO- https://raw.githubusercontent.com/im-JvD/LiteLLM-OpenCode/main/
 | ⌨️ CLI مدیریت | `litellm up / down / restart / status / logs / uninstall` |
 | 🪟 تشخیص هوشمند ویندوز | پیدا کردن مسیر پروفایل با PowerShell (حتی با فاصله در نام کاربری) |
 | 🔒 کلید امن | ساخت خودکار Master Key و ذخیرهٔ امن آن |
-| 🧪 تست‌شده | ۲۱ سناریوی شبیه‌سازی‌شده + تست واقعی E2E با خودِ LiteLLM |
+| 🧪 تست‌شده | ۲۳ سناریوی شبیه‌سازی‌شده + تست واقعی E2E با خودِ LiteLLM |
 
 ---
 

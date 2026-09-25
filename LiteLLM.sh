@@ -34,7 +34,8 @@ set -euo pipefail
 # Constants
 #-------------------------------------------------------------------------------
 CONTAINER_NAME="litellm"
-LITELLM_IMAGE="ghcr.io/berriai/litellm:main-latest"
+# Overridable via env: LITELLM_IMAGE=<registry>/berriai/litellm:main-latest
+LITELLM_IMAGE="${LITELLM_IMAGE:-ghcr.io/berriai/litellm:main-latest}"
 LITELLM_PORT="4000"
 LITELLM_DIR="${HOME}/.litellm"
 LITELLM_CONFIG="${LITELLM_DIR}/config.yaml"
@@ -204,6 +205,19 @@ mask_key() {
   fi
 }
 
+# Warn when a pasted value does not match the provider's known key prefix
+# (catches keys pasted into the wrong prompt, e.g. Groq key into OpenRouter).
+warn_key_prefix() {
+  local val="$1" prefix="$2" name="$3"
+  [ -n "$val" ] || return 0
+  case "$val" in
+    "$prefix"*) return 0 ;;
+    *)
+      log_warn "       NOTE: this value does not look like a ${name} key (expected prefix '${prefix}') - double-check it."
+      ;;
+  esac
+}
+
 collect_api_keys() {
   echo
   log_info "[4/9] API keys setup (5 providers)"
@@ -226,6 +240,12 @@ collect_api_keys() {
     GEMINI_KEY="${GEMINI_KEY//[[:space:]]/}"
     CEREBRAS_KEY="${CEREBRAS_KEY//[[:space:]]/}"
     MISTRAL_KEY="${MISTRAL_KEY//[[:space:]]/}"
+
+    # Mistral has no stable public key prefix, so it is not checked.
+    warn_key_prefix "$GROQ_KEY"       "gsk_"   "Groq"
+    warn_key_prefix "$OPENROUTER_KEY" "sk-or-" "OpenRouter"
+    warn_key_prefix "$GEMINI_KEY"     "AIza"   "Google AI"
+    warn_key_prefix "$CEREBRAS_KEY"   "csk-"   "Cerebras"
 
     KEY_COUNT=0
     [ -n "$GROQ_KEY" ]       && KEY_COUNT=$((KEY_COUNT + 1)) || true
@@ -378,11 +398,54 @@ remove_existing_container() {
 pull_liteLLM_image() {
   log_info "[6/9] Pulling prebuilt LiteLLM image (no build step): ${LITELLM_IMAGE}"
   log_info "       This may take several minutes on the first run..."
-  if ! $SUDO docker pull "$LITELLM_IMAGE"; then
-    die "Image pull failed. Check your connection. ghcr.io is usually NOT blocked;
-         if it is, configure an HTTPS_PROXY for Docker and retry."
+
+  # Is a usable image already stored locally (previous install)?
+  local have_local=0
+  if $SUDO docker image inspect "$LITELLM_IMAGE" >/dev/null 2>&1; then
+    have_local=1
+    log_ok "       Image already exists locally (from a previous install)."
   fi
-  log_ok "Image pulled successfully."
+
+  # Transient TLS handshake timeouts are common on filtered networks -> retry.
+  local attempts="${LITELLM_PULL_RETRIES:-3}"
+  case "$attempts" in ''|*[!0-9]*) attempts=3 ;; esac
+  attempts="$((attempts < 1 ? 1 : attempts))"
+
+  local i
+  for i in $(seq 1 "$attempts"); do
+    if [ "$i" -gt 1 ]; then
+      log_warn "       Retry ${i}/${attempts} (transient TLS/network timeouts are common)..."
+    fi
+    if $SUDO docker pull "$LITELLM_IMAGE"; then
+      log_ok "Image pulled successfully."
+      return 0
+    fi
+    [ "$i" -lt "$attempts" ] && sleep 5
+  done
+
+  # Continue with the already-downloaded image instead of failing hard.
+  if [ "$have_local" -eq 1 ]; then
+    log_warn "Pull failed, but the image already exists locally - continuing with the local copy."
+    log_warn "To update it later, fix the connection and run: ${SUDO} docker pull ${LITELLM_IMAGE}"
+    return 0
+  fi
+
+  # Optional last resort: a ghcr pull-through mirror, e.g. ghcr.nju.edu.cn
+  if [ -n "${LITELLM_GHCR_MIRROR:-}" ]; then
+    local mirror_image="${LITELLM_GHCR_MIRROR%/}/berriai/litellm:main-latest"
+    log_warn "       Trying the ghcr fallback mirror: ${mirror_image}"
+    if $SUDO docker pull "$mirror_image" && $SUDO docker tag "$mirror_image" "$LITELLM_IMAGE"; then
+      log_ok "Image pulled via the mirror and tagged as ${LITELLM_IMAGE}."
+      return 0
+    fi
+  fi
+
+  die "Image pull failed after ${attempts} attempt(s). Fixes, in order:
+         1. Simply re-run the installer - TLS timeouts are often transient.
+         2. Check your internet connection inside WSL:  curl -I https://ghcr.io/v2/
+         3. Turn a VPN on (on the WINDOWS side) and re-run the installer.
+         4. Use a ghcr mirror:   LITELLM_GHCR_MIRROR=ghcr.nju.edu.cn bash LiteLLM.sh
+         5. Use a custom image:  LITELLM_IMAGE=<registry>/berriai/litellm:main-latest bash LiteLLM.sh"
 }
 
 start_litellm_container() {

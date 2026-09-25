@@ -5,7 +5,7 @@
 
    Proxy target : ghcr.io/berriai/litellm:main-latest
    Proxy port   : 4000   (restart policy: unless-stopped)
-   Linux config : /tmp/litellm-test.tIjTUh/home/.litellm
+   Linux config : /tmp/litellm-test.cBYkDO/home/.litellm
 
    Please choose an option:
 
@@ -42,14 +42,18 @@ apt-get: docker.io installed (stub)
          Google AI  : <skipped>
          Cerebras   : <skipped>
          Mistral    : <skipped>
-[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-test.tIjTUh/home/.litellm/master_key.txt
-[INFO] [5/9] Generating LiteLLM configuration: /tmp/litellm-test.tIjTUh/home/.litellm/config.yaml
+[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-test.cBYkDO/home/.litellm/master_key.txt
+[INFO] [5/9] Generating LiteLLM configuration: /tmp/litellm-test.cBYkDO/home/.litellm/config.yaml
 [ OK ] config.yaml generated (only providers with keys are enabled).
 [INFO] [6/9] Pulling prebuilt LiteLLM image (no build step): ghcr.io/berriai/litellm:main-latest
 [INFO]        This may take several minutes on the first run...
 Error response from daemon: simulated pull failure (test stub)
-[FAIL] Image pull failed. Check your connection. ghcr.io is usually NOT blocked;
-         if it is, configure an HTTPS_PROXY for Docker and retry.
+[FAIL] Image pull failed after 1 attempt(s). Fixes, in order:
+         1. Simply re-run the installer - TLS timeouts are often transient.
+         2. Check your internet connection inside WSL:  curl -I https://ghcr.io/v2/
+         3. Turn a VPN on (on the WINDOWS side) and re-run the installer.
+         4. Use a ghcr mirror:   LITELLM_GHCR_MIRROR=ghcr.nju.edu.cn bash LiteLLM.sh
+         5. Use a custom image:  LITELLM_IMAGE=<registry>/berriai/litellm:main-latest bash LiteLLM.sh
     ok: exit code = 1
     ok: contains: Image pull failed
     ok: file missing: /mnt/c/Users/Test User/.config/opencode/opencode.json
@@ -58,6 +62,7 @@ Error response from daemon: simulated pull failure (test stub)
 service docker restart
 systemctl enable docker.service
 docker info
+docker image inspect ghcr.io/berriai/litellm:main-latest
 docker pull ghcr.io/berriai/litellm:main-latest
 
 --- apt-calls.log ---

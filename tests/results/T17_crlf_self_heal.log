@@ -5,7 +5,7 @@
 
    Proxy target : ghcr.io/berriai/litellm:main-latest
    Proxy port   : 4000   (restart policy: unless-stopped)
-   Linux config : /tmp/litellm-test.oCqqaf/home/.litellm
+   Linux config : /tmp/litellm-test.ACz2vi/home/.litellm
 
    Please choose an option:
 
@@ -42,8 +42,8 @@ apt-get: docker.io installed (stub)
          Google AI  : <skipped>
          Cerebras   : <skipped>
          Mistral    : <skipped>
-[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-test.oCqqaf/home/.litellm/master_key.txt
-[INFO] [5/9] Generating LiteLLM configuration: /tmp/litellm-test.oCqqaf/home/.litellm/config.yaml
+[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-test.ACz2vi/home/.litellm/master_key.txt
+[INFO] [5/9] Generating LiteLLM configuration: /tmp/litellm-test.ACz2vi/home/.litellm/config.yaml
 [ OK ] config.yaml generated (only providers with keys are enabled).
 [INFO] [6/9] Pulling prebuilt LiteLLM image (no build step): ghcr.io/berriai/litellm:main-latest
 [INFO]        This may take several minutes on the first run...
@@ -70,9 +70,9 @@ apt-get: docker.io installed (stub)
     Username  : admin
     Password  : (the Master key below)
 
-  Master key (also saved to)      : /tmp/litellm-test.oCqqaf/home/.litellm/master_key.txt
-  Master key                      : sk-6d71f0276e3835aad8e35f83fd4dfb1a043dee2a6dbb9ba2f3f755df0b5eface
-  LiteLLM config file             : /tmp/litellm-test.oCqqaf/home/.litellm/config.yaml
+  Master key (also saved to)      : /tmp/litellm-test.ACz2vi/home/.litellm/master_key.txt
+  Master key                      : sk-06fbd28f7a58b401fe247dc402201d81721fd594a39939a9ca60e936bc77539e
+  LiteLLM config file             : /tmp/litellm-test.ACz2vi/home/.litellm/config.yaml
   OpenCode config file (Windows)  : /mnt/c/Users/Test User/.config/opencode/opencode.json
   Container name                  : litellm
   Auto-start on WSL boot          : systemd service: litellm.service (enabled)
@@ -86,7 +86,7 @@ apt-get: docker.io installed (stub)
     Stop proxy       : sudo docker stop litellm
     Start proxy      : sudo docker start litellm
     Test endpoint    : curl -s http://127.0.0.1:4000/v1/models \
-                         -H "Authorization: Bearer sk-6d71f0276e3835aad8e35f83fd4dfb1a043dee2a6dbb9ba2f3f755df0b5eface"
+                         -H "Authorization: Bearer sk-06fbd28f7a58b401fe247dc402201d81721fd594a39939a9ca60e936bc77539e"
     Re-run this tool : bash <(curl -fsSL https://raw.githubusercontent.com/im-JvD/LiteLLM-OpenCode/main/LiteLLM.sh)
 
   NEXT STEPS (on WINDOWS):
@@ -108,9 +108,10 @@ apt-get: docker.io installed (stub)
 service docker restart
 systemctl enable docker.service
 docker info
+docker image inspect ghcr.io/berriai/litellm:main-latest
 docker pull ghcr.io/berriai/litellm:main-latest
 docker ps -a --format {{.Names}}
-docker run -d --name litellm --restart unless-stopped -p 4000:4000 -v /tmp/litellm-test.oCqqaf/home/.litellm/config.yaml:/app/config.yaml:ro -e LITELLM_MASTER_KEY=sk-6d71f0276e3835aad8e35f83fd4dfb1a043dee2a6dbb9ba2f3f755df0b5eface -e UI_USERNAME=admin -e UI_PASSWORD=sk-6d71f0276e3835aad8e35f83fd4dfb1a043dee2a6dbb9ba2f3f755df0b5eface -e GROQ_API_KEY=gsk_crlf_0123456789abcdef ghcr.io/berriai/litellm:main-latest --config /app/config.yaml --port 4000
+docker run -d --name litellm --restart unless-stopped -p 4000:4000 -v /tmp/litellm-test.ACz2vi/home/.litellm/config.yaml:/app/config.yaml:ro -e LITELLM_MASTER_KEY=sk-06fbd28f7a58b401fe247dc402201d81721fd594a39939a9ca60e936bc77539e -e UI_USERNAME=admin -e UI_PASSWORD=sk-06fbd28f7a58b401fe247dc402201d81721fd594a39939a9ca60e936bc77539e -e GROQ_API_KEY=gsk_crlf_0123456789abcdef ghcr.io/berriai/litellm:main-latest --config /app/config.yaml --port 4000
 systemctl daemon-reload
 systemctl enable litellm.service
 
@@ -160,7 +161,7 @@ general_settings:
       "name": "LiteLLM Proxy (Local)",
       "options": {
         "baseURL": "http://127.0.0.1:4000/v1",
-        "apiKey": "sk-6d71f0276e3835aad8e35f83fd4dfb1a043dee2a6dbb9ba2f3f755df0b5eface"
+        "apiKey": "sk-06fbd28f7a58b401fe247dc402201d81721fd594a39939a9ca60e936bc77539e"
       },
       "models": {
         "qwen-2.5-coder-32b": { "name": "Qwen 2.5 Coder 32B (Groq, free)" },

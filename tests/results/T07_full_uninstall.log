@@ -5,7 +5,7 @@
 
    Proxy target : ghcr.io/berriai/litellm:main-latest
    Proxy port   : 4000   (restart policy: unless-stopped)
-   Linux config : /tmp/litellm-test.SkGj4q/home/.litellm
+   Linux config : /tmp/litellm-test.sNh64K/home/.litellm
 
    Please choose an option:
 
@@ -42,8 +42,8 @@ apt-get: docker.io installed (stub)
          Google AI  : <skipped>
          Cerebras   : <skipped>
          Mistral    : <skipped>
-[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-test.SkGj4q/home/.litellm/master_key.txt
-[INFO] [5/9] Generating LiteLLM configuration: /tmp/litellm-test.SkGj4q/home/.litellm/config.yaml
+[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-test.sNh64K/home/.litellm/master_key.txt
+[INFO] [5/9] Generating LiteLLM configuration: /tmp/litellm-test.sNh64K/home/.litellm/config.yaml
 [ OK ] config.yaml generated (only providers with keys are enabled).
 [INFO] [6/9] Pulling prebuilt LiteLLM image (no build step): ghcr.io/berriai/litellm:main-latest
 [INFO]        This may take several minutes on the first run...
@@ -70,9 +70,9 @@ apt-get: docker.io installed (stub)
     Username  : admin
     Password  : (the Master key below)
 
-  Master key (also saved to)      : /tmp/litellm-test.SkGj4q/home/.litellm/master_key.txt
-  Master key                      : sk-b30d481aa7827785f0f075805b8fed58016ceca882c8bf588d935cfac0524e99
-  LiteLLM config file             : /tmp/litellm-test.SkGj4q/home/.litellm/config.yaml
+  Master key (also saved to)      : /tmp/litellm-test.sNh64K/home/.litellm/master_key.txt
+  Master key                      : sk-5420ad0e29a95efd85573fce6f2130d51719b007299063893838bf650492e14e
+  LiteLLM config file             : /tmp/litellm-test.sNh64K/home/.litellm/config.yaml
   OpenCode config file (Windows)  : /mnt/c/Users/Test User/.config/opencode/opencode.json
   Container name                  : litellm
   Auto-start on WSL boot          : systemd service: litellm.service (enabled)
@@ -86,7 +86,7 @@ apt-get: docker.io installed (stub)
     Stop proxy       : sudo docker stop litellm
     Start proxy      : sudo docker start litellm
     Test endpoint    : curl -s http://127.0.0.1:4000/v1/models \
-                         -H "Authorization: Bearer sk-b30d481aa7827785f0f075805b8fed58016ceca882c8bf588d935cfac0524e99"
+                         -H "Authorization: Bearer sk-5420ad0e29a95efd85573fce6f2130d51719b007299063893838bf650492e14e"
     Re-run this tool : bash "/home/user/LiteLLM-OpenCode/LiteLLM.sh"
 
   NEXT STEPS (on WINDOWS):
@@ -106,7 +106,7 @@ apt-get: docker.io installed (stub)
 
    Proxy target : ghcr.io/berriai/litellm:main-latest
    Proxy port   : 4000   (restart policy: unless-stopped)
-   Linux config : /tmp/litellm-test.SkGj4q/home/.litellm
+   Linux config : /tmp/litellm-test.sNh64K/home/.litellm
 
    Please choose an option:
 
@@ -120,7 +120,7 @@ apt-get: docker.io installed (stub)
 
 [INFO] Stopping and removing container 'litellm'...
 [ OK ] Container removed.
-[ OK ] Removed LiteLLM config folder: /tmp/litellm-test.SkGj4q/home/.litellm
+[ OK ] Removed LiteLLM config folder: /tmp/litellm-test.sNh64K/home/.litellm
 [ OK ] Removed OpenCode config: /mnt/c/Users/Test User/.config/opencode/opencode.json
 [ OK ] Removed systemd service: /etc/systemd/system/litellm.service
 [ OK ] Removed boot helper: /usr/local/bin/litellm-boot.sh
@@ -132,7 +132,7 @@ apt-get: docker.io installed (stub)
 
   Removed:
     - Docker container : litellm
-    - Linux folder     : /tmp/litellm-test.SkGj4q/home/.litellm  (config.yaml + master key)
+    - Linux folder     : /tmp/litellm-test.sNh64K/home/.litellm  (config.yaml + master key)
     - Windows file     : ~/.config/opencode/opencode.json
     - Boot persistence : systemd service / wsl.conf boot entry / helper
     - Management CLI   : /usr/local/bin/litellm
@@ -146,20 +146,21 @@ apt-get: docker.io installed (stub)
     ok: contains: stop litellm
     ok: contains: rm litellm
     ok: container registry empty
-    ok: file missing: /tmp/litellm-test.SkGj4q/home/.litellm/config.yaml
-    ok: file missing: /tmp/litellm-test.SkGj4q/home/.litellm/master_key.txt
+    ok: file missing: /tmp/litellm-test.sNh64K/home/.litellm/config.yaml
+    ok: file missing: /tmp/litellm-test.sNh64K/home/.litellm/master_key.txt
     ok: file missing: /mnt/c/Users/Test User/.config/opencode/opencode.json
-    ok: file missing: /tmp/litellm-test.SkGj4q/fakeroot/usr/local/bin/litellm
-    ok: file missing: /tmp/litellm-test.SkGj4q/fakeroot/usr/local/bin/litellm-boot.sh
+    ok: file missing: /tmp/litellm-test.sNh64K/fakeroot/usr/local/bin/litellm
+    ok: file missing: /tmp/litellm-test.sNh64K/fakeroot/usr/local/bin/litellm-boot.sh
     ok: not contains: litellm-boot.sh
 
 --- docker-calls.log ---
 service docker restart
 systemctl enable docker.service
 docker info
+docker image inspect ghcr.io/berriai/litellm:main-latest
 docker pull ghcr.io/berriai/litellm:main-latest
 docker ps -a --format {{.Names}}
-docker run -d --name litellm --restart unless-stopped -p 4000:4000 -v /tmp/litellm-test.SkGj4q/home/.litellm/config.yaml:/app/config.yaml:ro -e LITELLM_MASTER_KEY=sk-b30d481aa7827785f0f075805b8fed58016ceca882c8bf588d935cfac0524e99 -e UI_USERNAME=admin -e UI_PASSWORD=sk-b30d481aa7827785f0f075805b8fed58016ceca882c8bf588d935cfac0524e99 -e GROQ_API_KEY=gsk_uninstall_0123456789ab ghcr.io/berriai/litellm:main-latest --config /app/config.yaml --port 4000
+docker run -d --name litellm --restart unless-stopped -p 4000:4000 -v /tmp/litellm-test.sNh64K/home/.litellm/config.yaml:/app/config.yaml:ro -e LITELLM_MASTER_KEY=sk-5420ad0e29a95efd85573fce6f2130d51719b007299063893838bf650492e14e -e UI_USERNAME=admin -e UI_PASSWORD=sk-5420ad0e29a95efd85573fce6f2130d51719b007299063893838bf650492e14e -e GROQ_API_KEY=gsk_uninstall_0123456789ab ghcr.io/berriai/litellm:main-latest --config /app/config.yaml --port 4000
 systemctl daemon-reload
 systemctl enable litellm.service
 docker ps -a --format {{.Names}}

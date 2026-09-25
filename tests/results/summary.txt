@@ -1,4 +1,4 @@
-SUITE RUN - 2026-09-25T13:09:42Z
+SUITE RUN - 2026-09-25T13:18:52Z
 host: Linux 6.1.158+ | user: user | bash: 5.2.15(1)-release
 PASS  T00_static_checks
 PASS  T01_full_install_all_keys
@@ -21,6 +21,8 @@ PASS  T17_crlf_self_heal
 PASS  T18_autostart_systemd_unit
 PASS  T19_management_cli
 PASS  T20_autostart_wslconf_boot
+PASS  T21_pull_failure_with_local_image
+PASS  T22_ghcr_mirror_fallback
 
-TOTAL: 21 passed, 0 failed, 0 skipped
+TOTAL: 23 passed, 0 failed, 0 skipped
 E2E litellm_real: PASS

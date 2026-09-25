@@ -5,7 +5,7 @@
 
    Proxy target : ghcr.io/berriai/litellm:main-latest
    Proxy port   : 4000   (restart policy: unless-stopped)
-   Linux config : /tmp/litellm-test.3Ow8qk/home/.litellm
+   Linux config : /tmp/litellm-test.gTnnra/home/.litellm
 
    Please choose an option:
 
@@ -37,6 +37,7 @@ apt-get: docker.io installed (stub)
 
 [FAIL] At least ONE API key is required. Let's try again.
 
+[WARN]        NOTE: this value does not look like a OpenRouter key (expected prefix 'sk-or-') - double-check it.
 
 [ OK ] Collected 1 API key(s):
          Groq       : <skipped>
@@ -44,8 +45,8 @@ apt-get: docker.io installed (stub)
          Google AI  : <skipped>
          Cerebras   : <skipped>
          Mistral    : <skipped>
-[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-test.3Ow8qk/home/.litellm/master_key.txt
-[INFO] [5/9] Generating LiteLLM configuration: /tmp/litellm-test.3Ow8qk/home/.litellm/config.yaml
+[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-test.gTnnra/home/.litellm/master_key.txt
+[INFO] [5/9] Generating LiteLLM configuration: /tmp/litellm-test.gTnnra/home/.litellm/config.yaml
 [ OK ] config.yaml generated (only providers with keys are enabled).
 [INFO] [6/9] Pulling prebuilt LiteLLM image (no build step): ghcr.io/berriai/litellm:main-latest
 [INFO]        This may take several minutes on the first run...
@@ -72,9 +73,9 @@ apt-get: docker.io installed (stub)
     Username  : admin
     Password  : (the Master key below)
 
-  Master key (also saved to)      : /tmp/litellm-test.3Ow8qk/home/.litellm/master_key.txt
-  Master key                      : sk-9fb5c74fda8dd5dc1ce341d1a6206a10ce68c657e48a1cad8a52afd9dc9d6fa0
-  LiteLLM config file             : /tmp/litellm-test.3Ow8qk/home/.litellm/config.yaml
+  Master key (also saved to)      : /tmp/litellm-test.gTnnra/home/.litellm/master_key.txt
+  Master key                      : sk-01abe9f909e52c0b24b5812c0820f47fdb31e628b5c589ec7779138acdaa43e5
+  LiteLLM config file             : /tmp/litellm-test.gTnnra/home/.litellm/config.yaml
   OpenCode config file (Windows)  : /mnt/c/Users/Test User/.config/opencode/opencode.json
   Container name                  : litellm
   Auto-start on WSL boot          : systemd service: litellm.service (enabled)
@@ -88,7 +89,7 @@ apt-get: docker.io installed (stub)
     Stop proxy       : sudo docker stop litellm
     Start proxy      : sudo docker start litellm
     Test endpoint    : curl -s http://127.0.0.1:4000/v1/models \
-                         -H "Authorization: Bearer sk-9fb5c74fda8dd5dc1ce341d1a6206a10ce68c657e48a1cad8a52afd9dc9d6fa0"
+                         -H "Authorization: Bearer sk-01abe9f909e52c0b24b5812c0820f47fdb31e628b5c589ec7779138acdaa43e5"
     Re-run this tool : bash "/home/user/LiteLLM-OpenCode/LiteLLM.sh"
 
   NEXT STEPS (on WINDOWS):
@@ -111,9 +112,10 @@ apt-get: docker.io installed (stub)
 service docker restart
 systemctl enable docker.service
 docker info
+docker image inspect ghcr.io/berriai/litellm:main-latest
 docker pull ghcr.io/berriai/litellm:main-latest
 docker ps -a --format {{.Names}}
-docker run -d --name litellm --restart unless-stopped -p 4000:4000 -v /tmp/litellm-test.3Ow8qk/home/.litellm/config.yaml:/app/config.yaml:ro -e LITELLM_MASTER_KEY=sk-9fb5c74fda8dd5dc1ce341d1a6206a10ce68c657e48a1cad8a52afd9dc9d6fa0 -e UI_USERNAME=admin -e UI_PASSWORD=sk-9fb5c74fda8dd5dc1ce341d1a6206a10ce68c657e48a1cad8a52afd9dc9d6fa0 -e OPENROUTER_API_KEY=sk_or_second_0123456789ab ghcr.io/berriai/litellm:main-latest --config /app/config.yaml --port 4000
+docker run -d --name litellm --restart unless-stopped -p 4000:4000 -v /tmp/litellm-test.gTnnra/home/.litellm/config.yaml:/app/config.yaml:ro -e LITELLM_MASTER_KEY=sk-01abe9f909e52c0b24b5812c0820f47fdb31e628b5c589ec7779138acdaa43e5 -e UI_USERNAME=admin -e UI_PASSWORD=sk-01abe9f909e52c0b24b5812c0820f47fdb31e628b5c589ec7779138acdaa43e5 -e OPENROUTER_API_KEY=sk_or_second_0123456789ab ghcr.io/berriai/litellm:main-latest --config /app/config.yaml --port 4000
 systemctl daemon-reload
 systemctl enable litellm.service
 
@@ -163,7 +165,7 @@ general_settings:
       "name": "LiteLLM Proxy (Local)",
       "options": {
         "baseURL": "http://127.0.0.1:4000/v1",
-        "apiKey": "sk-9fb5c74fda8dd5dc1ce341d1a6206a10ce68c657e48a1cad8a52afd9dc9d6fa0"
+        "apiKey": "sk-01abe9f909e52c0b24b5812c0820f47fdb31e628b5c589ec7779138acdaa43e5"
       },
       "models": {
         "deepseek/deepseek-chat-v3:free": { "name": "DeepSeek Chat V3 (OpenRouter, free)" },

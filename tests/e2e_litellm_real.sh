@@ -126,7 +126,7 @@ if [ ! -d "$PROFILE_DIR" ]; then
     log "SKIP - cannot create fake Windows profile under /mnt/c"; exit 0
   fi
 fi
-printf '1\ngsk_e2e_groq_0123456789abcd\nsk-or-e2e_0123456789abcd\nAIzaE2eTest0123456789ab\ncsk_e2e_0123456789abcd\nsk_e2e_mistral0123456789\n' | \
+printf '1\ngsk_e2e_groq_0123456789abcd\nsk-or-e2e_0123456789abcd\nAIzaE2eTest0123456789ab\ncsk-e2e_0123456789abcd\nsk_e2e_mistral0123456789\n' | \
   env -u DOCKER_PULL_FAIL -u DOCKER_APT_FAIL -u HEALTH_CODE -u PS_USERNAME \
     HOME="$HOME_DIR" PATH="${STUBBIN}:${PATH}" \
     STUBBIN="$STUBBIN" T_WORKSTATE="${WORK}/state" FAKE_ROOT="${WORK}/fakeroot" \
@@ -155,7 +155,7 @@ LITELLM_MASTER_KEY="$MASTER_KEY" \
 GROQ_API_KEY="gsk_e2e_groq_0123456789abcd" \
 OPENROUTER_API_KEY="sk-or-e2e_0123456789abcd" \
 GEMINI_API_KEY="AIzaE2eTest0123456789ab" \
-CEREBRAS_API_KEY="csk_e2e_0123456789abcd" \
+CEREBRAS_API_KEY="csk-e2e_0123456789abcd" \
 MISTRAL_API_KEY="sk_e2e_mistral0123456789" \
   setsid "${VENV}/bin/litellm" --config "$CONFIG" --port "$PORT" \
   </dev/null > "${WORK}/server.log" 2>&1 &

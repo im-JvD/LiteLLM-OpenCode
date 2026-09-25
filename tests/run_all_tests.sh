@@ -105,6 +105,7 @@ fresh_env() {
   : > "${T_WORKSTATE}/apt-calls.log"
   : > "${T_WORKSTATE}/containers.txt"
   : > "${T_WORKSTATE}/container-running.txt"
+  : > "${T_WORKSTATE}/images.txt"
   # reset shared fake Windows profiles so every test starts clean
   for u in "Test User" "Ali Rezaei"; do
     d="/mnt/c/Users/${u}/.config"
@@ -131,6 +132,7 @@ run_script() { # optional $1 = path of the script copy to run (default: the real
     FAKE_ROOT="$FAKE_ROOT" \
     HEALTH_CODE="${T_HEALTH_CODE:-200}" \
     LITELLM_BOOT_MODE="${T_BOOT_MODE:-auto}" \
+    LITELLM_PULL_RETRIES="${T_PULL_RETRIES:-3}" \
     bash "$script_file" >> "$CURRENT_LOG" 2>&1
 }
 
@@ -326,7 +328,7 @@ fi
 start_test "T01_full_install_all_keys"
 if [ "$MNT_OK" -eq 1 ]; then
   fresh_env
-  printf '1\n\n\n\n\n\ngsk_test_groq_0123456789abcd\nsk-or-test_0123456789abcd\nAIzaTest0123456789abcd\ncsk_test_0123456789abcd\nsk_mistral_test012345678\n' | run_script
+  printf '1\n\n\n\n\n\ngsk_test_groq_0123456789abcd\nsk-or-test_0123456789abcd\nAIzaTest0123456789abcd\ncsk-test_0123456789abcd\nsk_mistral_test012345678\n' | run_script
   T_RC=$?
   assert_rc 0
   assert_contains "$CURRENT_LOG" "INSTALLATION COMPLETED SUCCESSFULLY"
@@ -338,7 +340,7 @@ if [ "$MNT_OK" -eq 1 ]; then
   assert_contains "${T_WORKSTATE}/docker-calls.log" "-e GROQ_API_KEY=gsk_test_groq_0123456789abcd"
   assert_contains "${T_WORKSTATE}/docker-calls.log" "-e OPENROUTER_API_KEY=sk-or-test_0123456789abcd"
   assert_contains "${T_WORKSTATE}/docker-calls.log" "-e GEMINI_API_KEY=AIzaTest0123456789abcd"
-  assert_contains "${T_WORKSTATE}/docker-calls.log" "-e CEREBRAS_API_KEY=csk_test_0123456789abcd"
+  assert_contains "${T_WORKSTATE}/docker-calls.log" "-e CEREBRAS_API_KEY=csk-test_0123456789abcd"
   assert_contains "${T_WORKSTATE}/docker-calls.log" "-e MISTRAL_API_KEY=sk_mistral_test012345678"
   if grep -qxF "litellm" "${T_WORKSTATE}/containers.txt"; then a_ok "container registered"; else a_bad "container not registered"; fi
   assert_file_exists "${HOME_DIR}/.litellm/config.yaml"
@@ -655,7 +657,7 @@ if [ "$MNT_OK" -eq 1 ]; then
   fresh_env
   printf '1\ngsk_pullfail_0123456789abc\n\n\n\n\n' | \
     env -u DOCKER_APT_FAIL -u HEALTH_CODE -u PS_USERNAME \
-      DOCKER_PULL_FAIL="1" \
+      DOCKER_PULL_FAIL="1" LITELLM_PULL_RETRIES="1" \
       HOME="$HOME_DIR" PATH="${STUBBIN}:${PATH}" \
       STUBBIN="$STUBBIN" T_WORKSTATE="$T_WORKSTATE" FAKE_ROOT="$FAKE_ROOT" \
       HEALTH_CODE="200" \
@@ -793,6 +795,60 @@ if [ "$MNT_OK" -eq 1 ]; then
   assert_contains "$CURRENT_LOG" "Boot command added to /etc/wsl.conf"
   assert_contains "${FAKE_ROOT}/etc/wsl.conf" "command = /usr/local/bin/litellm-boot.sh"
   assert_file_missing "${FAKE_ROOT}/etc/systemd/system/litellm.service"
+  dump_state
+  finish_test
+else
+  skip_test "requires writable /mnt/c"
+fi
+
+#===============================================================================
+# T21 - pull fails but a local image exists -> continue with the local copy
+#===============================================================================
+start_test "T21_pull_failure_with_local_image"
+if [ "$MNT_OK" -eq 1 ]; then
+  fresh_env
+  echo "ghcr.io/berriai/litellm:main-latest" > "${T_WORKSTATE}/images.txt"
+  printf '1\ngsk_localimg_0123456789abc\n\n\n\n\n' | \
+    env -u DOCKER_APT_FAIL -u HEALTH_CODE -u PS_USERNAME \
+      DOCKER_PULL_FAIL="1" LITELLM_PULL_RETRIES="1" \
+      HOME="$HOME_DIR" PATH="${STUBBIN}:${PATH}" \
+      STUBBIN="$STUBBIN" T_WORKSTATE="$T_WORKSTATE" FAKE_ROOT="$FAKE_ROOT" \
+      HEALTH_CODE="200" \
+      bash "$SCRIPT_FILE" >> "$CURRENT_LOG" 2>&1
+  T_RC=$?
+  assert_rc 0
+  assert_contains "$CURRENT_LOG" "Image already exists locally"
+  assert_contains "$CURRENT_LOG" "continuing with the local copy"
+  assert_contains "$CURRENT_LOG" "INSTALLATION COMPLETED SUCCESSFULLY"
+  assert_file_exists "/mnt/c/Users/Test User/.config/opencode/opencode.json"
+  dump_state
+  finish_test
+else
+  skip_test "requires writable /mnt/c"
+fi
+
+#===============================================================================
+# T22 - ghcr fallback mirror is used when the direct pull fails
+#===============================================================================
+start_test "T22_ghcr_mirror_fallback"
+if [ "$MNT_OK" -eq 1 ]; then
+  fresh_env
+  printf '1\ngsk_mirror_0123456789abcd\n\n\n\n\n' | \
+    env -u DOCKER_APT_FAIL -u HEALTH_CODE -u PS_USERNAME \
+      DOCKER_PULL_FAIL_MATCH="ghcr.io" LITELLM_PULL_RETRIES="1" \
+      LITELLM_GHCR_MIRROR="ghcr.nju.edu.cn/" \
+      HOME="$HOME_DIR" PATH="${STUBBIN}:${PATH}" \
+      STUBBIN="$STUBBIN" T_WORKSTATE="$T_WORKSTATE" FAKE_ROOT="$FAKE_ROOT" \
+      HEALTH_CODE="200" \
+      bash "$SCRIPT_FILE" >> "$CURRENT_LOG" 2>&1
+  T_RC=$?
+  assert_rc 0
+  assert_contains "$CURRENT_LOG" "Trying the ghcr fallback mirror"
+  assert_contains "${T_WORKSTATE}/docker-calls.log" "pull ghcr.nju.edu.cn/berriai/litellm:main-latest"
+  assert_contains "${T_WORKSTATE}/docker-calls.log" "tag ghcr.nju.edu.cn/berriai/litellm:main-latest ghcr.io/berriai/litellm:main-latest"
+  assert_contains "$CURRENT_LOG" "INSTALLATION COMPLETED SUCCESSFULLY"
+  MK="$(master_key_from)"
+  assert_opencode_json "/mnt/c/Users/Test User/.config/opencode/opencode.json" "$MK" "qwen-2.5-coder-32b" "$GROQ2_MODELS"
   dump_state
   finish_test
 else
