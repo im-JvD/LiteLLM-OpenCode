@@ -4,7 +4,17 @@
 
 ---
 
-## ۱. حذف از طریق منو
+## ۱. حذف از طریق دستور مدیریت (سریع‌ترین راه)
+
+اگر نصب کامل است، فقط داخل WSL بزنید:
+
+```bash
+litellm uninstall
+```
+
+(برای اجرای بدون سؤال: `litellm uninstall --yes`)
+
+## ۲. حذف از طریق منوی نصاب
 
 اسکریپت را اجرا کنید و گزینهٔ `2` را بزنید:
 
@@ -34,13 +44,16 @@ bash <(curl -fsSL https://raw.githubusercontent.com/im-JvD/LiteLLM-OpenCode/main
 
 ---
 
-## ۲. چه چیزی حذف می‌شود و چه چیزی می‌ماند؟
+## ۳. چه چیزی حذف می‌شود و چه چیزی می‌ماند؟
 
 | مورد | وضعیت | مسیر |
 |---|---|---|
 | کانتینر `litellm` | ✅ حذف (stop + rm) | — |
 | پوشهٔ کانفیگ لینوکس | ✅ حذف | `~/.litellm/` (شامل `config.yaml` و `master_key.txt`) |
 | کانفیگ OpenCode ویندوز | ✅ حذف | `%USERPROFILE%\.config\opencode\opencode.json` |
+| سرویس systemd / boot command | ✅ حذف | `litellm.service` یا خط boot در `/etc/wsl.conf` |
+| اسکریپت استارت بوت | ✅ حذف | `/usr/local/bin/litellm-boot.sh` |
+| دستور مدیریت `litellm` | ✅ حذف | `/usr/local/bin/litellm` |
 | خودِ Docker | ❌ حفظ | — |
 | میرورهای ایرانی | ❌ حفظ | `/etc/docker/daemon.json` |
 | ایمیج LiteLLM (دانلودشده) | ❌ حفظ | برای نصب مجدد سریع |
@@ -48,7 +61,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/im-JvD/LiteLLM-OpenCode/main
 
 ---
 
-## ۳. حذف دستی (اگر اسکریپت در دسترس نیست)
+## ۴. حذف دستی (اگر اسکریپت در دسترس نیست)
 
 داخل WSL:
 
@@ -56,6 +69,9 @@ bash <(curl -fsSL https://raw.githubusercontent.com/im-JvD/LiteLLM-OpenCode/main
 sudo docker stop litellm 2>/dev/null
 sudo docker rm litellm 2>/dev/null
 rm -rf ~/.litellm
+sudo rm -f /usr/local/bin/litellm /usr/local/bin/litellm-boot.sh
+sudo rm -f /etc/systemd/system/litellm.service
+sudo sed -i '\|^command = /usr/local/bin/litellm-boot.sh$|d' /etc/wsl.conf 2>/dev/null
 ```
 
 در ویندوز (PowerShell یا Run):
@@ -66,7 +82,7 @@ del "$env:USERPROFILE\.config\opencode\opencode.json"
 
 ---
 
-## ۴. حذف کامل‌تر (اختیاری)
+## ۵. حذف کامل‌تر (اختیاری)
 
 اگر می‌خواهید اثری از نصب باقی نماند:
 
@@ -91,7 +107,7 @@ sudo apt-get autoremove -y
 
 ---
 
-## ۵. نصب مجدد
+## ۶. نصب مجدد
 
 بعد از Uninstall، برای نصب مجدد کافی است دوباره گزینهٔ `1` را اجرا کنید. چون ایمیج و داکر حفظ شده‌اند، نصب مجدد فقط چند ثانیه طول می‌کشد (بدون دانلود مجدد).
 

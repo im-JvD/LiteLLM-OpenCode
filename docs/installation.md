@@ -88,19 +88,20 @@ bash LiteLLM.sh
 
 ## ۴. مراحل نصب (گزینهٔ 1)
 
-اسکریپت ۸ مرحله را به‌ترتیب انجام می‌دهد:
+اسکریپت ۹ مرحله را به‌ترتیب انجام می‌دهد:
 
 | مرحله | کار |
 |---|---|
-| 1/8 | بررسی محیط WSL2 و موجود بودن `powershell.exe` |
-| 2/8 | نصب داکر از مخازن apt اوبونتو (`docker.io`) — اگر از قبل نباشد |
-| 3/8 | نوشتن میرورهای ایرانی در `/etc/docker/daemon.json` (با بکاپ از فایل قبلی) |
+| 1/9 | بررسی محیط WSL2 و موجود بودن `powershell.exe` |
+| 2/9 | نصب داکر از مخازن apt اوبونتو (`docker.io`) — اگر از قبل نباشد |
+| 3/9 | نوشتن میرورهای ایرانی در `/etc/docker/daemon.json` (با بکاپ از فایل قبلی) |
 | — | راه‌اندازی دیمن داکر + فعال‌سازی auto-start در صورت وجود systemd |
-| 4/8 | دریافت ۵ کلید API (پایین‌تر را ببینید) |
-| 5/8 | ساخت `~/.litellm/config.yaml` و Master Key |
-| 6/8 | دانلود ایمیج آمادهٔ `ghcr.io/berriai/litellm:main-latest` |
-| 7/8 | اجرای کانتینر روی پورت 4000 با `--restart unless-stopped` |
-| 8/8 | ساخت `opencode.json` در پروفایل ویندوز |
+| 4/9 | دریافت ۵ کلید API (پایین‌تر را ببینید) |
+| 5/9 | ساخت `~/.litellm/config.yaml` و Master Key |
+| 6/9 | دانلود ایمیج آمادهٔ `ghcr.io/berriai/litellm:main-latest` |
+| 7/9 | اجرای کانتینر روی پورت 4000 با `--restart unless-stopped` |
+| 8/9 | پیکربندی اجرای خودکار در بوت WSL + نصب دستورات مدیریت `litellm` |
+| 9/9 | ساخت `opencode.json` در پروفایل ویندوز |
 
 ---
 
@@ -134,17 +135,59 @@ bash LiteLLM.sh
 =================================================================
 
   LiteLLM endpoint (from Windows) : http://127.0.0.1:4000/v1
+
+  ADMIN PANEL (UI) - open in the WINDOWS browser:
+    URL       : http://127.0.0.1:4000/ui
+    Username  : admin
+    Password  : (the Master key below)
+
   Master key (also saved to)      : /home/<user>/.litellm/master_key.txt
   Master key                      : sk-...
   LiteLLM config file             : /home/<user>/.litellm/config.yaml
   OpenCode config file (Windows)  : /mnt/c/Users/<Name>/.config/opencode/opencode.json
   Container name                  : litellm
+  Auto-start on WSL boot          : systemd service / wsl.conf boot command
   ...
 ```
 
 ---
 
-## ۷. راه‌اندازی OpenCode در ویندوز
+## ۷. پنل مدیریت (UI)، اجرای خودکار و دستورات مدیریت
+
+### پنل مدیریت LiteLLM
+
+در مرورگر **ویندوز** باز کنید: `http://127.0.0.1:4000/ui`
+
+| فیلد | مقدار |
+|---|---|
+| Username | `admin` |
+| Password | همان **Master Key** (چاپ‌شده در خروجی نصب یا `cat ~/.litellm/master_key.txt`) |
+
+### اجرای خودکار در بوت WSL
+
+اسکریپت بسته به وضعیت سیستم شما یکی از دو مکانیزم را نصب می‌کند:
+
+- اگر **systemd** فعال باشد (`[boot] systemd=true` در `/etc/wsl.conf`): سرویس `litellm.service` ساخته و enable می‌شود که در بوت، داکر و سپس کانتینر را بالا می‌آورد.
+- در غیر این صورت: یک **boot command** در `/etc/wsl.conf` اضافه می‌شود (`command = /usr/local/bin/litellm-boot.sh`) که موقع باز شدن WSL اجرا شده و داکر + کانتینر را start می‌کند.
+
+در هر دو حالت، خود کانتینر هم `--restart unless-stopped` است؛ یعنی تا وقتی خودتان `litellm down` نزده باشید، همیشه بالا می‌ماند.
+
+### دستورات مدیریت سریع
+
+بعد از نصب، این دستورات در ترمینال WSL در دسترس‌اند:
+
+```bash
+litellm status     # وضعیت کانتینر، سلامت و مسیر فایل‌ها
+litellm up         # روشن کردن (داکر و کانتینر)
+litellm down       # خاموش کردن
+litellm restart    # ری‌استارت + انتظار برای سلامت
+litellm logs       # مشاهدهٔ زندهٔ لاگ‌ها (Ctrl+C برای خروج)
+litellm uninstall  # حذف کامل (کانتینر، کانفیگ‌ها و خود CLI)
+```
+
+---
+
+## ۸. راه‌اندازی OpenCode در ویندوز
 
 1. یک **ترمینال جدید** ویندوز (PowerShell یا CMD) باز کنید.
 2. وارد پوشهٔ پروژهٔ خود شوید: `cd C:\projects\my-app`
@@ -153,7 +196,7 @@ bash LiteLLM.sh
 
 ---
 
-## ۸. بررسی سلامت نصب
+## ۹. بررسی سلامت نصب
 
 داخل WSL:
 

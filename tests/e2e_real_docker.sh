@@ -116,6 +116,14 @@ else
   fail "restart policy = '${POLICY:-unknown}' (expected unless-stopped)"
 fi
 
+# [a2] admin panel env vars + management CLI installed
+PANEL_ENV="$(docker inspect -f '{{range .Config.Env}}{{println .}}{{end}}' litellm 2>/dev/null | grep -c '^UI_USERNAME=admin' || true)"
+if [ "${PANEL_ENV:-0}" -ge 1 ]; then ok "UI_USERNAME=admin present in container env"; else fail "UI_USERNAME missing in container env"; fi
+if command -v litellm >/dev/null 2>&1; then ok "management CLI installed (litellm)"; else fail "management CLI not installed"; fi
+if litellm status >/dev/null 2>&1; then ok "litellm status -> OK"; else fail "litellm status failed"; fi
+BOOT_FILE="/usr/local/bin/litellm-boot.sh"
+if [ -f "$BOOT_FILE" ]; then ok "boot helper installed: ${BOOT_FILE}"; else fail "boot helper missing"; fi
+
 # [b] health endpoint
 HEALTH=""
 for i in $(seq 1 30); do
@@ -178,6 +186,8 @@ fi
 [ ! -f "${HOME}/.litellm/config.yaml" ]  && ok "linux config removed"     || fail "linux config still present"
 [ ! -f "${HOME}/.litellm/master_key.txt" ] && ok "master key file removed" || fail "master key still present"
 [ ! -f "$OC_JSON" ]                       && ok "windows opencode.json removed" || fail "opencode.json still present"
+[ ! -f /usr/local/bin/litellm ]           && ok "management CLI removed"        || fail "management CLI still present"
+[ ! -f /usr/local/bin/litellm-boot.sh ]   && ok "boot helper removed"           || fail "boot helper still present"
 
 #-------------------------------------------------------------------------------
 # Summary

@@ -104,6 +104,7 @@ fresh_env() {
   : > "${T_WORKSTATE}/docker-calls.log"
   : > "${T_WORKSTATE}/apt-calls.log"
   : > "${T_WORKSTATE}/containers.txt"
+  : > "${T_WORKSTATE}/container-running.txt"
   # reset shared fake Windows profiles so every test starts clean
   for u in "Test User" "Ali Rezaei"; do
     d="/mnt/c/Users/${u}/.config"
@@ -129,6 +130,7 @@ run_script() { # optional $1 = path of the script copy to run (default: the real
     T_WORKSTATE="$T_WORKSTATE" \
     FAKE_ROOT="$FAKE_ROOT" \
     HEALTH_CODE="${T_HEALTH_CODE:-200}" \
+    LITELLM_BOOT_MODE="${T_BOOT_MODE:-auto}" \
     bash "$script_file" >> "$CURRENT_LOG" 2>&1
 }
 
@@ -344,6 +346,16 @@ if [ "$MNT_OK" -eq 1 ]; then
   assert_models "${HOME_DIR}/.litellm/config.yaml" "$ALL7_MODELS"
   MK="$(master_key_from)"
   if [ -n "$MK" ] && [ "$MK" = "$(master_key_in_docker_run)" ]; then a_ok "master key consistent (file == docker env)"; else a_bad "master key mismatch"; fi
+  assert_contains "${T_WORKSTATE}/docker-calls.log" "-e UI_USERNAME=admin"
+  assert_contains "${T_WORKSTATE}/docker-calls.log" "-e UI_PASSWORD=${MK}"
+  assert_file_exists "${FAKE_ROOT}/usr/local/bin/litellm"
+  assert_file_exists "${FAKE_ROOT}/usr/local/bin/litellm-boot.sh"
+  if grep -qF "command = /usr/local/bin/litellm-boot.sh" "${FAKE_ROOT}/etc/wsl.conf" 2>/dev/null \
+     || [ -f "${FAKE_ROOT}/etc/systemd/system/litellm.service" ]; then
+    a_ok "boot persistence configured (wsl.conf entry or systemd unit)"
+  else
+    a_bad "no boot persistence found (neither wsl.conf entry nor systemd unit)"
+  fi
   assert_daemon_json_mirrors "${FAKE_ROOT}/etc/docker/daemon.json"
   if [ -f /etc/docker/daemon.json ]; then
     assert_contains "$CURRENT_LOG" "Existing daemon.json backed up"
@@ -469,6 +481,9 @@ if [ "$MNT_OK" -eq 1 ]; then
   assert_file_missing "${HOME_DIR}/.litellm/config.yaml"
   assert_file_missing "${HOME_DIR}/.litellm/master_key.txt"
   assert_file_missing "/mnt/c/Users/Test User/.config/opencode/opencode.json"
+  assert_file_missing "${FAKE_ROOT}/usr/local/bin/litellm"
+  assert_file_missing "${FAKE_ROOT}/usr/local/bin/litellm-boot.sh"
+  assert_not_contains "${FAKE_ROOT}/etc/wsl.conf" "litellm-boot.sh"
   dump_state
   finish_test
 else
@@ -690,6 +705,94 @@ if [ "$MNT_OK" -eq 1 ]; then
   assert_contains "$CURRENT_LOG" "INSTALLATION COMPLETED SUCCESSFULLY"
   MK="$(master_key_from)"
   assert_opencode_json "/mnt/c/Users/Test User/.config/opencode/opencode.json" "$MK" "qwen-2.5-coder-32b" "$GROQ2_MODELS"
+  dump_state
+  finish_test
+else
+  skip_test "requires writable /mnt/c"
+fi
+
+#===============================================================================
+# T18 - systemd branch: litellm.service unit created and enabled
+#===============================================================================
+start_test "T18_autostart_systemd_unit"
+if [ "$MNT_OK" -eq 1 ]; then
+  fresh_env
+  T_BOOT_MODE="systemd"
+  printf '1\ngsk_systemd_0123456789abc\n\n\n\n\n' | run_script
+  T_RC=$?
+  T_BOOT_MODE=""
+  assert_rc 0
+  UNIT="${FAKE_ROOT}/etc/systemd/system/litellm.service"
+  assert_file_exists "$UNIT"
+  assert_contains "$UNIT" "ExecStart=/usr/local/bin/litellm-boot.sh"
+  assert_contains "${T_WORKSTATE}/docker-calls.log" "systemctl enable litellm.service"
+  assert_contains "$CURRENT_LOG" "systemd service: litellm.service (enabled)"
+  if [ -f "${FAKE_ROOT}/etc/wsl.conf" ]; then
+    assert_not_contains "${FAKE_ROOT}/etc/wsl.conf" "litellm-boot.sh"
+  fi
+  dump_state
+  finish_test
+else
+  skip_test "requires writable /mnt/c"
+fi
+
+#===============================================================================
+# T19 - management CLI: up / down / restart / status / uninstall
+#===============================================================================
+start_test "T19_management_cli"
+if [ "$MNT_OK" -eq 1 ]; then
+  fresh_env
+  printf '1\ngsk_cli_0123456789abcdef\n\n\n\n\n' | run_script
+  T_RC=$?
+  assert_rc 0
+  CLI="${FAKE_ROOT}/usr/local/bin/litellm"
+  if [ -x "$CLI" ]; then a_ok "CLI installed and executable"; else a_bad "CLI missing or not executable"; fi
+  run_cli() {
+    env -u DOCKER_PULL_FAIL -u DOCKER_APT_FAIL -u HEALTH_CODE -u PS_USERNAME \
+      HOME="$HOME_DIR" PATH="${STUBBIN}:${PATH}" \
+      STUBBIN="$STUBBIN" T_WORKSTATE="$T_WORKSTATE" FAKE_ROOT="$FAKE_ROOT" \
+      HEALTH_CODE="200" PS_USERNAME="Test User" \
+      bash "$CLI" "$@" >> "$CURRENT_LOG" 2>&1
+  }
+  run_cli status
+  assert_contains "$CURRENT_LOG" "Container state : running"
+  assert_contains "$CURRENT_LOG" "Restart policy  : unless-stopped"
+  assert_contains "$CURRENT_LOG" "Admin panel     : http://127.0.0.1:4000/ui"
+  run_cli down
+  assert_contains "${T_WORKSTATE}/docker-calls.log" "stop litellm"
+  if grep -qxF "litellm" "${T_WORKSTATE}/container-running.txt"; then a_bad "container still marked running after down"; else a_ok "running state cleared after down"; fi
+  run_cli up
+  assert_contains "${T_WORKSTATE}/docker-calls.log" "start litellm"
+  run_cli restart
+  assert_contains "${T_WORKSTATE}/docker-calls.log" "restart litellm"
+  run_cli uninstall --yes
+  assert_contains "$CURRENT_LOG" "UNINSTALL COMPLETED."
+  if [ ! -s "${T_WORKSTATE}/containers.txt" ]; then a_ok "container registry empty after CLI uninstall"; else a_bad "container still registered after CLI uninstall"; fi
+  assert_file_missing "${HOME_DIR}/.litellm/config.yaml"
+  assert_file_missing "/mnt/c/Users/Test User/.config/opencode/opencode.json"
+  assert_file_missing "$CLI"
+  assert_file_missing "${FAKE_ROOT}/usr/local/bin/litellm-boot.sh"
+  assert_not_contains "${FAKE_ROOT}/etc/wsl.conf" "litellm-boot.sh"
+  dump_state
+  finish_test
+else
+  skip_test "requires writable /mnt/c"
+fi
+
+#===============================================================================
+# T20 - wsl.conf boot-command branch (forced via LITELLM_BOOT_MODE=wslconf)
+#===============================================================================
+start_test "T20_autostart_wslconf_boot"
+if [ "$MNT_OK" -eq 1 ]; then
+  fresh_env
+  T_BOOT_MODE="wslconf"
+  printf '1\ngsk_wslconf_0123456789abc\n\n\n\n\n' | run_script
+  T_RC=$?
+  T_BOOT_MODE=""
+  assert_rc 0
+  assert_contains "$CURRENT_LOG" "Boot command added to /etc/wsl.conf"
+  assert_contains "${FAKE_ROOT}/etc/wsl.conf" "command = /usr/local/bin/litellm-boot.sh"
+  assert_file_missing "${FAKE_ROOT}/etc/systemd/system/litellm.service"
   dump_state
   finish_test
 else

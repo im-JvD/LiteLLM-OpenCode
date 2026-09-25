@@ -13,6 +13,9 @@
 | `~/.litellm/config.yaml` | لینوکس (WSL) | پیکربندی LiteLLM: لیست مدل‌ها و تنظیمات |
 | `~/.litellm/master_key.txt` | لینوکس (WSL) | کلید احراز هویت پروکسی (دسترسی `600`) |
 | `/etc/docker/daemon.json` | لینوکس (WSL) | میرورهای ایرانی داکرهاب |
+| `/usr/local/bin/litellm` | لینوکس (WSL) | دستورات مدیریت سریع (up/down/restart/…) |
+| `/usr/local/bin/litellm-boot.sh` | لینوکس (WSL) | اسکریپت استارت خودکار در بوت WSL |
+| `/etc/systemd/system/litellm.service` یا `/etc/wsl.conf` | لینوکس (WSL) | مکانیزم اجرای خودکار (بسته به وجود systemd) |
 | `%USERPROFILE%\.config\opencode\opencode.json` | ویندوز | اتصال OpenCode به پروکسی |
 
 ---
@@ -145,7 +148,64 @@ sudo docker run -d \
 
 ---
 
-## ۶. شخصی‌سازی‌های رایج
+## ۶. پنل مدیریت (UI)
+
+LiteLLM یک رابط وب مدیریت دارد که با نصب، روی این آدرس فعال می‌شود:
+
+```
+http://127.0.0.1:4000/ui
+```
+
+- در مرورگر **ویندوز** باز کنید (WSL2 پورت را به ویندوز منتقل می‌کند).
+- نام کاربری: `admin` — رمز عبور: همان **Master Key**.
+- این اطلاعات با متغیرهای `UI_USERNAME` و `UI_PASSWORD` روی کانتینر تنظیم شده‌اند.
+- از این پنل می‌توانید مدل‌ها را تست کنید، لاگ ببینید و مصرف را ببینید.
+
+---
+
+## ۷. اجرای خودکار در بوت WSL (Persistence)
+
+خاموش/روشن شدن ویندوز باعث می‌شود WSL هم ری‌استارت شود. اسکریپت برای «همیشه روشن ماندن» دو لایه می‌سازد:
+
+1. سیاست `--restart unless-stopped` روی خود کانتینر (داخل داکر).
+2. استارت خودکار دیمن داکر + کانتینر در بوت WSL، با یکی از این دو مکانیزم:
+   - **systemd** (اگر فعال باشد): سرویس `litellm.service` — مدیریت با `systemctl status litellm`
+   - **boot command**: خط `command = /usr/local/bin/litellm-boot.sh` در `/etc/wsl.conf` (بدون systemd)
+
+> 💡 برای فعال‌سازی systemd (پیشنهادی) در `/etc/wsl.conf` این را بگذارید و بعد `wsl --shutdown` کنید:
+> ```ini
+> [boot]
+> systemd=true
+> ```
+
+می‌توانید حالت را هم اجبار کنید — قبل از اجرای نصاب:
+
+```bash
+LITELLM_BOOT_MODE=systemd bash LiteLLM.sh   # فقط سرویس systemd
+LITELLM_BOOT_MODE=wslconf bash LiteLLM.sh   # فقط boot command در /etc/wsl.conf
+# پیش‌فرض: تشخیص خودکار (auto)
+```
+
+---
+
+## ۸. دستورات مدیریت سریع (`litellm` CLI)
+
+نصب، یک CLI به نام `litellm` در `/usr/local/bin` می‌سازد:
+
+| دستور | کار |
+|---|---|
+| `litellm up` | استارت دیمن داکر (اگر خاموش باشد) + کانتینر + انتظار برای سلامت |
+| `litellm down` | توقف کانتینر |
+| `litellm restart` | ری‌استارت + انتظار برای سلامت |
+| `litellm status` | وضعیت کانتینر، policy، سلامت، آدرس پنل و مسیر فایل‌ها |
+| `litellm logs` | دنبال‌کردن زندهٔ لاگ‌ها |
+| `litellm uninstall` | حذف کامل همه‌چیز (با تأیید) — معادل گزینهٔ ۲ نصاب |
+
+> ⚠️ اگر روزی LiteLLM را با `pip install litellm` در خود WSL نصب کنید، باینری pip جای این CLI را در PATH می‌گیرد. برای پروکسی داکری نیازی به pip نیست.
+
+---
+
+## ۹. شخصی‌سازی‌های رایج
 
 ### افزودن مدل جدید
 

@@ -5,25 +5,38 @@
 #
 # A stateful docker CLI emulator:
 #   - records every command line into $T_WORKSTATE/docker-calls.log
-#   - tracks container names in $T_WORKSTATE/containers.txt (like `docker ps -a`)
+#   - tracks container names in $T_WORKSTATE/containers.txt  (like `docker ps -a`)
+#   - tracks the running set in $T_WORKSTATE/container-running.txt
+#   - answers `docker inspect -f '...'` from that state
 #
 # Env:
-#   T_WORKSTATE     - per-test state dir (required)
-#   DOCKER_PULL_FAIL- when non-empty, `docker pull` fails with exit code 1
+#   T_WORKSTATE      - per-test state dir (required)
+#   DOCKER_PULL_FAIL - when non-empty, `docker pull` fails with exit code 1
 #-------------------------------------------------------------------------------
 LOG="${T_WORKSTATE:?T_WORKSTATE not set}/docker-calls.log"
 STATE="${T_WORKSTATE:?}/containers.txt"
+RUNNING="${T_WORKSTATE:?}/container-running.txt"
+touch "$STATE" "$RUNNING"
 echo "docker $*" >> "$LOG"
 
 cmd="${1:-}"
 if [ "$#" -gt 0 ]; then shift; fi
+
+mark_running() {
+  grep -vxF "$1" "$RUNNING" 2>/dev/null > "${RUNNING}.tmp" || true
+  [ -f "${RUNNING}.tmp" ] && mv "${RUNNING}.tmp" "$RUNNING"
+  echo "$1" >> "$RUNNING"
+}
+mark_stopped() {
+  grep -vxF "$1" "$RUNNING" 2>/dev/null > "${RUNNING}.tmp" || true
+  [ -f "${RUNNING}.tmp" ] && mv "${RUNNING}.tmp" "$RUNNING"
+}
 
 case "$cmd" in
   info)
     exit 0
     ;;
   ps)
-    # only used by the script as: docker ps -a --format '{{.Names}}'
     [ -f "$STATE" ] && cat "$STATE"
     exit 0
     ;;
@@ -45,8 +58,33 @@ case "$cmd" in
       grep -vxF "$name" "$STATE" 2>/dev/null > "${STATE}.tmp" || true
       [ -f "${STATE}.tmp" ] && mv "${STATE}.tmp" "$STATE"
       echo "$name" >> "$STATE"
+      mark_running "$name"
     fi
     echo "fake-container-id"
+    exit 0
+    ;;
+  start)
+    name=""
+    for a in "$@"; do
+      case "$a" in -*) ;; *) name="$a" ;; esac
+    done
+    if grep -qxF "$name" "$STATE" 2>/dev/null; then mark_running "$name"; fi
+    exit 0
+    ;;
+  stop)
+    name=""
+    for a in "$@"; do
+      case "$a" in -*) ;; *) name="$a" ;; esac
+    done
+    mark_stopped "$name"
+    exit 0
+    ;;
+  restart)
+    name=""
+    for a in "$@"; do
+      case "$a" in -*) ;; *) name="$a" ;; esac
+    done
+    if grep -qxF "$name" "$STATE" 2>/dev/null; then mark_running "$name"; fi
     exit 0
     ;;
   rm)
@@ -61,9 +99,36 @@ case "$cmd" in
       grep -vxF "$name" "$STATE" > "${STATE}.tmp" 2>/dev/null || true
       [ -f "${STATE}.tmp" ] && mv "${STATE}.tmp" "$STATE"
     fi
+    mark_stopped "$name"
     exit 0
     ;;
-  stop|restart|start|logs|images)
+  inspect)
+    # used as: docker inspect -f '{{.State.Running}}' litellm
+    fmt=""
+    name=""
+    for a in "$@"; do
+      case "$a" in
+        '{{'*) fmt="$a" ;;
+        -*)    ;;
+        *)     name="$a" ;;
+      esac
+    done
+    if grep -qxF "$name" "$STATE" 2>/dev/null; then
+      case "$fmt" in
+        *State.Running*)
+          if grep -qxF "$name" "$RUNNING" 2>/dev/null; then echo "true"; else echo "false"; fi
+          ;;
+        *State.Status*)
+          if grep -qxF "$name" "$RUNNING" 2>/dev/null; then echo "running"; else echo "exited"; fi
+          ;;
+        *RestartPolicy*)
+          echo "unless-stopped"
+          ;;
+      esac
+    fi
+    exit 0
+    ;;
+  logs|images|version)
     exit 0
     ;;
   *)

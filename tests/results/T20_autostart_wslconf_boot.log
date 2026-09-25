@@ -5,7 +5,7 @@
 
    Proxy target : ghcr.io/berriai/litellm:main-latest
    Proxy port   : 4000   (restart policy: unless-stopped)
-   Linux config : /tmp/litellm-test.3Ow8qk/home/.litellm
+   Linux config : /tmp/litellm-test.uZCjXR/home/.litellm
 
    Please choose an option:
 
@@ -35,17 +35,15 @@ apt-get: docker.io installed (stub)
        Press ENTER to skip a provider you do not use.
        At least ONE key is required.
 
-[FAIL] At least ONE API key is required. Let's try again.
-
 
 [ OK ] Collected 1 API key(s):
-         Groq       : <skipped>
-         OpenRouter : sk_o****89ab
+         Groq       : gsk_****9abc
+         OpenRouter : <skipped>
          Google AI  : <skipped>
          Cerebras   : <skipped>
          Mistral    : <skipped>
-[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-test.3Ow8qk/home/.litellm/master_key.txt
-[INFO] [5/9] Generating LiteLLM configuration: /tmp/litellm-test.3Ow8qk/home/.litellm/config.yaml
+[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-test.uZCjXR/home/.litellm/master_key.txt
+[INFO] [5/9] Generating LiteLLM configuration: /tmp/litellm-test.uZCjXR/home/.litellm/config.yaml
 [ OK ] config.yaml generated (only providers with keys are enabled).
 [INFO] [6/9] Pulling prebuilt LiteLLM image (no build step): ghcr.io/berriai/litellm:main-latest
 [INFO]        This may take several minutes on the first run...
@@ -55,7 +53,8 @@ apt-get: docker.io installed (stub)
 [INFO]        Waiting for LiteLLM to become healthy (up to 60s)...
 [ OK ] LiteLLM is healthy: http://127.0.0.1:4000
 [INFO] [8/9] Setting up auto-start on boot + management CLI...
-[ OK ] Auto-start on WSL boot: systemd service: litellm.service (enabled)
+[ OK ]        Boot command added to /etc/wsl.conf.
+[ OK ] Auto-start on WSL boot: /etc/wsl.conf boot command (no systemd detected)
 [ OK ] Management CLI installed: /usr/local/bin/litellm  (try: litellm status)
 [INFO] [9/9] Configuring OpenCode on the Windows side...
 [ OK ] Windows user profile detected: /mnt/c/Users/Test User
@@ -72,12 +71,12 @@ apt-get: docker.io installed (stub)
     Username  : admin
     Password  : (the Master key below)
 
-  Master key (also saved to)      : /tmp/litellm-test.3Ow8qk/home/.litellm/master_key.txt
-  Master key                      : sk-9fb5c74fda8dd5dc1ce341d1a6206a10ce68c657e48a1cad8a52afd9dc9d6fa0
-  LiteLLM config file             : /tmp/litellm-test.3Ow8qk/home/.litellm/config.yaml
+  Master key (also saved to)      : /tmp/litellm-test.uZCjXR/home/.litellm/master_key.txt
+  Master key                      : sk-9c5b304ca3911db0f05fca2cbb51bb35cb8a5659552d2d71cf0be3cbebe84d04
+  LiteLLM config file             : /tmp/litellm-test.uZCjXR/home/.litellm/config.yaml
   OpenCode config file (Windows)  : /mnt/c/Users/Test User/.config/opencode/opencode.json
   Container name                  : litellm
-  Auto-start on WSL boot          : systemd service: litellm.service (enabled)
+  Auto-start on WSL boot          : /etc/wsl.conf boot command (no systemd detected)
 
   MANAGEMENT COMMANDS (any terminal):
     litellm up | down | restart | status | logs | uninstall
@@ -88,7 +87,7 @@ apt-get: docker.io installed (stub)
     Stop proxy       : sudo docker stop litellm
     Start proxy      : sudo docker start litellm
     Test endpoint    : curl -s http://127.0.0.1:4000/v1/models \
-                         -H "Authorization: Bearer sk-9fb5c74fda8dd5dc1ce341d1a6206a10ce68c657e48a1cad8a52afd9dc9d6fa0"
+                         -H "Authorization: Bearer sk-9c5b304ca3911db0f05fca2cbb51bb35cb8a5659552d2d71cf0be3cbebe84d04"
     Re-run this tool : bash "/home/user/LiteLLM-OpenCode/LiteLLM.sh"
 
   NEXT STEPS (on WINDOWS):
@@ -102,10 +101,9 @@ apt-get: docker.io installed (stub)
 
 [ OK ] Done. Happy coding!
     ok: exit code = 0
-    ok: contains: At least ONE API key is required. Let's try again.
-    ok: contains: Collected 1 API key(s)
-    ok: models match (deepseek/deepseek-chat-v3:free, deepseek/deepseek-r1:free)
-    ok: opencode.json valid (/mnt/c/Users/Test User/.config/opencode/opencode.json)
+    ok: contains: Boot command added to /etc/wsl.conf
+    ok: contains: command = /usr/local/bin/litellm-boot.sh
+    ok: file missing: /tmp/litellm-test.uZCjXR/fakeroot/etc/systemd/system/litellm.service
 
 --- docker-calls.log ---
 service docker restart
@@ -113,9 +111,7 @@ systemctl enable docker.service
 docker info
 docker pull ghcr.io/berriai/litellm:main-latest
 docker ps -a --format {{.Names}}
-docker run -d --name litellm --restart unless-stopped -p 4000:4000 -v /tmp/litellm-test.3Ow8qk/home/.litellm/config.yaml:/app/config.yaml:ro -e LITELLM_MASTER_KEY=sk-9fb5c74fda8dd5dc1ce341d1a6206a10ce68c657e48a1cad8a52afd9dc9d6fa0 -e UI_USERNAME=admin -e UI_PASSWORD=sk-9fb5c74fda8dd5dc1ce341d1a6206a10ce68c657e48a1cad8a52afd9dc9d6fa0 -e OPENROUTER_API_KEY=sk_or_second_0123456789ab ghcr.io/berriai/litellm:main-latest --config /app/config.yaml --port 4000
-systemctl daemon-reload
-systemctl enable litellm.service
+docker run -d --name litellm --restart unless-stopped -p 4000:4000 -v /tmp/litellm-test.uZCjXR/home/.litellm/config.yaml:/app/config.yaml:ro -e LITELLM_MASTER_KEY=sk-9c5b304ca3911db0f05fca2cbb51bb35cb8a5659552d2d71cf0be3cbebe84d04 -e UI_USERNAME=admin -e UI_PASSWORD=sk-9c5b304ca3911db0f05fca2cbb51bb35cb8a5659552d2d71cf0be3cbebe84d04 -e GROQ_API_KEY=gsk_wslconf_0123456789abc ghcr.io/berriai/litellm:main-latest --config /app/config.yaml --port 4000
 
 --- apt-calls.log ---
 apt-get update -y
@@ -126,17 +122,17 @@ litellm
 
 --- generated config.yaml ---
 model_list:
-  # ---------------- OpenRouter (free coding models) ----------------
-  - model_name: deepseek/deepseek-chat-v3:free
+  # ---------------- Groq (fast inference) ----------------
+  - model_name: qwen-2.5-coder-32b
     litellm_params:
-      model: openrouter/deepseek/deepseek-chat-v3:free
-      api_key: os.environ/OPENROUTER_API_KEY
-      api_base: https://openrouter.ai/api/v1
-  - model_name: deepseek/deepseek-r1:free
+      model: groq/qwen-2.5-coder-32b
+      api_key: os.environ/GROQ_API_KEY
+      api_base: https://api.groq.com/openai/v1
+  - model_name: llama-3.3-70b-versatile
     litellm_params:
-      model: openrouter/deepseek/deepseek-r1:free
-      api_key: os.environ/OPENROUTER_API_KEY
-      api_base: https://openrouter.ai/api/v1
+      model: groq/llama-3.3-70b-versatile
+      api_key: os.environ/GROQ_API_KEY
+      api_base: https://api.groq.com/openai/v1
 
 litellm_settings:
   drop_params: true        # silently drop unsupported provider params
@@ -156,18 +152,18 @@ general_settings:
 --- generated opencode.json ---
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "litellm/deepseek/deepseek-chat-v3:free",
+  "model": "litellm/qwen-2.5-coder-32b",
   "provider": {
     "litellm": {
       "npm": "@ai-sdk/openai-compatible",
       "name": "LiteLLM Proxy (Local)",
       "options": {
         "baseURL": "http://127.0.0.1:4000/v1",
-        "apiKey": "sk-9fb5c74fda8dd5dc1ce341d1a6206a10ce68c657e48a1cad8a52afd9dc9d6fa0"
+        "apiKey": "sk-9c5b304ca3911db0f05fca2cbb51bb35cb8a5659552d2d71cf0be3cbebe84d04"
       },
       "models": {
-        "deepseek/deepseek-chat-v3:free": { "name": "DeepSeek Chat V3 (OpenRouter, free)" },
-                "deepseek/deepseek-r1:free": { "name": "DeepSeek R1 (OpenRouter, free)" }
+        "qwen-2.5-coder-32b": { "name": "Qwen 2.5 Coder 32B (Groq, free)" },
+                "llama-3.3-70b-versatile": { "name": "Llama 3.3 70B Versatile (Groq, free)" }
       }
     }
   }

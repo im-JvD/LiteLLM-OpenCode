@@ -152,6 +152,35 @@ sudo docker logs -f litellm
 
 ---
 
+## 🟢 خطاهای مدیریت و پنل
+
+### `litellm: command not found`
+
+CLI مدیریت نصب نشده یا حذف شده — دوباره گزینهٔ `1` نصاب را اجرا کنید. مسیر: `/usr/local/bin/litellm`.
+
+### پنل `http://127.0.0.1:4000/ui` باز نمی‌شود یا Login نمی‌شود
+
+- پروکسی روشن است؟ `litellm status`
+- نام کاربری دقیقاً `admin` و رمز همان Master Key است: `cat ~/.litellm/master_key.txt`
+- از مرورگر **ویندوز** باز کنید نه داخل WSL (هرچند هر دو کار می‌کند).
+
+### بعد از ری‌استارت ویندوز/WSL کانتینر بالا نیامد
+
+```bash
+litellm up        # همین کافی است
+```
+
+بررسی مکانیزم استارت خودکار:
+
+```bash
+systemctl status litellm 2>/dev/null || grep -A1 '\[boot\]' /etc/wsl.conf
+cat /tmp/litellm-boot.log
+```
+
+اگر systemd ندارید و می‌خواهید کانفیگ درست شود، دوباره گزینهٔ `1` را اجرا کنید.
+
+---
+
 ## 🔵 موارد عمومی
 
 ### بعد از `wsl --shutdown` هیچ‌چیز کار نمی‌کند

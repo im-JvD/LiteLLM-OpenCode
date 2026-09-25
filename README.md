@@ -42,9 +42,12 @@ bash <(wget -qO- https://raw.githubusercontent.com/im-JvD/LiteLLM-OpenCode/main/
 | 🔑 ۵ کلید API | Groq، OpenRouter، Google AI، Cerebras، Mistral (حداقل یک کلید اجباری) |
 | 🧠 ۷ مدل کدنویسی | ساخت خودکار `config.yaml` فقط بر اساس کلیدهایی که داده‌اید |
 | 🔁 اجرای پایدار | کانتینر با `--restart unless-stopped` روی پورت 4000 |
+| 🖥️ پنل مدیریت | رابط وب LiteLLM روی `http://127.0.0.1:4000/ui` (admin / Master Key) |
+| ⚙️ استارت خودکار در بوت WSL | سرویس systemd یا boot command در `/etc/wsl.conf` |
+| ⌨️ CLI مدیریت | `litellm up / down / restart / status / logs / uninstall` |
 | 🪟 تشخیص هوشمند ویندوز | پیدا کردن مسیر پروفایل با PowerShell (حتی با فاصله در نام کاربری) |
 | 🔒 کلید امن | ساخت خودکار Master Key و ذخیرهٔ امن آن |
-| 🧪 تست‌شده | ۱۸ سناریوی شبیه‌سازی‌شده + تست واقعی E2E با خودِ LiteLLM |
+| 🧪 تست‌شده | ۲۱ سناریوی شبیه‌سازی‌شده + تست واقعی E2E با خودِ LiteLLM |
 
 ---
 
