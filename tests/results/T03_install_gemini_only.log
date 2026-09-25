@@ -5,7 +5,7 @@
 
    Proxy target : ghcr.io/berriai/litellm:main-latest
    Proxy port   : 4000   (restart policy: unless-stopped)
-   Linux config : /tmp/litellm-test.LMPxpp/home/.litellm
+   Linux config : /tmp/litellm-test.SpC8QO/home/.litellm
 
    Please choose an option:
 
@@ -42,9 +42,9 @@ apt-get: docker.io installed (stub)
          Google AI  : AIza****89ab
          Cerebras   : <skipped>
          Mistral    : <skipped>
-[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-test.LMPxpp/home/.litellm/master_key.txt
-[ OK ] Dashboard login saved to: /tmp/litellm-test.LMPxpp/home/.litellm/dashboard_credentials.txt
-[INFO] [5/9] Generating LiteLLM configuration: /tmp/litellm-test.LMPxpp/home/.litellm/config.yaml
+[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-test.SpC8QO/home/.litellm/master_key.txt
+[ OK ] Dashboard login saved to: /tmp/litellm-test.SpC8QO/home/.litellm/dashboard_credentials.txt
+[INFO] [5/9] Generating LiteLLM configuration: /tmp/litellm-test.SpC8QO/home/.litellm/config.yaml
 [ OK ] config.yaml generated (only providers with keys are enabled).
 [INFO] [6/9] Pulling prebuilt LiteLLM image (no build step): ghcr.io/berriai/litellm:main-latest
 [INFO]        This may take several minutes on the first run...
@@ -69,13 +69,13 @@ apt-get: docker.io installed (stub)
   ADMIN PANEL (UI) - open in the WINDOWS browser:
     URL       : http://127.0.0.1:4000/ui
     Username  : admin
-    Password  : sk-65ba7d636e11b592512e32d4e2298cb6b4ee2a0f9fc45a7e4313e92a367beb78
+    Password  : sk-47f7e61c90f32db75c4658689d70ed9354a937ca9b7d559f77dc4824152e36c0
     (the dashboard password IS the master key - no separate password exists)
-    saved to  : /tmp/litellm-test.LMPxpp/home/.litellm/dashboard_credentials.txt
+    saved to  : /tmp/litellm-test.SpC8QO/home/.litellm/dashboard_credentials.txt
 
-  Master key (also saved to)      : /tmp/litellm-test.LMPxpp/home/.litellm/master_key.txt
-  Master key                      : sk-65ba7d636e11b592512e32d4e2298cb6b4ee2a0f9fc45a7e4313e92a367beb78
-  LiteLLM config file             : /tmp/litellm-test.LMPxpp/home/.litellm/config.yaml
+  Master key (also saved to)      : /tmp/litellm-test.SpC8QO/home/.litellm/master_key.txt
+  Master key                      : sk-47f7e61c90f32db75c4658689d70ed9354a937ca9b7d559f77dc4824152e36c0
+  LiteLLM config file             : /tmp/litellm-test.SpC8QO/home/.litellm/config.yaml
   OpenCode config file (Windows)  : /mnt/c/Users/Test User/.config/opencode/opencode.json
   Container name                  : litellm
   Auto-start on WSL boot          : systemd service: litellm.service (enabled)
@@ -89,7 +89,7 @@ apt-get: docker.io installed (stub)
     Stop proxy       : sudo docker stop litellm
     Start proxy      : sudo docker start litellm
     Test endpoint    : curl -s http://127.0.0.1:4000/v1/models \
-                         -H "Authorization: Bearer sk-65ba7d636e11b592512e32d4e2298cb6b4ee2a0f9fc45a7e4313e92a367beb78"
+                         -H "Authorization: Bearer sk-47f7e61c90f32db75c4658689d70ed9354a937ca9b7d559f77dc4824152e36c0"
     Re-run this tool : bash "/home/user/LiteLLM-OpenCode/LiteLLM.sh"
 
   NEXT STEPS (on WINDOWS):
@@ -110,10 +110,11 @@ apt-get: docker.io installed (stub)
 service docker restart
 systemctl enable docker.service
 docker info
+docker inspect -f {{range .Config.Env}}{{println .}}{{end}} litellm
 docker image inspect ghcr.io/berriai/litellm:main-latest
 docker pull ghcr.io/berriai/litellm:main-latest
 docker ps -a --format {{.Names}}
-docker run -d --name litellm --restart unless-stopped -p 4000:4000 -v /tmp/litellm-test.LMPxpp/home/.litellm/config.yaml:/app/config.yaml:ro -e LITELLM_MASTER_KEY=sk-65ba7d636e11b592512e32d4e2298cb6b4ee2a0f9fc45a7e4313e92a367beb78 -e UI_USERNAME=admin -e UI_PASSWORD=sk-65ba7d636e11b592512e32d4e2298cb6b4ee2a0f9fc45a7e4313e92a367beb78 -e GEMINI_API_KEY=AIzaOnlyTest0123456789ab ghcr.io/berriai/litellm:main-latest --config /app/config.yaml --port 4000
+docker run -d --name litellm --restart unless-stopped -p 4000:4000 -v /tmp/litellm-test.SpC8QO/home/.litellm/config.yaml:/app/config.yaml:ro -e LITELLM_MASTER_KEY=sk-47f7e61c90f32db75c4658689d70ed9354a937ca9b7d559f77dc4824152e36c0 -e UI_USERNAME=admin -e UI_PASSWORD=sk-47f7e61c90f32db75c4658689d70ed9354a937ca9b7d559f77dc4824152e36c0 -e GEMINI_API_KEY=AIzaOnlyTest0123456789ab ghcr.io/berriai/litellm:main-latest --config /app/config.yaml --port 4000
 systemctl daemon-reload
 systemctl enable litellm.service
 
@@ -157,7 +158,7 @@ general_settings:
       "name": "LiteLLM Proxy (Local)",
       "options": {
         "baseURL": "http://127.0.0.1:4000/v1",
-        "apiKey": "sk-65ba7d636e11b592512e32d4e2298cb6b4ee2a0f9fc45a7e4313e92a367beb78"
+        "apiKey": "sk-47f7e61c90f32db75c4658689d70ed9354a937ca9b7d559f77dc4824152e36c0"
       },
       "models": {
         "gemini-2.0-flash": { "name": "Gemini 2.0 Flash (Google AI, free)" }

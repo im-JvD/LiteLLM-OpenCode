@@ -47,7 +47,7 @@ bash <(wget -qO- https://raw.githubusercontent.com/im-JvD/LiteLLM-OpenCode/main/
 | ⌨️ CLI مدیریت | `litellm up / down / restart / status / credentials / logs / uninstall` |
 | 🪟 تشخیص هوشمند ویندوز | پیدا کردن مسیر پروفایل با PowerShell (حتی با فاصله در نام کاربری) |
 | 🔒 کلید امن | ساخت خودکار Master Key و ذخیرهٔ امن آن |
-| 🧪 تست‌شده | ۲۳ سناریوی شبیه‌سازی‌شده + تست واقعی E2E با خودِ LiteLLM |
+| 🧪 تست‌شده | ۲۴ سناریوی شبیه‌سازی‌شده + تست واقعی E2E با خودِ LiteLLM |
 
 ---
 

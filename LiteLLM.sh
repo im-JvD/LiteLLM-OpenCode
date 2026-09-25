@@ -206,6 +206,24 @@ mask_key() {
   fi
 }
 
+# Read the provider API keys stored in an existing container (previous install).
+# Sets EXISTING_* variables; returns 0 when at least one key was found.
+read_existing_keys_from_container() {
+  EXISTING_GROQ=""; EXISTING_OPENROUTER=""; EXISTING_GEMINI=""
+  EXISTING_CEREBRAS=""; EXISTING_MISTRAL=""
+  command -v docker >/dev/null 2>&1 || return 1
+  local envs
+  envs="$($SUDO docker inspect -f '{{range .Config.Env}}{{println .}}{{end}}' "$CONTAINER_NAME" 2>/dev/null || true)"
+  [ -n "$envs" ] || return 1
+  EXISTING_GROQ="$(printf '%s\n' "$envs" | sed -n 's/^GROQ_API_KEY=//p' | head -1)"
+  EXISTING_OPENROUTER="$(printf '%s\n' "$envs" | sed -n 's/^OPENROUTER_API_KEY=//p' | head -1)"
+  EXISTING_GEMINI="$(printf '%s\n' "$envs" | sed -n 's/^GEMINI_API_KEY=//p' | head -1)"
+  EXISTING_CEREBRAS="$(printf '%s\n' "$envs" | sed -n 's/^CEREBRAS_API_KEY=//p' | head -1)"
+  EXISTING_MISTRAL="$(printf '%s\n' "$envs" | sed -n 's/^MISTRAL_API_KEY=//p' | head -1)"
+  [ -n "$EXISTING_GROQ" ] || [ -n "$EXISTING_OPENROUTER" ] || \
+    [ -n "$EXISTING_GEMINI" ] || [ -n "$EXISTING_CEREBRAS" ] || [ -n "$EXISTING_MISTRAL" ]
+}
+
 # Warn when a pasted value does not match the provider's known key prefix
 # (catches keys pasted into the wrong prompt, e.g. Groq key into OpenRouter).
 warn_key_prefix() {
@@ -222,6 +240,53 @@ warn_key_prefix() {
 collect_api_keys() {
   echo
   log_info "[4/9] API keys setup (5 providers)"
+
+  # A previous install? Offer to keep the already-configured keys.
+  if read_existing_keys_from_container; then
+    echo "       Existing API keys found (from the previous install):"
+    echo "         Groq       : $(mask_key "$EXISTING_GROQ")"
+    echo "         OpenRouter : $(mask_key "$EXISTING_OPENROUTER")"
+    echo "         Google AI  : $(mask_key "$EXISTING_GEMINI")"
+    echo "         Cerebras   : $(mask_key "$EXISTING_CEREBRAS")"
+    echo "         Mistral    : $(mask_key "$EXISTING_MISTRAL")"
+    local answer="" keep_answers=0
+    while true; do
+      printf "       Keep these keys? [Y/n]: "
+      read -r answer || answer=""
+      case "$answer" in
+        ""|y|Y|yes|Yes|YES)
+          GROQ_KEY="$EXISTING_GROQ"
+          OPENROUTER_KEY="$EXISTING_OPENROUTER"
+          GEMINI_KEY="$EXISTING_GEMINI"
+          CEREBRAS_KEY="$EXISTING_CEREBRAS"
+          MISTRAL_KEY="$EXISTING_MISTRAL"
+          KEY_COUNT=0
+          [ -n "$GROQ_KEY" ]       && KEY_COUNT=$((KEY_COUNT + 1)) || true
+          [ -n "$OPENROUTER_KEY" ] && KEY_COUNT=$((KEY_COUNT + 1)) || true
+          [ -n "$GEMINI_KEY" ]     && KEY_COUNT=$((KEY_COUNT + 1)) || true
+          [ -n "$CEREBRAS_KEY" ]   && KEY_COUNT=$((KEY_COUNT + 1)) || true
+          [ -n "$MISTRAL_KEY" ]    && KEY_COUNT=$((KEY_COUNT + 1)) || true
+          echo
+          log_ok "Keeping the existing ${KEY_COUNT} API key(s)."
+          return 0
+          ;;
+        n|N|no|No|NO)
+          echo "       OK - enter the replacement keys below."
+          echo
+          break
+          ;;
+        *)
+          keep_answers=$((keep_answers + 1))
+          if [ "$keep_answers" -ge 5 ]; then
+            log_warn "       Unrecognized input - keeping the existing keys."
+            return 0
+          fi
+          echo "       Please answer y (keep) or n (replace)."
+          ;;
+      esac
+    done
+  fi
+
   echo "       Press ENTER to skip a provider you do not use."
   echo "       At least ONE key is required."
   echo
@@ -275,7 +340,13 @@ collect_api_keys() {
 }
 
 generate_master_key() {
-  if command -v openssl >/dev/null 2>&1; then
+  # Keep the master key stable across reinstalls (dashboard login + every
+  # client that stored it stay valid). Only generate one when none exists.
+  local reused=0
+  if [ -s "$LITELLM_KEYFILE" ]; then
+    MASTER_KEY="$(tr -d '\n' < "$LITELLM_KEYFILE")"
+    reused=1
+  elif command -v openssl >/dev/null 2>&1; then
     MASTER_KEY="sk-$(openssl rand -hex 32)"
   else
     MASTER_KEY="sk-$(od -An -N32 -tx1 /dev/urandom | tr -d ' \n')"
@@ -291,7 +362,11 @@ generate_master_key() {
     echo "  Password : ${MASTER_KEY}"
   } > "$LITELLM_CRED_FILE"
   chmod 600 "$LITELLM_CRED_FILE"
-  log_ok "LiteLLM master key generated and saved to: ${LITELLM_KEYFILE}"
+  if [ "$reused" -eq 1 ]; then
+    log_ok "Master key reused (unchanged): ${LITELLM_KEYFILE}"
+  else
+    log_ok "LiteLLM master key generated and saved to: ${LITELLM_KEYFILE}"
+  fi
   log_ok "Dashboard login saved to: ${LITELLM_CRED_FILE}"
 }
 

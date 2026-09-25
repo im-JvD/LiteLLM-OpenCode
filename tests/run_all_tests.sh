@@ -456,9 +456,12 @@ start_test "T06_reinstall_replaces_container"
 if [ "$MNT_OK" -eq 1 ]; then
   fresh_env
   printf '1\ngsk_first_0123456789abcdef\n\n\n\n\n' | run_script
-  printf '1\ngsk_second_0123456789abcdef\n\n\n\n\n' | run_script
+  # second run: answer 'n' -> replace all keys
+  printf '1\nn\ngsk_second_0123456789abcdef\n\n\n\n\n' | run_script
   T_RC=$?
   assert_rc 0
+  assert_contains "$CURRENT_LOG" "Existing API keys found (from the previous install)"
+  assert_contains "$CURRENT_LOG" "OK - enter the replacement keys below."
   assert_contains "$CURRENT_LOG" "Found existing container 'litellm'. Removing it..."
   assert_contains "${T_WORKSTATE}/docker-calls.log" "rm -f litellm"
   if [ "$(grep -cx 'litellm' "${T_WORKSTATE}/containers.txt")" = "1" ]; then a_ok "exactly one container registered"; else a_bad "container registry not deduplicated"; fi
@@ -857,6 +860,33 @@ if [ "$MNT_OK" -eq 1 ]; then
   assert_contains "${T_WORKSTATE}/docker-calls.log" "pull ghcr.nju.edu.cn/berriai/litellm:main-latest"
   assert_contains "${T_WORKSTATE}/docker-calls.log" "tag ghcr.nju.edu.cn/berriai/litellm:main-latest ghcr.io/berriai/litellm:main-latest"
   assert_contains "$CURRENT_LOG" "INSTALLATION COMPLETED SUCCESSFULLY"
+  MK="$(master_key_from)"
+  assert_opencode_json "/mnt/c/Users/Test User/.config/opencode/opencode.json" "$MK" "qwen-2.5-coder-32b" "$GROQ2_MODELS"
+  dump_state
+  finish_test
+else
+  skip_test "requires writable /mnt/c"
+fi
+
+#===============================================================================
+# T23 - reinstall keeps existing keys by default (Enter = keep)
+#===============================================================================
+start_test "T23_reinstall_keeps_existing_keys"
+if [ "$MNT_OK" -eq 1 ]; then
+  fresh_env
+  printf '1\ngsk_keepme_0123456789abc\n\n\n\n\n' | run_script
+  # second run: only the menu answer -> default keeps existing keys
+  printf '1\n\n' | run_script
+  T_RC=$?
+  assert_rc 0
+  assert_contains "$CURRENT_LOG" "Existing API keys found (from the previous install)"
+  assert_contains "$CURRENT_LOG" "Groq       : gsk_****9abc"
+  assert_contains "$CURRENT_LOG" "Keeping the existing 1 API key(s)."
+  assert_not_contains "$CURRENT_LOG" "Groq API key"
+  assert_contains "${T_WORKSTATE}/docker-calls.log" "-e GROQ_API_KEY=gsk_keepme_0123456789abc"
+  MK1="$(grep -o 'LITELLM_MASTER_KEY=[^ ]*' "${T_WORKSTATE}/docker-calls.log" | head -1 | cut -d= -f2)"
+  MK2="$(grep -o 'LITELLM_MASTER_KEY=[^ ]*' "${T_WORKSTATE}/docker-calls.log" | tail -1 | cut -d= -f2)"
+  if [ -n "$MK1" ] && [ "$MK1" = "$MK2" ]; then a_ok "master key stable across reinstall"; else a_bad "master key changed on reinstall"; fi
   MK="$(master_key_from)"
   assert_opencode_json "/mnt/c/Users/Test User/.config/opencode/opencode.json" "$MK" "qwen-2.5-coder-32b" "$GROQ2_MODELS"
   dump_state

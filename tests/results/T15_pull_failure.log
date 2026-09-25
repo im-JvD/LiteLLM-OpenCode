@@ -5,7 +5,7 @@
 
    Proxy target : ghcr.io/berriai/litellm:main-latest
    Proxy port   : 4000   (restart policy: unless-stopped)
-   Linux config : /tmp/litellm-test.z4nJPh/home/.litellm
+   Linux config : /tmp/litellm-test.BGpqHd/home/.litellm
 
    Please choose an option:
 
@@ -42,9 +42,9 @@ apt-get: docker.io installed (stub)
          Google AI  : <skipped>
          Cerebras   : <skipped>
          Mistral    : <skipped>
-[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-test.z4nJPh/home/.litellm/master_key.txt
-[ OK ] Dashboard login saved to: /tmp/litellm-test.z4nJPh/home/.litellm/dashboard_credentials.txt
-[INFO] [5/9] Generating LiteLLM configuration: /tmp/litellm-test.z4nJPh/home/.litellm/config.yaml
+[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-test.BGpqHd/home/.litellm/master_key.txt
+[ OK ] Dashboard login saved to: /tmp/litellm-test.BGpqHd/home/.litellm/dashboard_credentials.txt
+[INFO] [5/9] Generating LiteLLM configuration: /tmp/litellm-test.BGpqHd/home/.litellm/config.yaml
 [ OK ] config.yaml generated (only providers with keys are enabled).
 [INFO] [6/9] Pulling prebuilt LiteLLM image (no build step): ghcr.io/berriai/litellm:main-latest
 [INFO]        This may take several minutes on the first run...
@@ -63,6 +63,7 @@ Error response from daemon: simulated pull failure (test stub)
 service docker restart
 systemctl enable docker.service
 docker info
+docker inspect -f {{range .Config.Env}}{{println .}}{{end}} litellm
 docker image inspect ghcr.io/berriai/litellm:main-latest
 docker pull ghcr.io/berriai/litellm:main-latest
 

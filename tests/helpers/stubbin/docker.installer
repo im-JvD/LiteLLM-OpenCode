@@ -82,8 +82,11 @@ case "$cmd" in
   run)
     name=""
     prev=""
+    env_args=()
     for a in "$@"; do
       if [ "$prev" = "--name" ]; then name="$a"; fi
+      case "$a" in -e) prev="-e"; continue ;; esac
+      if [ "$prev" = "-e" ]; then env_args+=("$a"); prev=""; continue; fi
       prev="$a"
     done
     if [ -n "$name" ]; then
@@ -91,6 +94,17 @@ case "$cmd" in
       [ -f "${STATE}.tmp" ] && mv "${STATE}.tmp" "$STATE"
       echo "$name" >> "$STATE"
       mark_running "$name"
+      local_e="${T_WORKSTATE}/env-${name}.txt"
+      : > "$local_e"
+      local_a=""
+      for a in "$@"; do
+        if [ "$local_a" = "1" ]; then
+          echo "$a" >> "$local_e"
+          local_a=""
+        elif [ "$a" = "-e" ]; then
+          local_a="1"
+        fi
+      done
     fi
     echo "fake-container-id"
     exit 0
@@ -132,6 +146,7 @@ case "$cmd" in
       [ -f "${STATE}.tmp" ] && mv "${STATE}.tmp" "$STATE"
     fi
     mark_stopped "$name"
+    rm -f "${T_WORKSTATE}/env-${name}.txt"
     exit 0
     ;;
   inspect)
@@ -147,6 +162,9 @@ case "$cmd" in
     done
     if grep -qxF "$name" "$STATE" 2>/dev/null; then
       case "$fmt" in
+        *Config.Env*)
+          [ -f "${T_WORKSTATE}/env-${name}.txt" ] && cat "${T_WORKSTATE}/env-${name}.txt"
+          ;;
         *State.Running*)
           if grep -qxF "$name" "$RUNNING" 2>/dev/null; then echo "true"; else echo "false"; fi
           ;;
