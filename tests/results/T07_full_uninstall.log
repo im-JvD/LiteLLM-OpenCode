@@ -1,0 +1,213 @@
+
+=================================================================
+     LiteLLM  <->  OpenCode  Bridge  |  WSL2 Ubuntu Setup
+=================================================================
+
+   Proxy target : ghcr.io/berriai/litellm:main-latest
+   Proxy port   : 4000   (restart policy: unless-stopped)
+   Linux config : /tmp/litellm-test.pYiUVH/home/.litellm
+
+   Please choose an option:
+
+     1) Full Install    (Docker + LiteLLM proxy + OpenCode config)
+     2) Full Uninstall  (remove container + all generated configs)
+     q) Quit
+
+
+
+[INFO] === FULL INSTALL: starting ===
+
+[INFO] [1/9] Checking WSL2 environment...
+[WARN] This does not look like a WSL kernel (/proc/version).
+[WARN] Continuing anyway - Windows/PowerShell integration may fail.
+[ OK ] WSL2 environment looks good.
+[INFO] [2/9] Installing Docker Engine (docker.io from Ubuntu apt repository)...
+apt-get: docker.io installed (stub)
+[INFO] [3/9] Configuring Iranian Docker Hub mirrors (/etc/docker/daemon.json)...
+[ OK ] Registry mirrors written:
+       - https://docker.arvancloud.ir
+       - https://docker.hub.iran.liara.run
+       - https://docker.iranserver.com
+[INFO]        Starting/restarting the Docker daemon...
+[ OK ] Docker daemon is up and running.
+
+[INFO] [4/9] API keys setup (5 providers)
+       Press ENTER to skip a provider you do not use.
+       At least ONE key is required.
+
+
+[ OK ] Collected 1 API key(s):
+         Groq       : gsk_****89ab
+         OpenRouter : <skipped>
+         Google AI  : <skipped>
+         Cerebras   : <skipped>
+         Mistral    : <skipped>
+
+[INFO]        Verifying API keys against the providers...
+[ OK ]          Groq: valid (HTTP 200)
+[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-test.pYiUVH/home/.litellm/master_key.txt
+[ OK ] Dashboard login saved to: /tmp/litellm-test.pYiUVH/home/.litellm/dashboard_credentials.txt
+[INFO] [5/9] Generating LiteLLM configuration: /tmp/litellm-test.pYiUVH/home/.litellm/config.yaml
+[ OK ] config.yaml generated (only providers with keys are enabled).
+[INFO] [6/9] Pulling prebuilt LiteLLM image (no build step): ghcr.io/berriai/litellm:main-latest
+[INFO]        This may take several minutes on the first run...
+[ OK ] Image pulled successfully.
+[INFO] [7/9] Starting LiteLLM container on port 4000...
+[INFO]        Starting the Admin UI database (postgres:16-alpine)...
+[ OK ]        Database container 'litellm-db' started (restart policy: unless-stopped).
+[INFO]        Waiting for the database to accept connections...
+[ OK ]        Database is ready.
+[ OK ] Container 'litellm' started (restart policy: unless-stopped).
+[INFO]        Waiting for LiteLLM to become healthy (up to 120s)...
+[ OK ] LiteLLM is healthy: http://127.0.0.1:4000
+[INFO] [8/9] Setting up auto-start on boot + management CLI...
+[ OK ] Auto-start on WSL boot: systemd service: litellm.service (enabled)
+[ OK ] Management CLI installed: /usr/local/bin/litellm  (try: litellm status)
+[INFO] [9/9] Configuring OpenCode on the Windows side...
+[ OK ] Windows user profile detected: /mnt/c/Users/Test User
+[ OK ] OpenCode config written: /mnt/c/Users/Test User/.config/opencode/opencode.json
+
+=================================================================
+  INSTALLATION COMPLETED SUCCESSFULLY!
+=================================================================
+
+  LiteLLM endpoint (from Windows) : http://127.0.0.1:4000/v1
+
+  ADMIN PANEL (UI) - open in the WINDOWS browser:
+    URL       : http://127.0.0.1:4000/ui
+    Username  : admin
+    Password  : sk-1a13aca3fb231b0f02c4b7e6bc5863d9307e35450d42d46bc1b524fe1ed3ee52
+    (the dashboard password IS the master key - no separate password exists)
+    saved to  : /tmp/litellm-test.pYiUVH/home/.litellm/dashboard_credentials.txt
+
+  Master key (also saved to)      : /tmp/litellm-test.pYiUVH/home/.litellm/master_key.txt
+  Master key                      : sk-1a13aca3fb231b0f02c4b7e6bc5863d9307e35450d42d46bc1b524fe1ed3ee52
+  LiteLLM config file             : /tmp/litellm-test.pYiUVH/home/.litellm/config.yaml
+  OpenCode config file (Windows)  : /mnt/c/Users/Test User/.config/opencode/opencode.json
+  Container name                  : litellm
+  Auto-start on WSL boot          : systemd service: litellm.service (enabled)
+  Admin UI database               : litellm-db (postgres, restart: unless-stopped)
+
+  MANAGEMENT COMMANDS (any terminal):
+    litellm up | down | restart | status | logs | uninstall
+
+  USEFUL COMMANDS (run inside WSL):
+    Live logs        : sudo docker logs -f litellm
+    Restart proxy    : sudo docker restart litellm
+    Stop proxy       : sudo docker stop litellm
+    Start proxy      : sudo docker start litellm
+    Test endpoint    : curl -s http://127.0.0.1:4000/v1/models \
+                         -H "Authorization: Bearer sk-1a13aca3fb231b0f02c4b7e6bc5863d9307e35450d42d46bc1b524fe1ed3ee52"
+    Re-run this tool : bash "/home/user/LiteLLM-OpenCode/LiteLLM.sh"
+
+  NEXT STEPS (on WINDOWS):
+    1. Open a NEW terminal (PowerShell or CMD).
+    2. cd into any project folder.
+    3. Run: opencode
+    4. Pick the provider 'LiteLLM Proxy (Local)' and a model.
+
+  NOTE: If you ever run 'wsl --shutdown', start Docker again with:
+        sudo service docker start   (auto if systemd is enabled)
+
+[ OK ] Done. Happy coding!
+
+=================================================================
+     LiteLLM  <->  OpenCode  Bridge  |  WSL2 Ubuntu Setup
+=================================================================
+
+   Proxy target : ghcr.io/berriai/litellm:main-latest
+   Proxy port   : 4000   (restart policy: unless-stopped)
+   Linux config : /tmp/litellm-test.pYiUVH/home/.litellm
+
+   Please choose an option:
+
+     1) Full Install    (Docker + LiteLLM proxy + OpenCode config)
+     2) Full Uninstall  (remove container + all generated configs)
+     q) Quit
+
+
+
+[INFO] === FULL UNINSTALL: starting ===
+
+[INFO] Stopping and removing container 'litellm'...
+[ OK ] Container removed.
+[ OK ] Removed Admin UI database container: litellm-db
+[ OK ] Removed LiteLLM config folder: /tmp/litellm-test.pYiUVH/home/.litellm
+[ OK ] Removed OpenCode config: /mnt/c/Users/Test User/.config/opencode/opencode.json
+[ OK ] Removed systemd service: /etc/systemd/system/litellm.service
+[ OK ] Removed boot helper: /usr/local/bin/litellm-boot.sh
+[ OK ] Removed management CLI: /usr/local/bin/litellm
+
+=================================================================
+  UNINSTALL COMPLETED SUCCESSFULLY!
+=================================================================
+
+  Removed:
+    - Docker container : litellm
+    - UI database      : litellm-db (postgres) + network litellm-net
+    - Linux folder     : /tmp/litellm-test.pYiUVH/home/.litellm  (config.yaml + master key)
+    - Windows file     : ~/.config/opencode/opencode.json
+    - Boot persistence : systemd service / wsl.conf boot entry / helper
+    - Management CLI   : /usr/local/bin/litellm
+
+  Kept (on purpose):
+    - Docker Engine itself and /etc/docker/daemon.json (mirrors)
+
+[ OK ] Done.
+    ok: exit code = 0
+    ok: contains: UNINSTALL COMPLETED SUCCESSFULLY
+    ok: contains: stop litellm
+    ok: contains: rm litellm
+    ok: contains: rm litellm-db
+    ok: contains: network rm litellm-net
+    ok: container registry empty
+    ok: file missing: /tmp/litellm-test.pYiUVH/home/.litellm/config.yaml
+    ok: file missing: /tmp/litellm-test.pYiUVH/home/.litellm/master_key.txt
+    ok: file missing: /tmp/litellm-test.pYiUVH/home/.litellm/dashboard_credentials.txt
+    ok: file missing: /mnt/c/Users/Test User/.config/opencode/opencode.json
+    ok: file missing: /tmp/litellm-test.pYiUVH/fakeroot/usr/local/bin/litellm
+    ok: file missing: /tmp/litellm-test.pYiUVH/fakeroot/usr/local/bin/litellm-boot.sh
+    ok: not contains: litellm-boot.sh
+
+--- docker-calls.log ---
+service docker restart
+systemctl enable docker.service
+docker info
+docker inspect -f {{range .Config.Env}}{{println .}}{{end}} litellm
+docker image inspect ghcr.io/berriai/litellm:main-latest
+docker pull ghcr.io/berriai/litellm:main-latest
+docker network inspect litellm-net
+docker ps -a --format {{.Names}}
+docker run -d --name litellm-db --restart unless-stopped --network litellm-net -e POSTGRES_USER=litellm -e POSTGRES_PASSWORD=50efefd845c80795af6b74303af507a6 -e POSTGRES_DB=litellm -v /tmp/litellm-test.pYiUVH/home/.litellm/pgdata:/var/lib/postgresql/data postgres:16-alpine
+docker exec litellm-db pg_isready -U litellm -d litellm
+docker ps -a --format {{.Names}}
+docker run -d --name litellm --restart unless-stopped -p 4000:4000 -v /tmp/litellm-test.pYiUVH/home/.litellm/config.yaml:/app/config.yaml:ro --network litellm-net -e LITELLM_MASTER_KEY=sk-1a13aca3fb231b0f02c4b7e6bc5863d9307e35450d42d46bc1b524fe1ed3ee52 -e UI_USERNAME=admin -e UI_PASSWORD=sk-1a13aca3fb231b0f02c4b7e6bc5863d9307e35450d42d46bc1b524fe1ed3ee52 -e DATABASE_URL=postgresql://litellm:50efefd845c80795af6b74303af507a6@litellm-db:5432/litellm -e GROQ_API_KEY=gsk_uninstall_0123456789ab ghcr.io/berriai/litellm:main-latest --config /app/config.yaml --port 4000
+systemctl daemon-reload
+systemctl enable litellm.service
+docker ps -a --format {{.Names}}
+docker stop litellm
+docker rm litellm
+docker ps -a --format {{.Names}}
+docker stop litellm-db
+docker rm litellm-db
+docker network rm litellm-net
+systemctl daemon-reload
+
+--- apt-calls.log ---
+apt-get update -y
+apt-get install -y docker.io
+
+--- containers.txt ---
+
+--- generated config.yaml ---
+
+--- generated daemon.json (virtual) ---
+{
+  "registry-mirrors": [
+    "https://docker.arvancloud.ir",
+    "https://docker.hub.iran.liara.run",
+    "https://docker.iranserver.com"
+  ]
+}
+
+--- generated opencode.json ---

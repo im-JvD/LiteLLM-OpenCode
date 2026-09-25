@@ -1,0 +1,54 @@
+
+=================================================================
+     LiteLLM  <->  OpenCode  Bridge  |  WSL2 Ubuntu Setup
+=================================================================
+
+   Proxy target : ghcr.io/berriai/litellm:main-latest
+   Proxy port   : 4000   (restart policy: unless-stopped)
+   Linux config : /tmp/litellm-test.NKPPKH/home/.litellm
+
+   Please choose an option:
+
+     1) Full Install    (Docker + LiteLLM proxy + OpenCode config)
+     2) Full Uninstall  (remove container + all generated configs)
+     q) Quit
+
+
+
+[INFO] === FULL UNINSTALL: starting ===
+
+[WARN] No container named 'litellm' found - nothing to remove.
+[WARN] LiteLLM config folder not found: /tmp/litellm-test.NKPPKH/home/.litellm
+[WARN] OpenCode config not found: /mnt/c/Users/Test User/.config/opencode/opencode.json
+
+=================================================================
+  UNINSTALL COMPLETED SUCCESSFULLY!
+=================================================================
+
+  Removed:
+    - Docker container : litellm
+    - UI database      : litellm-db (postgres) + network litellm-net
+    - Linux folder     : /tmp/litellm-test.NKPPKH/home/.litellm  (config.yaml + master key)
+    - Windows file     : ~/.config/opencode/opencode.json
+    - Boot persistence : systemd service / wsl.conf boot entry / helper
+    - Management CLI   : /usr/local/bin/litellm
+
+  Kept (on purpose):
+    - Docker Engine itself and /etc/docker/daemon.json (mirrors)
+
+[ OK ] Done.
+    ok: exit code = 0
+    ok: contains: No container named 'litellm' found
+    ok: contains: UNINSTALL COMPLETED SUCCESSFULLY
+
+--- docker-calls.log ---
+
+--- apt-calls.log ---
+
+--- containers.txt ---
+
+--- generated config.yaml ---
+
+--- generated daemon.json (virtual) ---
+
+--- generated opencode.json ---

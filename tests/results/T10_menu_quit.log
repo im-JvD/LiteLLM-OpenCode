@@ -1,0 +1,31 @@
+
+=================================================================
+     LiteLLM  <->  OpenCode  Bridge  |  WSL2 Ubuntu Setup
+=================================================================
+
+   Proxy target : ghcr.io/berriai/litellm:main-latest
+   Proxy port   : 4000   (restart policy: unless-stopped)
+   Linux config : /tmp/litellm-test.uaZyMn/home/.litellm
+
+   Please choose an option:
+
+     1) Full Install    (Docker + LiteLLM proxy + OpenCode config)
+     2) Full Uninstall  (remove container + all generated configs)
+     q) Quit
+
+
+[INFO] Bye!
+    ok: exit code = 0
+    ok: contains: Bye!
+
+--- docker-calls.log ---
+
+--- apt-calls.log ---
+
+--- containers.txt ---
+
+--- generated config.yaml ---
+
+--- generated daemon.json (virtual) ---
+
+--- generated opencode.json ---

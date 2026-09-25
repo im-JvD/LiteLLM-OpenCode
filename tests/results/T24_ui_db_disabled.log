@@ -1,0 +1,184 @@
+
+=================================================================
+     LiteLLM  <->  OpenCode  Bridge  |  WSL2 Ubuntu Setup
+=================================================================
+
+   Proxy target : ghcr.io/berriai/litellm:main-latest
+   Proxy port   : 4000   (restart policy: unless-stopped)
+   Linux config : /tmp/litellm-test.YcZhfT/home/.litellm
+
+   Please choose an option:
+
+     1) Full Install    (Docker + LiteLLM proxy + OpenCode config)
+     2) Full Uninstall  (remove container + all generated configs)
+     q) Quit
+
+
+
+[INFO] === FULL INSTALL: starting ===
+
+[INFO] [1/9] Checking WSL2 environment...
+[WARN] This does not look like a WSL kernel (/proc/version).
+[WARN] Continuing anyway - Windows/PowerShell integration may fail.
+[ OK ] WSL2 environment looks good.
+[INFO] [2/9] Installing Docker Engine (docker.io from Ubuntu apt repository)...
+apt-get: docker.io installed (stub)
+[INFO] [3/9] Configuring Iranian Docker Hub mirrors (/etc/docker/daemon.json)...
+[ OK ] Registry mirrors written:
+       - https://docker.arvancloud.ir
+       - https://docker.hub.iran.liara.run
+       - https://docker.iranserver.com
+[INFO]        Starting/restarting the Docker daemon...
+[ OK ] Docker daemon is up and running.
+
+[INFO] [4/9] API keys setup (5 providers)
+       Press ENTER to skip a provider you do not use.
+       At least ONE key is required.
+
+
+[ OK ] Collected 1 API key(s):
+         Groq       : gsk_****abcd
+         OpenRouter : <skipped>
+         Google AI  : <skipped>
+         Cerebras   : <skipped>
+         Mistral    : <skipped>
+
+[INFO]        Verifying API keys against the providers...
+[ OK ]          Groq: valid (HTTP 200)
+[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-test.YcZhfT/home/.litellm/master_key.txt
+[ OK ] Dashboard login saved to: /tmp/litellm-test.YcZhfT/home/.litellm/dashboard_credentials.txt
+[INFO] [5/9] Generating LiteLLM configuration: /tmp/litellm-test.YcZhfT/home/.litellm/config.yaml
+[ OK ] config.yaml generated (only providers with keys are enabled).
+[INFO] [6/9] Pulling prebuilt LiteLLM image (no build step): ghcr.io/berriai/litellm:main-latest
+[INFO]        This may take several minutes on the first run...
+[ OK ] Image pulled successfully.
+[INFO] [7/9] Starting LiteLLM container on port 4000...
+[INFO]        Admin UI database disabled (LITELLM_UI_DB=0).
+[ OK ] Container 'litellm' started (restart policy: unless-stopped).
+[INFO]        Waiting for LiteLLM to become healthy (up to 60s)...
+[ OK ] LiteLLM is healthy: http://127.0.0.1:4000
+[INFO] [8/9] Setting up auto-start on boot + management CLI...
+[ OK ] Auto-start on WSL boot: systemd service: litellm.service (enabled)
+[ OK ] Management CLI installed: /usr/local/bin/litellm  (try: litellm status)
+[INFO] [9/9] Configuring OpenCode on the Windows side...
+[ OK ] Windows user profile detected: /mnt/c/Users/Test User
+[ OK ] OpenCode config written: /mnt/c/Users/Test User/.config/opencode/opencode.json
+
+=================================================================
+  INSTALLATION COMPLETED SUCCESSFULLY!
+=================================================================
+
+  LiteLLM endpoint (from Windows) : http://127.0.0.1:4000/v1
+
+  ADMIN PANEL (UI) - open in the WINDOWS browser:
+    URL       : http://127.0.0.1:4000/ui
+    Username  : admin
+    Password  : sk-42715ebda478d1eccb4827b427f472d817f0a85c6494cf3e4e2a08560d229754
+    (the dashboard password IS the master key - no separate password exists)
+    saved to  : /tmp/litellm-test.YcZhfT/home/.litellm/dashboard_credentials.txt
+
+  Master key (also saved to)      : /tmp/litellm-test.YcZhfT/home/.litellm/master_key.txt
+  Master key                      : sk-42715ebda478d1eccb4827b427f472d817f0a85c6494cf3e4e2a08560d229754
+  LiteLLM config file             : /tmp/litellm-test.YcZhfT/home/.litellm/config.yaml
+  OpenCode config file (Windows)  : /mnt/c/Users/Test User/.config/opencode/opencode.json
+  Container name                  : litellm
+  Auto-start on WSL boot          : systemd service: litellm.service (enabled)
+  Admin UI database               : disabled (UI login will NOT work; chat via OpenCode is fine)
+
+  MANAGEMENT COMMANDS (any terminal):
+    litellm up | down | restart | status | logs | uninstall
+
+  USEFUL COMMANDS (run inside WSL):
+    Live logs        : sudo docker logs -f litellm
+    Restart proxy    : sudo docker restart litellm
+    Stop proxy       : sudo docker stop litellm
+    Start proxy      : sudo docker start litellm
+    Test endpoint    : curl -s http://127.0.0.1:4000/v1/models \
+                         -H "Authorization: Bearer sk-42715ebda478d1eccb4827b427f472d817f0a85c6494cf3e4e2a08560d229754"
+    Re-run this tool : bash "/home/user/LiteLLM-OpenCode/LiteLLM.sh"
+
+  NEXT STEPS (on WINDOWS):
+    1. Open a NEW terminal (PowerShell or CMD).
+    2. cd into any project folder.
+    3. Run: opencode
+    4. Pick the provider 'LiteLLM Proxy (Local)' and a model.
+
+  NOTE: If you ever run 'wsl --shutdown', start Docker again with:
+        sudo service docker start   (auto if systemd is enabled)
+
+[ OK ] Done. Happy coding!
+    ok: exit code = 0
+    ok: not contains: litellm-db
+    ok: not contains: DATABASE_URL
+    ok: not contains: database_url
+    ok: not contains: --network litellm-net
+    ok: contains: Admin UI database               : disabled
+    ok: file exists: /mnt/c/Users/Test User/.config/opencode/opencode.json
+
+--- docker-calls.log ---
+service docker restart
+systemctl enable docker.service
+docker info
+docker inspect -f {{range .Config.Env}}{{println .}}{{end}} litellm
+docker image inspect ghcr.io/berriai/litellm:main-latest
+docker pull ghcr.io/berriai/litellm:main-latest
+docker ps -a --format {{.Names}}
+docker run -d --name litellm --restart unless-stopped -p 4000:4000 -v /tmp/litellm-test.YcZhfT/home/.litellm/config.yaml:/app/config.yaml:ro -e LITELLM_MASTER_KEY=sk-42715ebda478d1eccb4827b427f472d817f0a85c6494cf3e4e2a08560d229754 -e UI_USERNAME=admin -e UI_PASSWORD=sk-42715ebda478d1eccb4827b427f472d817f0a85c6494cf3e4e2a08560d229754 -e GROQ_API_KEY=gsk_nodb_0123456789abcd ghcr.io/berriai/litellm:main-latest --config /app/config.yaml --port 4000
+systemctl daemon-reload
+systemctl enable litellm.service
+
+--- apt-calls.log ---
+apt-get update -y
+apt-get install -y docker.io
+
+--- containers.txt ---
+litellm
+
+--- generated config.yaml ---
+model_list:
+  # ---------------- Groq (fast inference) ----------------
+  - model_name: qwen-2.5-coder-32b
+    litellm_params:
+      model: groq/qwen-2.5-coder-32b
+      api_key: os.environ/GROQ_API_KEY
+      api_base: https://api.groq.com/openai/v1
+  - model_name: llama-3.3-70b-versatile
+    litellm_params:
+      model: groq/llama-3.3-70b-versatile
+      api_key: os.environ/GROQ_API_KEY
+      api_base: https://api.groq.com/openai/v1
+
+litellm_settings:
+  drop_params: true        # silently drop unsupported provider params
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
+
+--- generated daemon.json (virtual) ---
+{
+  "registry-mirrors": [
+    "https://docker.arvancloud.ir",
+    "https://docker.hub.iran.liara.run",
+    "https://docker.iranserver.com"
+  ]
+}
+
+--- generated opencode.json ---
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "litellm/qwen-2.5-coder-32b",
+  "provider": {
+    "litellm": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "LiteLLM Proxy (Local)",
+      "options": {
+        "baseURL": "http://127.0.0.1:4000/v1",
+        "apiKey": "sk-42715ebda478d1eccb4827b427f472d817f0a85c6494cf3e4e2a08560d229754"
+      },
+      "models": {
+        "qwen-2.5-coder-32b": { "name": "Qwen 2.5 Coder 32B (Groq, free)" },
+                "llama-3.3-70b-versatile": { "name": "Llama 3.3 70B Versatile (Groq, free)" }
+      }
+    }
+  }
+}

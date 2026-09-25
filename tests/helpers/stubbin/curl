@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+#-------------------------------------------------------------------------------
+# Test stub: curl
+#
+# - Provider key-verification endpoints (groq/openrouter/google/cerebras/
+#   mistral) answer with KEYCHECK_CODE (default: 200).
+# - Anything else using -w '%{http_code}' (the health check) answers with
+#   HEALTH_CODE (default: 200).
+#-------------------------------------------------------------------------------
+for a in "$@"; do
+  case "$a" in
+    *api.groq.com*|*openrouter.ai*|*generativelanguage.googleapis.com*|*api.cerebras.ai*|*api.mistral.ai*)
+      printf '%s' "${KEYCHECK_CODE:-200}"
+      exit 0
+      ;;
+  esac
+done
+# /v1/models list for the doctor command (2 Groq models, matching the
+# groq-only install used in the offline tests)
+for a in "$@"; do
+  case "$a" in
+    http://127.0.0.1:4000/v1/models)
+      echo '{"data":[{"id":"qwen-2.5-coder-32b","object":"model"},{"id":"llama-3.3-70b-versatile","object":"model"}]}'
+      exit 0
+      ;;
+  esac
+done
+# chat completions (doctor live test): falls through to the generic
+# '%{http_code}' handler below (prints HEALTH_CODE, default 200).
+code="${HEALTH_CODE:-200}"
+for a in "$@"; do
+  case "$a" in
+    *%{http_code}*)
+      printf '%s' "$code"
+      exit 0
+      ;;
+  esac
+done
+exit 0

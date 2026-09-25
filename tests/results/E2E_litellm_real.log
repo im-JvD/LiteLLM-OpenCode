@@ -1,0 +1,161 @@
+[E2E] ===================================================================
+[E2E] REAL LiteLLM end-to-end test
+[E2E] script under test: /home/user/LiteLLM-OpenCode/LiteLLM.sh
+[E2E] ===================================================================
+[E2E] [0] preflight
+[E2E] ok  - python3 + venv + PyPI reachable
+[E2E] [1] preparing REAL LiteLLM installation (venv: /tmp/litellm-e2e-venv)
+[E2E]     installing litellm[proxy] from PyPI (this can take a few minutes)...
+[E2E] ok  - real LiteLLM ready (version: 1.102.1)
+[E2E]     venv reused for faster reruns; delete /tmp/litellm-e2e-venv to reinstall
+[E2E] [2] running the setup script to generate real configuration artifacts
+
+=================================================================
+     LiteLLM  <->  OpenCode  Bridge  |  WSL2 Ubuntu Setup
+=================================================================
+
+   Proxy target : ghcr.io/berriai/litellm:main-latest
+   Proxy port   : 4000   (restart policy: unless-stopped)
+   Linux config : /tmp/litellm-e2e-run.WvxeqU/home/.litellm
+
+   Please choose an option:
+
+     1) Full Install    (Docker + LiteLLM proxy + OpenCode config)
+     2) Full Uninstall  (remove container + all generated configs)
+     q) Quit
+
+
+
+[INFO] === FULL INSTALL: starting ===
+
+[INFO] [1/9] Checking WSL2 environment...
+[WARN] This does not look like a WSL kernel (/proc/version).
+[WARN] Continuing anyway - Windows/PowerShell integration may fail.
+[ OK ] WSL2 environment looks good.
+[INFO] [2/9] Installing Docker Engine (docker.io from Ubuntu apt repository)...
+apt-get: docker.io installed (stub)
+[INFO] [3/9] Configuring Iranian Docker Hub mirrors (/etc/docker/daemon.json)...
+[ OK ] Registry mirrors written:
+       - https://docker.arvancloud.ir
+       - https://docker.hub.iran.liara.run
+       - https://docker.iranserver.com
+[INFO]        Starting/restarting the Docker daemon...
+[ OK ] Docker daemon is up and running.
+
+[INFO] [4/9] API keys setup (5 providers)
+       Press ENTER to skip a provider you do not use.
+       At least ONE key is required.
+
+
+[ OK ] Collected 5 API key(s):
+         Groq       : gsk_****abcd
+         OpenRouter : sk-o****abcd
+         Google AI  : AIza****89ab
+         Cerebras   : csk-****abcd
+         Mistral    : sk_e****6789
+
+[INFO]        Verifying API keys against the providers...
+[ OK ]          Groq: valid (HTTP 200)
+[ OK ]          OpenRouter: valid (HTTP 200)
+[ OK ]          Google AI: valid (HTTP 200)
+[ OK ]          Cerebras: valid (HTTP 200)
+[ OK ]          Mistral: valid (HTTP 200)
+[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-e2e-run.WvxeqU/home/.litellm/master_key.txt
+[ OK ] Dashboard login saved to: /tmp/litellm-e2e-run.WvxeqU/home/.litellm/dashboard_credentials.txt
+[INFO] [5/9] Generating LiteLLM configuration: /tmp/litellm-e2e-run.WvxeqU/home/.litellm/config.yaml
+[ OK ] config.yaml generated (only providers with keys are enabled).
+[INFO] [6/9] Pulling prebuilt LiteLLM image (no build step): ghcr.io/berriai/litellm:main-latest
+[INFO]        This may take several minutes on the first run...
+[ OK ] Image pulled successfully.
+[INFO] [7/9] Starting LiteLLM container on port 4000...
+[INFO]        Admin UI database disabled (LITELLM_UI_DB=0).
+[ OK ] Container 'litellm' started (restart policy: unless-stopped).
+[INFO]        Waiting for LiteLLM to become healthy (up to 60s)...
+[ OK ] LiteLLM is healthy: http://127.0.0.1:4000
+[INFO] [8/9] Setting up auto-start on boot + management CLI...
+[ OK ] Auto-start on WSL boot: systemd service: litellm.service (enabled)
+[ OK ] Management CLI installed: /usr/local/bin/litellm  (try: litellm status)
+[INFO] [9/9] Configuring OpenCode on the Windows side...
+[ OK ] Windows user profile detected: /mnt/c/Users/Test User
+[ OK ] OpenCode config written: /mnt/c/Users/Test User/.config/opencode/opencode.json
+
+=================================================================
+  INSTALLATION COMPLETED SUCCESSFULLY!
+=================================================================
+
+  LiteLLM endpoint (from Windows) : http://127.0.0.1:4000/v1
+
+  ADMIN PANEL (UI) - open in the WINDOWS browser:
+    URL       : http://127.0.0.1:4000/ui
+    Username  : admin
+    Password  : sk-72ce9e6375fe700b9d21223e49ffe18fb51c71902b646ecf78720c5eb6d7ef97
+    (the dashboard password IS the master key - no separate password exists)
+    saved to  : /tmp/litellm-e2e-run.WvxeqU/home/.litellm/dashboard_credentials.txt
+
+  Master key (also saved to)      : /tmp/litellm-e2e-run.WvxeqU/home/.litellm/master_key.txt
+  Master key                      : sk-72ce9e6375fe700b9d21223e49ffe18fb51c71902b646ecf78720c5eb6d7ef97
+  LiteLLM config file             : /tmp/litellm-e2e-run.WvxeqU/home/.litellm/config.yaml
+  OpenCode config file (Windows)  : /mnt/c/Users/Test User/.config/opencode/opencode.json
+  Container name                  : litellm
+  Auto-start on WSL boot          : systemd service: litellm.service (enabled)
+  Admin UI database               : disabled (UI login will NOT work; chat via OpenCode is fine)
+
+  MANAGEMENT COMMANDS (any terminal):
+    litellm up | down | restart | status | logs | uninstall
+
+  USEFUL COMMANDS (run inside WSL):
+    Live logs        : sudo docker logs -f litellm
+    Restart proxy    : sudo docker restart litellm
+    Stop proxy       : sudo docker stop litellm
+    Start proxy      : sudo docker start litellm
+    Test endpoint    : curl -s http://127.0.0.1:4000/v1/models \
+                         -H "Authorization: Bearer sk-72ce9e6375fe700b9d21223e49ffe18fb51c71902b646ecf78720c5eb6d7ef97"
+    Re-run this tool : bash "/home/user/LiteLLM-OpenCode/LiteLLM.sh"
+
+  NEXT STEPS (on WINDOWS):
+    1. Open a NEW terminal (PowerShell or CMD).
+    2. cd into any project folder.
+    3. Run: opencode
+    4. Pick the provider 'LiteLLM Proxy (Local)' and a model.
+
+  NOTE: If you ever run 'wsl --shutdown', start Docker again with:
+        sudo service docker start   (auto if systemd is enabled)
+
+[ OK ] Done. Happy coding!
+[E2E] ok  - setup script completed (exit 0)
+[E2E] ok  - config.yaml generated
+[E2E] ok  - master key generated
+[E2E] ok  - opencode.json generated
+[E2E] [3] starting REAL LiteLLM proxy on port 4000 with the generated config
+[E2E] ok  - proxy is UP - /health/liveliness returned 200
+[E2E] [4] asserting against the live LiteLLM API
+[E2E] ok  - GET /v1/models with master key -> 200
+[E2E] ok  - model list matches exactly all 7 expected models
+[E2E] ok  - model list == 7 expected models
+[E2E] ok  - GET /v1/models without auth rejected (code 500)
+[E2E] ok  - GET /v1/models with wrong key rejected (code 400)
+[E2E] ok  - POST /v1/chat/completions routed upstream and rejected fake provider key (code 500)
+[E2E] [5] cross-checking opencode.json against the live proxy
+[E2E] ok  - opencode.json points to the live proxy with the correct key
+[E2E] ok  - opencode.json consistent with live proxy
+
+--- live proxy log (tail) ---
+  File "/tmp/litellm-e2e-venv/lib/python3.11/site-packages/litellm/utils.py", line 2152, in wrapper_async
+    raise e
+  File "/tmp/litellm-e2e-venv/lib/python3.11/site-packages/litellm/utils.py", line 1964, in wrapper_async
+    result = await original_function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/litellm-e2e-venv/lib/python3.11/site-packages/litellm/main.py", line 701, in acompletion
+    raise exception_type(
+          ^^^^^^^^^^^^^^^
+  File "/tmp/litellm-e2e-venv/lib/python3.11/site-packages/litellm/litellm_core_utils/exception_mapping_utils.py", line 2673, in exception_type
+    raise e
+  File "/tmp/litellm-e2e-venv/lib/python3.11/site-packages/litellm/litellm_core_utils/exception_mapping_utils.py", line 2646, in exception_type
+    raise APIConnectionError(
+litellm.exceptions.APIConnectionError: litellm.APIConnectionError: GeminiException - Cannot connect to host generativelanguage.googleapis.com:443 ssl:<ssl.SSLContext object at 0x7fa92c9e35c0> [None]. Received Model Group=gemini-2.0-flash
+Available Model Group Fallbacks=None LiteLLM Retried: 2 times, LiteLLM Max Retries: 2
+INFO:     127.0.0.1:45672 - "POST /v1/chat/completions HTTP/1.1" 500 Internal Server Error
+
+[E2E] ===================================================================
+[E2E] E2E RESULT: PASS (all assertions against the REAL proxy passed)
+[E2E] ===================================================================
