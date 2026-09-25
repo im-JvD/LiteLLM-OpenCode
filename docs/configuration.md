@@ -13,6 +13,8 @@
 | `~/.litellm/config.yaml` | لینوکس (WSL) | پیکربندی LiteLLM: لیست مدل‌ها و تنظیمات |
 | `~/.litellm/master_key.txt` | لینوکس (WSL) | کلید احراز هویت پروکسی (دسترسی `600`) |
 | `~/.litellm/dashboard_credentials.txt` | لینوکس (WSL) | اطلاعات ورود پنل مدیریت: URL + Username + Password |
+| `~/.litellm/db_password.txt` | لینوکس (WSL) | رمز دیتابیس Postgres پنل مدیریت (دسترسی `600`) |
+| `~/.litellm/pgdata/` | لینوکس (WSL) | داده‌های ماندگار دیتابیس Admin UI |
 | `/etc/docker/daemon.json` | لینوکس (WSL) | میرورهای ایرانی داکرهاب |
 | `/usr/local/bin/litellm` | لینوکس (WSL) | دستورات مدیریت سریع (up/down/restart/…) |
 | `/usr/local/bin/litellm-boot.sh` | لینوکس (WSL) | اسکریپت استارت خودکار در بوت WSL |
@@ -159,6 +161,7 @@ http://127.0.0.1:4000/ui
 
 - در مرورگر **ویندوز** باز کنید (WSL2 پورت را به ویندوز منتقل می‌کند).
 - نام کاربری: `admin` — رمز عبور: همان **Master Key** (پسورد جداگانه وجود ندارد).
+- ⚠️ ورود به UI به دیتابیس نیاز دارد؛ نصاب به‌طور خودکار کانتینر `litellm-db` (Postgres) را می‌سازد و `DATABASE_URL` را به پروکسی می‌دهد. داده‌های DB در `~/.litellm/pgdata` ماندگارند و رمز DB در `~/.litellm/db_password.txt` (دسترسی 600) ذخیره می‌شود.
 - این اطلاعات با متغیرهای `UI_USERNAME` و `UI_PASSWORD` روی کانتینر تنظیم شده‌اند.
 - دیدن سریع اطلاعات ورود: `litellm credentials`
 - یک کپی هم در `~/.litellm/dashboard_credentials.txt` ذخیره می‌شود (دسترسی 600).
@@ -219,6 +222,8 @@ LITELLM_BOOT_MODE=wslconf bash LiteLLM.sh   # فقط boot command در /etc/wsl.
 | `LITELLM_IMAGE` | `ghcr.io/berriai/litellm:main-latest` | ایمیج سفارشی (رجیستری دلخواه) |
 | `LITELLM_GHCR_MIRROR` | خالی | میرور جایگزین ghcr (مثلاً `ghcr.nju.edu.cn`) — فقط وقتی pull مستقیم شکست خورد استفاده می‌شود |
 | `LITELLM_PULL_RETRIES` | `3` | تعداد تلاش مجدد pull قبل از fallback |
+| `LITELLM_UI_DB` | `1` | `1` = کانتینر Postgres برای ورود به Admin UI ساخته می‌شود؛ `0` = بدون DB (UI لاگین ندارد، چت سالم است) |
+| `LITELLM_DB_IMAGE` | `postgres:16-alpine` | ایمیج دیتابیس Admin UI (از داکرهاب و از مسیر میرورها) |
 
 نمونه:
 

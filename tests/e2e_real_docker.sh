@@ -124,14 +124,39 @@ if litellm status >/dev/null 2>&1; then ok "litellm status -> OK"; else fail "li
 BOOT_FILE="/usr/local/bin/litellm-boot.sh"
 if [ -f "$BOOT_FILE" ]; then ok "boot helper installed: ${BOOT_FILE}"; else fail "boot helper missing"; fi
 
-# [b] health endpoint
+# [b] Admin UI database container (required for UI login)
+if docker ps --format '{{.Names}}' | grep -qx "litellm-db"; then
+  ok "Admin UI database container 'litellm-db' is running"
+else
+  fail "Admin UI database container 'litellm-db' not running"
+fi
+
+# [b2] health endpoint (longer window: first boot runs DB migrations)
 HEALTH=""
-for i in $(seq 1 30); do
+for i in $(seq 1 60); do
   HEALTH="$(curl -s -o /dev/null -w '%{http_code}' --max-time 3 http://127.0.0.1:4000/health/liveliness 2>/dev/null || true)"
   [ "$HEALTH" = "200" ] && break
   sleep 2
 done
 if [ "$HEALTH" = "200" ]; then ok "health endpoint -> 200"; else fail "health endpoint -> ${HEALTH:-none}"; fi
+
+# [b3] THE critical check: Admin UI login must NOT hit the no-DB error
+LOGIN_CODE="$(curl -s -o "${WORK}/login.out" -w '%{http_code}' --max-time 20 \
+  -X POST -d "username=admin&password=${MASTER_KEY}" \
+  http://127.0.0.1:4000/login 2>/dev/null || true)"
+case "$LOGIN_CODE" in
+  200|302|303)
+    ok "Admin UI login with admin/master-key works (HTTP ${LOGIN_CODE}) - no 'Not connected to DB' error"
+    ;;
+  400)
+    fail "UI login returned 400 - the 'Not connected to DB!' error is still present"
+    cat "${WORK}/login.out" >> "$LOG_FILE" 2>/dev/null || true
+    ;;
+  *)
+    fail "UI login unexpected code: ${LOGIN_CODE:-none}"
+    cat "${WORK}/login.out" >> "$LOG_FILE" 2>/dev/null || true
+    ;;
+esac
 
 # [c] /v1/models with the generated master key
 MASTER_KEY="$(tr -d '\n' < "${HOME}/.litellm/master_key.txt" 2>/dev/null || true)"
@@ -182,6 +207,11 @@ if docker ps -a --format '{{.Names}}' 2>/dev/null | grep -qx "litellm"; then
   fail "container 'litellm' still exists after uninstall"
 else
   ok "container removed"
+fi
+if docker ps -a --format '{{.Names}}' 2>/dev/null | grep -qx "litellm-db"; then
+  fail "database container 'litellm-db' still exists after uninstall"
+else
+  ok "database container removed"
 fi
 [ ! -f "${HOME}/.litellm/config.yaml" ]  && ok "linux config removed"     || fail "linux config still present"
 [ ! -f "${HOME}/.litellm/master_key.txt" ] && ok "master key file removed" || fail "master key still present"

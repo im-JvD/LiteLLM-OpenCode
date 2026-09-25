@@ -9,7 +9,7 @@ on:
 
 jobs:
   offline-suite:
-    name: Offline simulated suite (24 scenarios)
+    name: Offline simulated suite (25 scenarios)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

@@ -48,6 +48,15 @@ SYSTEMD_UNIT="/etc/systemd/system/litellm.service"
 WSL_CONF="/etc/wsl.conf"
 BOOT_LINE="command = /usr/local/bin/litellm-boot.sh"
 AUTOSTART_MODE=""
+# Admin UI login requires a Postgres DB in recent LiteLLM versions.
+# Disable with LITELLM_UI_DB=0 (the proxy itself keeps working without it).
+UI_DB_ENABLED="${LITELLM_UI_DB:-1}"
+DB_CONTAINER="litellm-db"
+DB_NETWORK="litellm-net"
+DB_IMAGE="${LITELLM_DB_IMAGE:-postgres:16-alpine}"
+DB_USER="litellm"
+DB_NAME="litellm"
+DB_PASSWORD_FILE="${LITELLM_DIR}/db_password.txt"
 SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
 
 # Iranian Docker Hub mirrors (403 / rate-limit workaround)
@@ -339,6 +348,23 @@ collect_api_keys() {
   return 0
 }
 
+ensure_db_password() {
+  # Stable across reinstalls so the stored pgdata stays accessible.
+  if [ -s "$DB_PASSWORD_FILE" ]; then
+    DB_PASSWORD="$(tr -d '\n' < "$DB_PASSWORD_FILE")"
+  else
+    if command -v openssl >/dev/null 2>&1; then
+      DB_PASSWORD="$(openssl rand -hex 16)"
+    else
+      DB_PASSWORD="$(od -An -N16 -tx1 /dev/urandom | tr -d ' \n')"
+    fi
+    mkdir -p "$LITELLM_DIR"
+    printf '%s\n' "$DB_PASSWORD" > "$DB_PASSWORD_FILE"
+    chmod 600 "$DB_PASSWORD_FILE"
+  fi
+  return 0
+}
+
 generate_master_key() {
   # Keep the master key stable across reinstalls (dashboard login + every
   # client that stored it stay valid). Only generate one when none exists.
@@ -444,14 +470,15 @@ EOF
 EOF
     fi
 
-    cat <<'EOF'
-
-litellm_settings:
-  drop_params: true        # silently drop unsupported provider params
-
-general_settings:
-  master_key: os.environ/LITELLM_MASTER_KEY
-EOF
+    echo ""
+    echo "litellm_settings:"
+    echo "  drop_params: true        # silently drop unsupported provider params"
+    echo ""
+    echo "general_settings:"
+    echo "  master_key: os.environ/LITELLM_MASTER_KEY"
+    if [ "$UI_DB_ENABLED" = "1" ]; then
+      echo "  database_url: os.environ/DATABASE_URL"
+    fi
   } > "$LITELLM_CONFIG"
 
   log_ok "config.yaml generated (only providers with keys are enabled)."
@@ -464,11 +491,51 @@ build_docker_env_args() {
   DOCKER_ENV_ARGS=(-e "LITELLM_MASTER_KEY=${MASTER_KEY}")
   # Admin panel (UI) login credentials: http://127.0.0.1:4000/ui
   DOCKER_ENV_ARGS+=(-e "UI_USERNAME=admin" -e "UI_PASSWORD=${MASTER_KEY}")
+  if [ "$UI_DB_ENABLED" = "1" ]; then
+    ensure_db_password
+    DOCKER_ENV_ARGS+=(-e "DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@${DB_CONTAINER}:5432/${DB_NAME}")
+  fi
   if [ -n "$GROQ_KEY" ];       then DOCKER_ENV_ARGS+=(-e "GROQ_API_KEY=${GROQ_KEY}"); fi
   if [ -n "$OPENROUTER_KEY" ]; then DOCKER_ENV_ARGS+=(-e "OPENROUTER_API_KEY=${OPENROUTER_KEY}"); fi
   if [ -n "$GEMINI_KEY" ];     then DOCKER_ENV_ARGS+=(-e "GEMINI_API_KEY=${GEMINI_KEY}"); fi
   if [ -n "$CEREBRAS_KEY" ];   then DOCKER_ENV_ARGS+=(-e "CEREBRAS_API_KEY=${CEREBRAS_KEY}"); fi
   if [ -n "$MISTRAL_KEY" ];    then DOCKER_ENV_ARGS+=(-e "MISTRAL_API_KEY=${MISTRAL_KEY}"); fi
+  return 0
+}
+
+ensure_db_stack() {
+  if [ "$UI_DB_ENABLED" != "1" ]; then
+    log_info "       Admin UI database disabled (LITELLM_UI_DB=0)."
+    return 0
+  fi
+  ensure_db_password
+  $SUDO docker network inspect "$DB_NETWORK" >/dev/null 2>&1 || \
+    $SUDO docker network create "$DB_NETWORK" >/dev/null
+  if ! $SUDO docker ps -a --format '{{.Names}}' 2>/dev/null | grep -qx "$DB_CONTAINER"; then
+    log_info "       Starting the Admin UI database (${DB_IMAGE})..."
+    $SUDO docker run -d \
+      --name "$DB_CONTAINER" \
+      --restart unless-stopped \
+      --network "$DB_NETWORK" \
+      -e "POSTGRES_USER=${DB_USER}" \
+      -e "POSTGRES_PASSWORD=${DB_PASSWORD}" \
+      -e "POSTGRES_DB=${DB_NAME}" \
+      -v "${LITELLM_DIR}/pgdata:/var/lib/postgresql/data" \
+      "$DB_IMAGE" >/dev/null
+    log_ok "       Database container '${DB_CONTAINER}' started (restart policy: unless-stopped)."
+  else
+    log_ok "       Database container '${DB_CONTAINER}' already present."
+  fi
+  log_info "       Waiting for the database to accept connections..."
+  local i
+  for i in $(seq 1 30); do
+    if $SUDO docker exec "$DB_CONTAINER" pg_isready -U "$DB_USER" -d "$DB_NAME" >/dev/null 2>&1; then
+      log_ok "       Database is ready."
+      return 0
+    fi
+    sleep 2
+  done
+  log_warn "       Database not ready yet - LiteLLM will keep retrying in the background."
   return 0
 }
 
@@ -535,14 +602,21 @@ pull_liteLLM_image() {
 
 start_litellm_container() {
   log_info "[7/9] Starting LiteLLM container on port ${LITELLM_PORT}..."
+  ensure_db_stack
   remove_existing_container
   build_docker_env_args
+
+  local net_args=()
+  if [ "$UI_DB_ENABLED" = "1" ]; then
+    net_args+=(--network "$DB_NETWORK")
+  fi
 
   $SUDO docker run -d \
     --name "$CONTAINER_NAME" \
     --restart unless-stopped \
     -p "${LITELLM_PORT}:4000" \
     -v "${LITELLM_CONFIG}:/app/config.yaml:ro" \
+    "${net_args[@]}" \
     "${DOCKER_ENV_ARGS[@]}" \
     "$LITELLM_IMAGE" \
     --config /app/config.yaml \
@@ -552,9 +626,18 @@ start_litellm_container() {
 }
 
 wait_for_litellm() {
-  log_info "       Waiting for LiteLLM to become healthy (up to 60s)..."
+  # First boot with the database runs schema migrations - allow more time.
+  local max_iters
+  if [ -n "${LITELLM_HEALTH_WAIT_SEC:-}" ]; then
+    max_iters=$(( (LITELLM_HEALTH_WAIT_SEC + 1) / 2 ))
+  elif [ "$UI_DB_ENABLED" = "1" ]; then
+    max_iters=60
+  else
+    max_iters=30
+  fi
+  log_info "       Waiting for LiteLLM to become healthy (up to $((max_iters * 2))s)..."
   local i http_code=""
-  for i in $(seq 1 30); do
+  for i in $(seq 1 "$max_iters"); do
     http_code=""
     if command -v curl >/dev/null 2>&1; then
       http_code="$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:${LITELLM_PORT}/health/liveliness" 2>/dev/null || true)"
@@ -615,6 +698,8 @@ write_management_cli() {
 set -u
 
 CONTAINER_NAME="litellm"
+DB_CONTAINER="litellm-db"
+DB_NETWORK="litellm-net"
 PORT="4000"
 LITELLM_DIR="${HOME}/.litellm"
 KEYFILE="${LITELLM_DIR}/master_key.txt"
@@ -756,6 +841,13 @@ cmd_status() {
   echo "  Health endpoint : $(health_code)  (http://127.0.0.1:${PORT}/health/liveliness)"
   echo "  OpenAI endpoint : http://127.0.0.1:${PORT}/v1"
   echo "  Admin panel     : http://127.0.0.1:${PORT}/ui  (user: admin, password: master key)"
+  if $SUDO docker ps -a --format '{{.Names}}' 2>/dev/null | grep -qx "$DB_CONTAINER"; then
+    local dbstate
+    dbstate="$($SUDO docker inspect -f '{{.State.Status}}' "$DB_CONTAINER" 2>/dev/null || echo unknown)"
+    echo "  Admin database  : ${DB_CONTAINER} (${dbstate})"
+  else
+    echo "  Admin database  : not installed (UI login requires it)"
+  fi
   echo "  Config file     : ${CONFIG_FILE}$([ -f "$CONFIG_FILE" ] && echo ' (present)' || echo ' (missing)')"
   echo "  Master key file : ${KEYFILE}$([ -f "$KEYFILE" ] && echo ' (present)' || echo ' (missing)')"
   echo "  UI credentials  : ${LITELLM_DIR}/dashboard_credentials.txt$([ -f "${LITELLM_DIR}/dashboard_credentials.txt" ] && echo ' (present)' || echo ' (missing)')"
@@ -785,6 +877,13 @@ cmd_uninstall() {
   else
     log_warn "No container named '${CONTAINER_NAME}' found."
   fi
+
+  if $SUDO docker ps -a --format '{{.Names}}' 2>/dev/null | grep -qx "$DB_CONTAINER"; then
+    $SUDO docker stop "$DB_CONTAINER" >/dev/null 2>&1 || true
+    $SUDO docker rm "$DB_CONTAINER"   >/dev/null 2>&1 || true
+    log_ok "Admin UI database container removed."
+  fi
+  $SUDO docker network rm "$DB_NETWORK" >/dev/null 2>&1 || true
 
   if [ -d "$LITELLM_DIR" ]; then
     rm -rf "$LITELLM_DIR"
@@ -821,7 +920,7 @@ cmd_uninstall() {
 
   echo
   log_ok "UNINSTALL COMPLETED."
-  echo "  Kept: Docker Engine, /etc/docker/daemon.json and the pulled image."
+  echo "  Kept: Docker Engine, /etc/docker/daemon.json and the pulled images."
   return 0
 }
 
@@ -1036,6 +1135,11 @@ print_install_success() {
   echo "  OpenCode config file (Windows)  : ${oc_file}"
   echo "  Container name                  : ${CONTAINER_NAME}"
   echo "  Auto-start on WSL boot          : ${AUTOSTART_MODE}"
+  if [ "$UI_DB_ENABLED" = "1" ]; then
+    echo "  Admin UI database               : ${DB_CONTAINER} (postgres, restart: unless-stopped)"
+  else
+    echo "  Admin UI database               : disabled (UI login will NOT work; chat via OpenCode is fine)"
+  fi
   echo
   echo -e "${C_BOLD}  MANAGEMENT COMMANDS (any terminal):${C_NC}"
   echo "    litellm up | down | restart | status | logs | uninstall"
@@ -1083,6 +1187,16 @@ full_uninstall() {
     log_ok "Container removed."
   else
     log_warn "No container named '${CONTAINER_NAME}' found - nothing to remove."
+  fi
+
+  # 1b) Remove the Admin UI database container + docker network
+  if command -v docker >/dev/null 2>&1; then
+    if $SUDO docker ps -a --format '{{.Names}}' 2>/dev/null | grep -qx "$DB_CONTAINER"; then
+      $SUDO docker stop "$DB_CONTAINER" >/dev/null 2>&1 || true
+      $SUDO docker rm "$DB_CONTAINER"   >/dev/null 2>&1 || true
+      log_ok "Removed Admin UI database container: ${DB_CONTAINER}"
+    fi
+    $SUDO docker network rm "$DB_NETWORK" >/dev/null 2>&1 || true
   fi
 
   # 2) Remove the LiteLLM config folder in Linux
@@ -1142,6 +1256,7 @@ full_uninstall() {
   echo
   echo "  Removed:"
   echo "    - Docker container : ${CONTAINER_NAME}"
+  echo "    - UI database      : ${DB_CONTAINER} (postgres) + network ${DB_NETWORK}"
   echo "    - Linux folder     : ${LITELLM_DIR}  (config.yaml + master key)"
   echo "    - Windows file     : ~/.config/opencode/opencode.json"
   echo "    - Boot persistence : systemd service / wsl.conf boot entry / helper"

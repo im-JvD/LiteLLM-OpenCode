@@ -127,7 +127,11 @@ if [ ! -d "$PROFILE_DIR" ]; then
   fi
 fi
 printf '1\ngsk_e2e_groq_0123456789abcd\nsk-or-e2e_0123456789abcd\nAIzaE2eTest0123456789ab\ncsk-e2e_0123456789abcd\nsk_e2e_mistral0123456789\n' | \
+  # LITELLM_UI_DB=0: this sandbox cannot run the Postgres-backed Admin UI
+  # (prisma engine CDN is blocked here; the real Docker image ships it).
+  # The DB path is exercised by tests/e2e_real_docker.sh on a real machine.
   env -u DOCKER_PULL_FAIL -u DOCKER_APT_FAIL -u HEALTH_CODE -u PS_USERNAME \
+    LITELLM_UI_DB="0" \
     HOME="$HOME_DIR" PATH="${STUBBIN}:${PATH}" \
     STUBBIN="$STUBBIN" T_WORKSTATE="${WORK}/state" FAKE_ROOT="${WORK}/fakeroot" \
     HEALTH_CODE="200" PS_USERNAME="Test User" \

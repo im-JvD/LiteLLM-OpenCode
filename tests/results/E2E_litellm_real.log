@@ -15,7 +15,7 @@
 
    Proxy target : ghcr.io/berriai/litellm:main-latest
    Proxy port   : 4000   (restart policy: unless-stopped)
-   Linux config : /tmp/litellm-e2e-run.6p66G9/home/.litellm
+   Linux config : /tmp/litellm-e2e-run.mXtxZk/home/.litellm
 
    Please choose an option:
 
@@ -52,14 +52,15 @@ apt-get: docker.io installed (stub)
          Google AI  : AIza****89ab
          Cerebras   : csk-****abcd
          Mistral    : sk_e****6789
-[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-e2e-run.6p66G9/home/.litellm/master_key.txt
-[ OK ] Dashboard login saved to: /tmp/litellm-e2e-run.6p66G9/home/.litellm/dashboard_credentials.txt
-[INFO] [5/9] Generating LiteLLM configuration: /tmp/litellm-e2e-run.6p66G9/home/.litellm/config.yaml
+[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-e2e-run.mXtxZk/home/.litellm/master_key.txt
+[ OK ] Dashboard login saved to: /tmp/litellm-e2e-run.mXtxZk/home/.litellm/dashboard_credentials.txt
+[INFO] [5/9] Generating LiteLLM configuration: /tmp/litellm-e2e-run.mXtxZk/home/.litellm/config.yaml
 [ OK ] config.yaml generated (only providers with keys are enabled).
 [INFO] [6/9] Pulling prebuilt LiteLLM image (no build step): ghcr.io/berriai/litellm:main-latest
 [INFO]        This may take several minutes on the first run...
 [ OK ] Image pulled successfully.
 [INFO] [7/9] Starting LiteLLM container on port 4000...
+[INFO]        Admin UI database disabled (LITELLM_UI_DB=0).
 [ OK ] Container 'litellm' started (restart policy: unless-stopped).
 [INFO]        Waiting for LiteLLM to become healthy (up to 60s)...
 [ OK ] LiteLLM is healthy: http://127.0.0.1:4000
@@ -79,16 +80,17 @@ apt-get: docker.io installed (stub)
   ADMIN PANEL (UI) - open in the WINDOWS browser:
     URL       : http://127.0.0.1:4000/ui
     Username  : admin
-    Password  : sk-60cc483c0b8bbc957ea6cacb4951b8d244cc1ab119cf2d216a9e88ab3e5588c5
+    Password  : sk-c64d432695a59f593eb3ca37e0b6e6d1e96fb1f23274c77132a165af3023b2cf
     (the dashboard password IS the master key - no separate password exists)
-    saved to  : /tmp/litellm-e2e-run.6p66G9/home/.litellm/dashboard_credentials.txt
+    saved to  : /tmp/litellm-e2e-run.mXtxZk/home/.litellm/dashboard_credentials.txt
 
-  Master key (also saved to)      : /tmp/litellm-e2e-run.6p66G9/home/.litellm/master_key.txt
-  Master key                      : sk-60cc483c0b8bbc957ea6cacb4951b8d244cc1ab119cf2d216a9e88ab3e5588c5
-  LiteLLM config file             : /tmp/litellm-e2e-run.6p66G9/home/.litellm/config.yaml
+  Master key (also saved to)      : /tmp/litellm-e2e-run.mXtxZk/home/.litellm/master_key.txt
+  Master key                      : sk-c64d432695a59f593eb3ca37e0b6e6d1e96fb1f23274c77132a165af3023b2cf
+  LiteLLM config file             : /tmp/litellm-e2e-run.mXtxZk/home/.litellm/config.yaml
   OpenCode config file (Windows)  : /mnt/c/Users/Test User/.config/opencode/opencode.json
   Container name                  : litellm
   Auto-start on WSL boot          : systemd service: litellm.service (enabled)
+  Admin UI database               : disabled (UI login will NOT work; chat via OpenCode is fine)
 
   MANAGEMENT COMMANDS (any terminal):
     litellm up | down | restart | status | logs | uninstall
@@ -99,7 +101,7 @@ apt-get: docker.io installed (stub)
     Stop proxy       : sudo docker stop litellm
     Start proxy      : sudo docker start litellm
     Test endpoint    : curl -s http://127.0.0.1:4000/v1/models \
-                         -H "Authorization: Bearer sk-60cc483c0b8bbc957ea6cacb4951b8d244cc1ab119cf2d216a9e88ab3e5588c5"
+                         -H "Authorization: Bearer sk-c64d432695a59f593eb3ca37e0b6e6d1e96fb1f23274c77132a165af3023b2cf"
     Re-run this tool : bash "/home/user/LiteLLM-OpenCode/LiteLLM.sh"
 
   NEXT STEPS (on WINDOWS):
@@ -122,7 +124,7 @@ apt-get: docker.io installed (stub)
 [E2E] ok  - GET /v1/models with master key -> 200
 [E2E] ok  - model list matches exactly all 7 expected models
 [E2E] ok  - model list == 7 expected models
-[E2E] ok  - GET /v1/models without auth rejected (code 500)
+[E2E] ok  - GET /v1/models without auth rejected (code 401)
 [E2E] ok  - GET /v1/models with wrong key rejected (code 400)
 [E2E] ok  - POST /v1/chat/completions routed upstream and rejected fake provider key (code 500)
 [E2E] [5] cross-checking opencode.json against the live proxy
@@ -142,9 +144,9 @@ apt-get: docker.io installed (stub)
     raise e
   File "/tmp/litellm-e2e-venv/lib/python3.11/site-packages/litellm/litellm_core_utils/exception_mapping_utils.py", line 2646, in exception_type
     raise APIConnectionError(
-litellm.exceptions.APIConnectionError: litellm.APIConnectionError: GeminiException - Cannot connect to host generativelanguage.googleapis.com:443 ssl:<ssl.SSLContext object at 0x7feedc48b5c0> [None]. Received Model Group=gemini-2.0-flash
+litellm.exceptions.APIConnectionError: litellm.APIConnectionError: GeminiException - Cannot connect to host generativelanguage.googleapis.com:443 ssl:<ssl.SSLContext object at 0x7f5cba4e3da0> [None]. Received Model Group=gemini-2.0-flash
 Available Model Group Fallbacks=None LiteLLM Retried: 2 times, LiteLLM Max Retries: 2
-INFO:     127.0.0.1:41582 - "POST /v1/chat/completions HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:40038 - "POST /v1/chat/completions HTTP/1.1" 500 Internal Server Error
 
 [E2E] ===================================================================
 [E2E] E2E RESULT: PASS (all assertions against the REAL proxy passed)

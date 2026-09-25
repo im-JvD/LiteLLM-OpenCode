@@ -185,6 +185,28 @@ sudo docker logs -f litellm
 
 CLI مدیریت نصب نشده یا حذف شده — دوباره گزینهٔ `1` نصاب را اجرا کنید. مسیر: `/usr/local/bin/litellm`.
 
+### خطای «Authentication Error, Not connected to DB!» هنگام Login به پنل
+
+این شناخته‌شده‌ترین محدودیت نسخه‌های جدید LiteLLM است: **ورود به Admin UI بدون یک دیتابیس Postgres اصلاً ممکن نیست** — حتی اگر نام کاربری و رمز را درست بزنید. پیام پشت صحنه:
+
+```json
+{"error":{"message":"Authentication Error, Not connected to DB!","type":"auth_error","code":"400"}}
+```
+
+نصاب این مشکل را کامل حل کرده: یک کانتینر Postgres به نام `litellm-db` کنار پروکسی بالا می‌آورد (از داکرهاب و از طریق میرورهای ایرانی) و `DATABASE_URL` را به کانتینر `litellm` می‌دهد. پس در نصب‌های جدید این خطا نباید ظاهر شود. اگر دیدید:
+
+```bash
+sudo docker ps                     # هر دو کانتینر litellm و litellm-db باید Up باشند
+litellm restart                    # اولین بوت بعد از ساخت DB، مایگریشن انجام می‌دهد (کمی صبر)
+sudo docker logs litellm 2>&1 | grep -i "database\|prisma" | tail -20
+```
+
+اگر قبل از این نسخه نصب کرده‌اید (بدون دیتابیس)، یک بار نصاب را دوباره اجرا کنید تا کانتینر DB هم ساخته شود.
+
+- می‌خواهید بدون DB اجرا کنید؟ `LITELLM_UI_DB=0 bash LiteLLM.sh` — در این حالت UI لاگین ندارد ولی **چت از طریق OpenCode کاملاً کار می‌کند** (پروکسی به DB نیازی ندارد).
+
+---
+
 ### پنل `http://127.0.0.1:4000/ui` باز نمی‌شود یا Login نمی‌شود
 
 - پروکسی روشن است؟ `litellm status`

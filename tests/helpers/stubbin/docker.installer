@@ -178,6 +178,15 @@ case "$cmd" in
     fi
     exit 0
     ;;
+  network)
+    sub="${1:-}"; shift || true
+    # create/inspect/rm - always succeed (state is not tracked)
+    exit 0
+    ;;
+  exec)
+    # e.g. docker exec litellm-db pg_isready -U litellm -d litellm -> ready
+    exit 0
+    ;;
   logs|images|version)
     exit 0
     ;;

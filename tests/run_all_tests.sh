@@ -133,6 +133,8 @@ run_script() { # optional $1 = path of the script copy to run (default: the real
     HEALTH_CODE="${T_HEALTH_CODE:-200}" \
     LITELLM_BOOT_MODE="${T_BOOT_MODE:-auto}" \
     LITELLM_PULL_RETRIES="${T_PULL_RETRIES:-3}" \
+    LITELLM_UI_DB="${T_UI_DB:-1}" \
+    LITELLM_HEALTH_WAIT_SEC="${T_HEALTH_WAIT_SEC:-}" \
     bash "$script_file" >> "$CURRENT_LOG" 2>&1
 }
 
@@ -355,6 +357,15 @@ if [ "$MNT_OK" -eq 1 ]; then
   assert_contains "${T_WORKSTATE}/docker-calls.log" "-e UI_PASSWORD=${MK}"
   assert_contains "${T_WORKSTATE}/docker-calls.log" "-e UI_USERNAME=admin"
   assert_contains "${T_WORKSTATE}/docker-calls.log" "-e UI_PASSWORD=${MK}"
+  assert_file_exists "${HOME_DIR}/.litellm/db_password.txt"
+  assert_contains "${T_WORKSTATE}/docker-calls.log" "run -d --name litellm-db --restart unless-stopped --network litellm-net"
+  assert_contains "${T_WORKSTATE}/docker-calls.log" "-e POSTGRES_USER=litellm"
+  assert_contains "${T_WORKSTATE}/docker-calls.log" "-v ${HOME_DIR}/.litellm/pgdata:/var/lib/postgresql/data"
+  assert_contains "${T_WORKSTATE}/docker-calls.log" "exec litellm-db pg_isready"
+  assert_contains "${T_WORKSTATE}/docker-calls.log" "-e DATABASE_URL=postgresql://litellm:"
+  assert_contains "${T_WORKSTATE}/docker-calls.log" "@litellm-db:5432/litellm"
+  assert_contains "${T_WORKSTATE}/docker-calls.log" "--network litellm-net"
+  assert_contains "${HOME_DIR}/.litellm/config.yaml" "database_url: os.environ/DATABASE_URL"
   assert_file_exists "${FAKE_ROOT}/usr/local/bin/litellm"
   assert_file_exists "${FAKE_ROOT}/usr/local/bin/litellm-boot.sh"
   if grep -qF "command = /usr/local/bin/litellm-boot.sh" "${FAKE_ROOT}/etc/wsl.conf" 2>/dev/null \
@@ -487,6 +498,8 @@ if [ "$MNT_OK" -eq 1 ]; then
   assert_contains "$CURRENT_LOG" "UNINSTALL COMPLETED SUCCESSFULLY"
   assert_contains "${T_WORKSTATE}/docker-calls.log" "stop litellm"
   assert_contains "${T_WORKSTATE}/docker-calls.log" "rm litellm"
+  assert_contains "${T_WORKSTATE}/docker-calls.log" "rm litellm-db"
+  assert_contains "${T_WORKSTATE}/docker-calls.log" "network rm litellm-net"
   if [ ! -s "${T_WORKSTATE}/containers.txt" ]; then a_ok "container registry empty"; else a_bad "container still registered"; fi
   assert_file_missing "${HOME_DIR}/.litellm/config.yaml"
   assert_file_missing "${HOME_DIR}/.litellm/master_key.txt"
@@ -646,12 +659,14 @@ start_test "T14_health_check_timeout"
 if [ "$MNT_OK" -eq 1 ]; then
   fresh_env
   T_HEALTH_CODE="000"
+  T_HEALTH_WAIT_SEC="4"
   printf '1\ngsk_timeout_0123456789abcd\n\n\n\n\n' | run_script
   T_RC=$?
   assert_rc 0
   assert_contains "$CURRENT_LOG" "Health check timed out"
   assert_contains "$CURRENT_LOG" "INSTALLATION COMPLETED SUCCESSFULLY"
   T_HEALTH_CODE=""
+  T_HEALTH_WAIT_SEC=""
   dump_state
   finish_test
 else
@@ -879,6 +894,7 @@ if [ "$MNT_OK" -eq 1 ]; then
   printf '1\n\n' | run_script
   T_RC=$?
   assert_rc 0
+  assert_contains "$CURRENT_LOG" "Database container 'litellm-db' already present."
   assert_contains "$CURRENT_LOG" "Existing API keys found (from the previous install)"
   assert_contains "$CURRENT_LOG" "Groq       : gsk_****9abc"
   assert_contains "$CURRENT_LOG" "Keeping the existing 1 API key(s)."
@@ -889,6 +905,29 @@ if [ "$MNT_OK" -eq 1 ]; then
   if [ -n "$MK1" ] && [ "$MK1" = "$MK2" ]; then a_ok "master key stable across reinstall"; else a_bad "master key changed on reinstall"; fi
   MK="$(master_key_from)"
   assert_opencode_json "/mnt/c/Users/Test User/.config/opencode/opencode.json" "$MK" "qwen-2.5-coder-32b" "$GROQ2_MODELS"
+  dump_state
+  finish_test
+else
+  skip_test "requires writable /mnt/c"
+fi
+
+#===============================================================================
+# T24 - LITELLM_UI_DB=0: no database stack, config without database_url
+#===============================================================================
+start_test "T24_ui_db_disabled"
+if [ "$MNT_OK" -eq 1 ]; then
+  fresh_env
+  T_UI_DB="0"
+  printf '1\ngsk_nodb_0123456789abcd\n\n\n\n\n' | run_script
+  T_RC=$?
+  T_UI_DB=""
+  assert_rc 0
+  assert_not_contains "${T_WORKSTATE}/docker-calls.log" "litellm-db"
+  assert_not_contains "${T_WORKSTATE}/docker-calls.log" "DATABASE_URL"
+  assert_not_contains "${HOME_DIR}/.litellm/config.yaml" "database_url"
+  assert_not_contains "${T_WORKSTATE}/docker-calls.log" "--network litellm-net"
+  assert_contains "$CURRENT_LOG" "Admin UI database               : disabled"
+  assert_file_exists "/mnt/c/Users/Test User/.config/opencode/opencode.json"
   dump_state
   finish_test
 else
