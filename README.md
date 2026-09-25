@@ -26,6 +26,8 @@ bash <(wget -qO- https://raw.githubusercontent.com/im-JvD/LiteLLM-OpenCode/main/
 > curl -fsSL https://raw.githubusercontent.com/im-JvD/LiteLLM-OpenCode/main/LiteLLM.sh -o /tmp/LiteLLM.sh
 > bash /tmp/LiteLLM.sh
 > ```
+>
+> 📝 اگر فایل را **دستی در ویندوز ذخیره می‌کنید** و خطایی مثل `set: pipefail: invalid option name` دیدید، مشکل خط‌پایان ویندوزی (CRLF) است — راه‌حل در [عیب‌یابی](docs/troubleshooting.md). (اسکریپت در اجرای `bash LiteLLM.sh` خودش این حالت را ترمیم می‌کند.)
 
 ---
 
@@ -42,7 +44,7 @@ bash <(wget -qO- https://raw.githubusercontent.com/im-JvD/LiteLLM-OpenCode/main/
 | 🔁 اجرای پایدار | کانتینر با `--restart unless-stopped` روی پورت 4000 |
 | 🪟 تشخیص هوشمند ویندوز | پیدا کردن مسیر پروفایل با PowerShell (حتی با فاصله در نام کاربری) |
 | 🔒 کلید امن | ساخت خودکار Master Key و ذخیرهٔ امن آن |
-| 🧪 تست‌شده | ۱۷ سناریوی شبیه‌سازی‌شده + تست واقعی E2E با خودِ LiteLLM |
+| 🧪 تست‌شده | ۱۸ سناریوی شبیه‌سازی‌شده + تست واقعی E2E با خودِ LiteLLM |
 
 ---
 

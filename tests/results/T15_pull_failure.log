@@ -5,7 +5,7 @@
 
    Proxy target : ghcr.io/berriai/litellm:main-latest
    Proxy port   : 4000   (restart policy: unless-stopped)
-   Linux config : /tmp/litellm-test.Cg88z4/home/.litellm
+   Linux config : /tmp/litellm-test.R2MCkZ/home/.litellm
 
    Please choose an option:
 
@@ -42,8 +42,8 @@ apt-get: docker.io installed (stub)
          Google AI  : <skipped>
          Cerebras   : <skipped>
          Mistral    : <skipped>
-[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-test.Cg88z4/home/.litellm/master_key.txt
-[INFO] [5/8] Generating LiteLLM configuration: /tmp/litellm-test.Cg88z4/home/.litellm/config.yaml
+[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-test.R2MCkZ/home/.litellm/master_key.txt
+[INFO] [5/8] Generating LiteLLM configuration: /tmp/litellm-test.R2MCkZ/home/.litellm/config.yaml
 [ OK ] config.yaml generated (only providers with keys are enabled).
 [INFO] [6/8] Pulling prebuilt LiteLLM image (no build step): ghcr.io/berriai/litellm:main-latest
 [INFO]        This may take several minutes on the first run...

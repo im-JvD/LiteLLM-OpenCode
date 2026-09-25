@@ -1,4 +1,4 @@
-SUITE RUN - 2026-09-25T12:35:50Z
+SUITE RUN - 2026-09-25T12:46:27Z
 host: Linux 6.1.158+ | user: user | bash: 5.2.15(1)-release
 PASS  T00_static_checks
 PASS  T01_full_install_all_keys
@@ -17,7 +17,7 @@ PASS  T13_powershell_fallback_path
 PASS  T14_health_check_timeout
 PASS  T15_pull_failure
 PASS  T16_docker_already_installed
+PASS  T17_crlf_self_heal
 
-TOTAL: 17 passed, 0 failed, 0 skipped
+TOTAL: 18 passed, 0 failed, 0 skipped
 E2E litellm_real: PASS
-E2E real_docker: SKIP (not WSL)

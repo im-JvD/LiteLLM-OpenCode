@@ -19,6 +19,15 @@
 #     bash LiteLLM.sh
 #
 #===============================================================================
+#-----------------------------------------------------------------------------
+# CRLF self-heal: if this file was saved with Windows line endings (CRLF),
+# bash fails with "set: pipefail: invalid option name".
+# The guard below is a deliberate SINGLE-line simple command (CRLF-safe):
+# it detects CR bytes in this file and re-executes a stripped copy through
+# process substitution. See docs/troubleshooting.md for the manual fix.
+#-----------------------------------------------------------------------------
+[ -f "$0" ] && grep -q $'\r' "$0" && exec bash <(tr -d '\r' < "$0") "$@"
+
 set -euo pipefail
 
 #-------------------------------------------------------------------------------

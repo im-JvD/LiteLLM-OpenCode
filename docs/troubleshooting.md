@@ -6,6 +6,44 @@
 
 ---
 
+## 🔴 خطای `set: pipefail: invalid option name` (رایج‌ترین!)
+
+**نشانه‌ها:** بلافاصله بعد از اجرا چنین پیام‌هایی می‌بینید (متن به‌هم‌ریخته، گاهی `: invalid option nameset: pipefail`):
+
+```
+: invalid option nameset: pipefail
+```
+
+**علت:** فایل با **خط‌پایان ویندوزی (CRLF)** ذخیره شده است. اگر فایل را در ویندوز با Notepad یا ادیتورهای مشابه ذخیره کنید، یا آن را از حالت‌های غیر raw کپی کنید، هر انتهای خط یک کاراکتر نامرئی `\r` اضافه می‌شود و bash آن را جزء دستورات می‌خواند.
+
+**راه‌حل فوری** (روی همان فایل، داخل WSL):
+
+```bash
+sed -i 's/\r$//' LiteLLM.sh
+bash LiteLLM.sh
+```
+
+یا:
+
+```bash
+dos2unix LiteLLM.sh 2>/dev/null || sed -i 's/\r$//' LiteLLM.sh
+bash LiteLLM.sh
+```
+
+**پیشگیری:**
+
+- بهترین راه، همان اجرای یک‌خطی با `curl` است — فایل مستقیم و با خط‌پایان درست (LF) به WSL می‌رسد و اصلاً از ویندوز رد نمی‌شود:
+
+  ```bash
+  bash <(curl -fsSL https://raw.githubusercontent.com/im-JvD/LiteLLM-OpenCode/main/LiteLLM.sh)
+  ```
+
+- این اسکریپت از نسخهٔ فعلی مخزن، **محافظ self-heal** دارد: اگر نسخهٔ CRLF را با `bash LiteLLM.sh` اجرا کنید، خودش یک نسخهٔ تمیز می‌سازد و ادامهٔ نصب را با آن انجام می‌دهد (مگر در اجرای مستقیم `./LiteLLM.sh` که خطای shebang را همان اول می‌گیرید — در آن حالت از `bash LiteLLM.sh` استفاده کنید).
+
+- اگر خودتان مخزن را در ویندوز clone می‌کنید، فایل `.gitattributes` موجود در مخزن جلوی تبدیل خط‌پایان را می‌گیرد.
+
+---
+
 ## 🔴 خطاهای مرحلهٔ دانلود/داکر
 
 ### `docker pull` خطای 403 یا `toomanyrequests` می‌دهد

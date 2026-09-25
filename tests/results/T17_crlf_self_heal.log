@@ -5,7 +5,7 @@
 
    Proxy target : ghcr.io/berriai/litellm:main-latest
    Proxy port   : 4000   (restart policy: unless-stopped)
-   Linux config : /tmp/litellm-test.wD3yti/home/.litellm
+   Linux config : /tmp/litellm-test.uujSXO/home/.litellm
 
    Please choose an option:
 
@@ -37,13 +37,13 @@ apt-get: docker.io installed (stub)
 
 
 [ OK ] Collected 1 API key(s):
-         Groq       : <skipped>
+         Groq       : gsk_****cdef
          OpenRouter : <skipped>
-         Google AI  : AIza****89ab
+         Google AI  : <skipped>
          Cerebras   : <skipped>
          Mistral    : <skipped>
-[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-test.wD3yti/home/.litellm/master_key.txt
-[INFO] [5/8] Generating LiteLLM configuration: /tmp/litellm-test.wD3yti/home/.litellm/config.yaml
+[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-test.uujSXO/home/.litellm/master_key.txt
+[INFO] [5/8] Generating LiteLLM configuration: /tmp/litellm-test.uujSXO/home/.litellm/config.yaml
 [ OK ] config.yaml generated (only providers with keys are enabled).
 [INFO] [6/8] Pulling prebuilt LiteLLM image (no build step): ghcr.io/berriai/litellm:main-latest
 [INFO]        This may take several minutes on the first run...
@@ -61,9 +61,9 @@ apt-get: docker.io installed (stub)
 =================================================================
 
   LiteLLM endpoint (from Windows) : http://127.0.0.1:4000/v1
-  Master key (also saved to)      : /tmp/litellm-test.wD3yti/home/.litellm/master_key.txt
-  Master key                      : sk-67d2a70ea4a0e78eca2adc37c69b6e2189321edfbfc50b0dbe2fd811dd3ede92
-  LiteLLM config file             : /tmp/litellm-test.wD3yti/home/.litellm/config.yaml
+  Master key (also saved to)      : /tmp/litellm-test.uujSXO/home/.litellm/master_key.txt
+  Master key                      : sk-eb67a38b73dc1ff01a1b2412135c0ce478f77c7a8c3ee4c6b2250386fa55190b
+  LiteLLM config file             : /tmp/litellm-test.uujSXO/home/.litellm/config.yaml
   OpenCode config file (Windows)  : /mnt/c/Users/Test User/.config/opencode/opencode.json
   Container name                  : litellm
 
@@ -73,8 +73,8 @@ apt-get: docker.io installed (stub)
     Stop proxy       : sudo docker stop litellm
     Start proxy      : sudo docker start litellm
     Test endpoint    : curl -s http://127.0.0.1:4000/v1/models \
-                         -H "Authorization: Bearer sk-67d2a70ea4a0e78eca2adc37c69b6e2189321edfbfc50b0dbe2fd811dd3ede92"
-    Re-run this tool : bash "/home/user/LiteLLM-OpenCode/LiteLLM.sh"
+                         -H "Authorization: Bearer sk-eb67a38b73dc1ff01a1b2412135c0ce478f77c7a8c3ee4c6b2250386fa55190b"
+    Re-run this tool : bash "/dev/fd/63"
 
   NEXT STEPS (on WINDOWS):
     1. Open a NEW terminal (PowerShell or CMD).
@@ -87,7 +87,8 @@ apt-get: docker.io installed (stub)
 
 [ OK ] Done. Happy coding!
     ok: exit code = 0
-    ok: models match (gemini-2.0-flash)
+    ok: not contains: invalid option name
+    ok: contains: INSTALLATION COMPLETED SUCCESSFULLY
     ok: opencode.json valid (/mnt/c/Users/Test User/.config/opencode/opencode.json)
 
 --- docker-calls.log ---
@@ -96,7 +97,7 @@ systemctl enable docker.service
 docker info
 docker pull ghcr.io/berriai/litellm:main-latest
 docker ps -a --format {{.Names}}
-docker run -d --name litellm --restart unless-stopped -p 4000:4000 -v /tmp/litellm-test.wD3yti/home/.litellm/config.yaml:/app/config.yaml:ro -e LITELLM_MASTER_KEY=sk-67d2a70ea4a0e78eca2adc37c69b6e2189321edfbfc50b0dbe2fd811dd3ede92 -e GEMINI_API_KEY=AIzaOnlyTest0123456789ab ghcr.io/berriai/litellm:main-latest --config /app/config.yaml --port 4000
+docker run -d --name litellm --restart unless-stopped -p 4000:4000 -v /tmp/litellm-test.uujSXO/home/.litellm/config.yaml:/app/config.yaml:ro -e LITELLM_MASTER_KEY=sk-eb67a38b73dc1ff01a1b2412135c0ce478f77c7a8c3ee4c6b2250386fa55190b -e GROQ_API_KEY=gsk_crlf_0123456789abcdef ghcr.io/berriai/litellm:main-latest --config /app/config.yaml --port 4000
 
 --- apt-calls.log ---
 apt-get update -y
@@ -107,11 +108,17 @@ litellm
 
 --- generated config.yaml ---
 model_list:
-  # ---------------- Google AI Studio (Gemini) ----------------
-  - model_name: gemini-2.0-flash
+  # ---------------- Groq (fast inference) ----------------
+  - model_name: qwen-2.5-coder-32b
     litellm_params:
-      model: gemini/gemini-2.0-flash
-      api_key: os.environ/GEMINI_API_KEY
+      model: groq/qwen-2.5-coder-32b
+      api_key: os.environ/GROQ_API_KEY
+      api_base: https://api.groq.com/openai/v1
+  - model_name: llama-3.3-70b-versatile
+    litellm_params:
+      model: groq/llama-3.3-70b-versatile
+      api_key: os.environ/GROQ_API_KEY
+      api_base: https://api.groq.com/openai/v1
 
 litellm_settings:
   drop_params: true        # silently drop unsupported provider params
@@ -131,17 +138,18 @@ general_settings:
 --- generated opencode.json ---
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "litellm/gemini-2.0-flash",
+  "model": "litellm/qwen-2.5-coder-32b",
   "provider": {
     "litellm": {
       "npm": "@ai-sdk/openai-compatible",
       "name": "LiteLLM Proxy (Local)",
       "options": {
         "baseURL": "http://127.0.0.1:4000/v1",
-        "apiKey": "sk-67d2a70ea4a0e78eca2adc37c69b6e2189321edfbfc50b0dbe2fd811dd3ede92"
+        "apiKey": "sk-eb67a38b73dc1ff01a1b2412135c0ce478f77c7a8c3ee4c6b2250386fa55190b"
       },
       "models": {
-        "gemini-2.0-flash": { "name": "Gemini 2.0 Flash (Google AI, free)" }
+        "qwen-2.5-coder-32b": { "name": "Qwen 2.5 Coder 32B (Groq, free)" },
+                "llama-3.3-70b-versatile": { "name": "Llama 3.3 70B Versatile (Groq, free)" }
       }
     }
   }

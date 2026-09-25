@@ -5,7 +5,7 @@
 
    Proxy target : ghcr.io/berriai/litellm:main-latest
    Proxy port   : 4000   (restart policy: unless-stopped)
-   Linux config : /tmp/litellm-test.ALArna/home/.litellm
+   Linux config : /tmp/litellm-test.ehhiVT/home/.litellm
 
    Please choose an option:
 
@@ -42,8 +42,8 @@ apt-get: docker.io installed (stub)
          Google AI  : <skipped>
          Cerebras   : <skipped>
          Mistral    : <skipped>
-[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-test.ALArna/home/.litellm/master_key.txt
-[INFO] [5/8] Generating LiteLLM configuration: /tmp/litellm-test.ALArna/home/.litellm/config.yaml
+[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-test.ehhiVT/home/.litellm/master_key.txt
+[INFO] [5/8] Generating LiteLLM configuration: /tmp/litellm-test.ehhiVT/home/.litellm/config.yaml
 [ OK ] config.yaml generated (only providers with keys are enabled).
 [INFO] [6/8] Pulling prebuilt LiteLLM image (no build step): ghcr.io/berriai/litellm:main-latest
 [INFO]        This may take several minutes on the first run...
@@ -62,9 +62,9 @@ apt-get: docker.io installed (stub)
 =================================================================
 
   LiteLLM endpoint (from Windows) : http://127.0.0.1:4000/v1
-  Master key (also saved to)      : /tmp/litellm-test.ALArna/home/.litellm/master_key.txt
-  Master key                      : sk-3c1a5b3b2709669428eacba4aa16a508c56d13ba4c253394feda5d25e0169b8e
-  LiteLLM config file             : /tmp/litellm-test.ALArna/home/.litellm/config.yaml
+  Master key (also saved to)      : /tmp/litellm-test.ehhiVT/home/.litellm/master_key.txt
+  Master key                      : sk-dd0c5c3e6d71bd859e3fda18fcab3075366352935ae53f7a7186b1f2b318cb1f
+  LiteLLM config file             : /tmp/litellm-test.ehhiVT/home/.litellm/config.yaml
   OpenCode config file (Windows)  : /mnt/c/Users/Test User/.config/opencode/opencode.json
   Container name                  : litellm
 
@@ -74,7 +74,7 @@ apt-get: docker.io installed (stub)
     Stop proxy       : sudo docker stop litellm
     Start proxy      : sudo docker start litellm
     Test endpoint    : curl -s http://127.0.0.1:4000/v1/models \
-                         -H "Authorization: Bearer sk-3c1a5b3b2709669428eacba4aa16a508c56d13ba4c253394feda5d25e0169b8e"
+                         -H "Authorization: Bearer sk-dd0c5c3e6d71bd859e3fda18fcab3075366352935ae53f7a7186b1f2b318cb1f"
     Re-run this tool : bash "/home/user/LiteLLM-OpenCode/LiteLLM.sh"
 
   NEXT STEPS (on WINDOWS):
@@ -97,7 +97,7 @@ systemctl enable docker.service
 docker info
 docker pull ghcr.io/berriai/litellm:main-latest
 docker ps -a --format {{.Names}}
-docker run -d --name litellm --restart unless-stopped -p 4000:4000 -v /tmp/litellm-test.ALArna/home/.litellm/config.yaml:/app/config.yaml:ro -e LITELLM_MASTER_KEY=sk-3c1a5b3b2709669428eacba4aa16a508c56d13ba4c253394feda5d25e0169b8e -e GROQ_API_KEY=gsk_timeout_0123456789abcd ghcr.io/berriai/litellm:main-latest --config /app/config.yaml --port 4000
+docker run -d --name litellm --restart unless-stopped -p 4000:4000 -v /tmp/litellm-test.ehhiVT/home/.litellm/config.yaml:/app/config.yaml:ro -e LITELLM_MASTER_KEY=sk-dd0c5c3e6d71bd859e3fda18fcab3075366352935ae53f7a7186b1f2b318cb1f -e GROQ_API_KEY=gsk_timeout_0123456789abcd ghcr.io/berriai/litellm:main-latest --config /app/config.yaml --port 4000
 
 --- apt-calls.log ---
 apt-get update -y
@@ -145,7 +145,7 @@ general_settings:
       "name": "LiteLLM Proxy (Local)",
       "options": {
         "baseURL": "http://127.0.0.1:4000/v1",
-        "apiKey": "sk-3c1a5b3b2709669428eacba4aa16a508c56d13ba4c253394feda5d25e0169b8e"
+        "apiKey": "sk-dd0c5c3e6d71bd859e3fda18fcab3075366352935ae53f7a7186b1f2b318cb1f"
       },
       "models": {
         "qwen-2.5-coder-32b": { "name": "Qwen 2.5 Coder 32B (Groq, free)" },

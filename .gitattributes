@@ -1,0 +1,5 @@
+# Force LF line endings for shell scripts so Windows checkouts (git
+# core.autocrlf=true) never produce CRLF copies that break bash with
+# "set: pipefail: invalid option name".
+* text=auto
+*.sh text eol=lf

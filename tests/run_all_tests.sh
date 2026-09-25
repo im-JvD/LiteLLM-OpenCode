@@ -120,7 +120,8 @@ fresh_env() {
 
 # Runs the real script inside the isolated environment.
 # Expected input (menu choices / keys) is piped in by the caller.
-run_script() {
+run_script() { # optional $1 = path of the script copy to run (default: the real one)
+  local script_file="${1:-$SCRIPT_FILE}"
   env -u DOCKER_PULL_FAIL -u DOCKER_APT_FAIL \
     HOME="$HOME_DIR" \
     PATH="${STUBBIN}:${PATH}" \
@@ -128,7 +129,7 @@ run_script() {
     T_WORKSTATE="$T_WORKSTATE" \
     FAKE_ROOT="$FAKE_ROOT" \
     HEALTH_CODE="${T_HEALTH_CODE:-200}" \
-    bash "$SCRIPT_FILE" >> "$CURRENT_LOG" 2>&1
+    bash "$script_file" >> "$CURRENT_LOG" 2>&1
 }
 
 #-------------------------------------------------------------------------------
@@ -668,6 +669,27 @@ if [ "$MNT_OK" -eq 1 ]; then
   assert_contains "$CURRENT_LOG" "Docker binary already present, skipping apt installation"
   if [ ! -s "${T_WORKSTATE}/apt-calls.log" ]; then a_ok "apt-get never called"; else a_bad "apt-get was called unexpectedly"; fi
   rm -f "${STUBBIN}/docker"
+  dump_state
+  finish_test
+else
+  skip_test "requires writable /mnt/c"
+fi
+
+#===============================================================================
+# T17 - CRLF self-heal: a Windows-line-endings copy must still work end-to-end
+#===============================================================================
+start_test "T17_crlf_self_heal"
+if [ "$MNT_OK" -eq 1 ]; then
+  fresh_env
+  CRLF_COPY="${T_WORK}/LiteLLM.crlf.sh"
+  sed 's/$/\r/' "$SCRIPT_FILE" > "$CRLF_COPY"
+  printf '1\ngsk_crlf_0123456789abcdef\n\n\n\n\n' | run_script "$CRLF_COPY"
+  T_RC=$?
+  assert_rc 0
+  assert_not_contains "$CURRENT_LOG" "invalid option name"
+  assert_contains "$CURRENT_LOG" "INSTALLATION COMPLETED SUCCESSFULLY"
+  MK="$(master_key_from)"
+  assert_opencode_json "/mnt/c/Users/Test User/.config/opencode/opencode.json" "$MK" "qwen-2.5-coder-32b" "$GROQ2_MODELS"
   dump_state
   finish_test
 else
