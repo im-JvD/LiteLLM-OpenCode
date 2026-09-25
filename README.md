@@ -11,20 +11,20 @@
 داخل ترمینال **WSL2 Ubuntu** کافی است اجرا کنید:
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/im-JvD/LiteLLM-OpenCode/main/LiteLLM)
+bash <(curl -fsSL https://raw.githubusercontent.com/im-JvD/LiteLLM-OpenCode/main/LiteLLM.sh)
 ```
 
 یا با `wget`:
 
 ```bash
-bash <(wget -qO- https://raw.githubusercontent.com/im-JvD/LiteLLM-OpenCode/main/LiteLLM)
+bash <(wget -qO- https://raw.githubusercontent.com/im-JvD/LiteLLM-OpenCode/main/LiteLLM.sh)
 ```
 
 > ⚠️ **نکتهٔ مهم:** حتماً از حالت `bash <( curl ... )` استفاده کنید، نه `curl ... | bash`؛ چون اسکریپت تعاملی است و باید بتواند از شما سؤال بپرسد. اگر خواستید اول دانلود کنید:
 >
 > ```bash
-> curl -fsSL https://raw.githubusercontent.com/im-JvD/LiteLLM-OpenCode/main/LiteLLM -o /tmp/LiteLLM
-> bash /tmp/LiteLLM
+> curl -fsSL https://raw.githubusercontent.com/im-JvD/LiteLLM-OpenCode/main/LiteLLM.sh -o /tmp/LiteLLM.sh
+> bash /tmp/LiteLLM.sh
 > ```
 
 ---
@@ -73,7 +73,7 @@ bash <(wget -qO- https://raw.githubusercontent.com/im-JvD/LiteLLM-OpenCode/main/
 
 ```
 LiteLLM-OpenCode/
-├── LiteLLM                  ← اسکریپت اصلی (قابل اجرای مستقیم از GitHub)
+├── LiteLLM.sh                  ← اسکریپت اصلی (قابل اجرای مستقیم از GitHub)
 ├── docs/                    ← مستندات کامل فارسی
 │   ├── README.md            ← فهرست مستندات
 │   ├── installation.md      ← راهنمای گام‌به‌گام نصب

@@ -9,7 +9,7 @@
 اسکریپت را اجرا کنید و گزینهٔ `2` را بزنید:
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/im-JvD/LiteLLM-OpenCode/main/LiteLLM)
+bash <(curl -fsSL https://raw.githubusercontent.com/im-JvD/LiteLLM-OpenCode/main/LiteLLM.sh)
 ```
 
 ```

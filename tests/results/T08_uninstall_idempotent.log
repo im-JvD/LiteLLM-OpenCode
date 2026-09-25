@@ -5,7 +5,7 @@
 
    Proxy target : ghcr.io/berriai/litellm:main-latest
    Proxy port   : 4000   (restart policy: unless-stopped)
-   Linux config : /tmp/litellm-test.nAgJvq/home/.litellm
+   Linux config : /tmp/litellm-test.V1MxkH/home/.litellm
 
    Please choose an option:
 
@@ -18,7 +18,7 @@
 [INFO] === FULL UNINSTALL: starting ===
 
 [WARN] No container named 'litellm' found - nothing to remove.
-[WARN] LiteLLM config folder not found: /tmp/litellm-test.nAgJvq/home/.litellm
+[WARN] LiteLLM config folder not found: /tmp/litellm-test.V1MxkH/home/.litellm
 [WARN] OpenCode config not found: /mnt/c/Users/Test User/.config/opencode/opencode.json
 
 =================================================================
@@ -27,7 +27,7 @@
 
   Removed:
     - Docker container : litellm
-    - Linux folder     : /tmp/litellm-test.nAgJvq/home/.litellm  (config.yaml + master key)
+    - Linux folder     : /tmp/litellm-test.V1MxkH/home/.litellm  (config.yaml + master key)
     - Windows file     : ~/.config/opencode/opencode.json
 
   Kept (on purpose):

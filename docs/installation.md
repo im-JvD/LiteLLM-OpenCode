@@ -29,13 +29,13 @@ wsl --install -d Ubuntu
 داخل ترمینال **WSL Ubuntu**:
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/im-JvD/LiteLLM-OpenCode/main/LiteLLM)
+bash <(curl -fsSL https://raw.githubusercontent.com/im-JvD/LiteLLM-OpenCode/main/LiteLLM.sh)
 ```
 
 یا:
 
 ```bash
-bash <(wget -qO- https://raw.githubusercontent.com/im-JvD/LiteLLM-OpenCode/main/LiteLLM)
+bash <(wget -qO- https://raw.githubusercontent.com/im-JvD/LiteLLM-OpenCode/main/LiteLLM.sh)
 ```
 
 > ⚠️ از الگوی `bash <( curl ... )` استفاده کنید نه `curl ... | bash`.
@@ -44,8 +44,8 @@ bash <(wget -qO- https://raw.githubusercontent.com/im-JvD/LiteLLM-OpenCode/main/
 ### روش ۲: دانلود و سپس اجرا
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/im-JvD/LiteLLM-OpenCode/main/LiteLLM -o /tmp/LiteLLM
-bash /tmp/LiteLLM
+curl -fsSL https://raw.githubusercontent.com/im-JvD/LiteLLM-OpenCode/main/LiteLLM.sh -o /tmp/LiteLLM.sh
+bash /tmp/LiteLLM.sh
 ```
 
 ### روش ۳: کلون مخزن
@@ -53,7 +53,7 @@ bash /tmp/LiteLLM
 ```bash
 git clone https://github.com/im-JvD/LiteLLM-OpenCode.git
 cd LiteLLM-OpenCode
-bash LiteLLM
+bash LiteLLM.sh
 ```
 
 > 💡 اسکریپت را **بدون sudo** اجرا کنید؛ خودش در جای لازم ارتقای دسترسی می‌دهد. اگر با sudo اجرا کنید هم کار می‌کند ولی هشدار می‌دهد که کانفیگ‌ها زیر `/root` ساخته می‌شوند.

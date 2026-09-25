@@ -23,7 +23,7 @@
 set -u
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SCRIPT_FILE="${ROOT_DIR}/LiteLLM"
+SCRIPT_FILE="${ROOT_DIR}/LiteLLM.sh"
 TESTS_DIR="${ROOT_DIR}/tests"
 STUBBIN="${TESTS_DIR}/helpers/stubbin"
 RESULTS_DIR="${TESTS_DIR}/results"

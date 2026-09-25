@@ -5,7 +5,7 @@
 
    Proxy target : ghcr.io/berriai/litellm:main-latest
    Proxy port   : 4000   (restart policy: unless-stopped)
-   Linux config : /tmp/litellm-test.sFLy2x/home/.litellm
+   Linux config : /tmp/litellm-test.ghOIEF/home/.litellm
 
    Please choose an option:
 
@@ -24,7 +24,7 @@
 [INFO] [2/8] Installing Docker Engine (docker.io from Ubuntu apt repository)...
 apt-get: docker.io installed (stub)
 [INFO] [3/8] Configuring Iranian Docker Hub mirrors (/etc/docker/daemon.json)...
-[WARN] Existing daemon.json backed up to: /etc/docker/daemon.json.bak.20260925122955
+[WARN] Existing daemon.json backed up to: /etc/docker/daemon.json.bak.20260925123551
 [ OK ] Registry mirrors written:
        - https://docker.arvancloud.ir
        - https://docker.hub.iran.liara.run
@@ -43,8 +43,8 @@ apt-get: docker.io installed (stub)
          Google AI  : <skipped>
          Cerebras   : <skipped>
          Mistral    : <skipped>
-[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-test.sFLy2x/home/.litellm/master_key.txt
-[INFO] [5/8] Generating LiteLLM configuration: /tmp/litellm-test.sFLy2x/home/.litellm/config.yaml
+[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-test.ghOIEF/home/.litellm/master_key.txt
+[INFO] [5/8] Generating LiteLLM configuration: /tmp/litellm-test.ghOIEF/home/.litellm/config.yaml
 [ OK ] config.yaml generated (only providers with keys are enabled).
 [INFO] [6/8] Pulling prebuilt LiteLLM image (no build step): ghcr.io/berriai/litellm:main-latest
 [INFO]        This may take several minutes on the first run...
@@ -62,9 +62,9 @@ apt-get: docker.io installed (stub)
 =================================================================
 
   LiteLLM endpoint (from Windows) : http://127.0.0.1:4000/v1
-  Master key (also saved to)      : /tmp/litellm-test.sFLy2x/home/.litellm/master_key.txt
-  Master key                      : sk-6007a4faefc7b05c987b5b62d62ceaa0ca30fe312a73e5140afe75c9f6bf9160
-  LiteLLM config file             : /tmp/litellm-test.sFLy2x/home/.litellm/config.yaml
+  Master key (also saved to)      : /tmp/litellm-test.ghOIEF/home/.litellm/master_key.txt
+  Master key                      : sk-4f271d42ff4bb36cce2613afe4c5df5b5d436f0fa3e00582d1642bb787a964f9
+  LiteLLM config file             : /tmp/litellm-test.ghOIEF/home/.litellm/config.yaml
   OpenCode config file (Windows)  : /mnt/c/Users/Test User/.config/opencode/opencode.json
   Container name                  : litellm
 
@@ -74,8 +74,8 @@ apt-get: docker.io installed (stub)
     Stop proxy       : sudo docker stop litellm
     Start proxy      : sudo docker start litellm
     Test endpoint    : curl -s http://127.0.0.1:4000/v1/models \
-                         -H "Authorization: Bearer sk-6007a4faefc7b05c987b5b62d62ceaa0ca30fe312a73e5140afe75c9f6bf9160"
-    Re-run this tool : bash "/home/user/LiteLLM-OpenCode/LiteLLM"
+                         -H "Authorization: Bearer sk-4f271d42ff4bb36cce2613afe4c5df5b5d436f0fa3e00582d1642bb787a964f9"
+    Re-run this tool : bash "/home/user/LiteLLM-OpenCode/LiteLLM.sh"
 
   NEXT STEPS (on WINDOWS):
     1. Open a NEW terminal (PowerShell or CMD).
@@ -90,7 +90,7 @@ apt-get: docker.io installed (stub)
     ok: exit code = 0
     ok: contains: Existing daemon.json backed up
     ok: backup file created in virtual /etc/docker
-    ok: daemon.json mirrors exact (/tmp/litellm-test.sFLy2x/fakeroot/etc/docker/daemon.json)
+    ok: daemon.json mirrors exact (/tmp/litellm-test.ghOIEF/fakeroot/etc/docker/daemon.json)
 
 --- docker-calls.log ---
 service docker restart
@@ -98,7 +98,7 @@ systemctl enable docker.service
 docker info
 docker pull ghcr.io/berriai/litellm:main-latest
 docker ps -a --format {{.Names}}
-docker run -d --name litellm --restart unless-stopped -p 4000:4000 -v /tmp/litellm-test.sFLy2x/home/.litellm/config.yaml:/app/config.yaml:ro -e LITELLM_MASTER_KEY=sk-6007a4faefc7b05c987b5b62d62ceaa0ca30fe312a73e5140afe75c9f6bf9160 -e GROQ_API_KEY=gsk_backup_0123456789abcdef ghcr.io/berriai/litellm:main-latest --config /app/config.yaml --port 4000
+docker run -d --name litellm --restart unless-stopped -p 4000:4000 -v /tmp/litellm-test.ghOIEF/home/.litellm/config.yaml:/app/config.yaml:ro -e LITELLM_MASTER_KEY=sk-4f271d42ff4bb36cce2613afe4c5df5b5d436f0fa3e00582d1642bb787a964f9 -e GROQ_API_KEY=gsk_backup_0123456789abcdef ghcr.io/berriai/litellm:main-latest --config /app/config.yaml --port 4000
 
 --- apt-calls.log ---
 apt-get update -y
@@ -146,7 +146,7 @@ general_settings:
       "name": "LiteLLM Proxy (Local)",
       "options": {
         "baseURL": "http://127.0.0.1:4000/v1",
-        "apiKey": "sk-6007a4faefc7b05c987b5b62d62ceaa0ca30fe312a73e5140afe75c9f6bf9160"
+        "apiKey": "sk-4f271d42ff4bb36cce2613afe4c5df5b5d436f0fa3e00582d1642bb787a964f9"
       },
       "models": {
         "qwen-2.5-coder-32b": { "name": "Qwen 2.5 Coder 32B (Groq, free)" },

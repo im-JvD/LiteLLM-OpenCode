@@ -28,7 +28,7 @@
 set -u
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SCRIPT_FILE="${ROOT_DIR}/LiteLLM"
+SCRIPT_FILE="${ROOT_DIR}/LiteLLM.sh"
 RESULTS_DIR="${ROOT_DIR}/tests/results"
 LOG_FILE="${RESULTS_DIR}/E2E_real_docker.log"
 

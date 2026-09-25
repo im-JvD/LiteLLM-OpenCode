@@ -5,7 +5,7 @@
 
    Proxy target : ghcr.io/berriai/litellm:main-latest
    Proxy port   : 4000   (restart policy: unless-stopped)
-   Linux config : /tmp/litellm-test.VGiYza/home/.litellm
+   Linux config : /tmp/litellm-test.xjas5O/home/.litellm
 
    Please choose an option:
 
