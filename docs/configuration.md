@@ -12,6 +12,7 @@
 |---|---|---|
 | `~/.litellm/config.yaml` | لینوکس (WSL) | پیکربندی LiteLLM: لیست مدل‌ها و تنظیمات |
 | `~/.litellm/master_key.txt` | لینوکس (WSL) | کلید احراز هویت پروکسی (دسترسی `600`) |
+| `~/.litellm/dashboard_credentials.txt` | لینوکس (WSL) | اطلاعات ورود پنل مدیریت: URL + Username + Password |
 | `/etc/docker/daemon.json` | لینوکس (WSL) | میرورهای ایرانی داکرهاب |
 | `/usr/local/bin/litellm` | لینوکس (WSL) | دستورات مدیریت سریع (up/down/restart/…) |
 | `/usr/local/bin/litellm-boot.sh` | لینوکس (WSL) | اسکریپت استارت خودکار در بوت WSL |
@@ -157,8 +158,10 @@ http://127.0.0.1:4000/ui
 ```
 
 - در مرورگر **ویندوز** باز کنید (WSL2 پورت را به ویندوز منتقل می‌کند).
-- نام کاربری: `admin` — رمز عبور: همان **Master Key**.
+- نام کاربری: `admin` — رمز عبور: همان **Master Key** (پسورد جداگانه وجود ندارد).
 - این اطلاعات با متغیرهای `UI_USERNAME` و `UI_PASSWORD` روی کانتینر تنظیم شده‌اند.
+- دیدن سریع اطلاعات ورود: `litellm credentials`
+- یک کپی هم در `~/.litellm/dashboard_credentials.txt` ذخیره می‌شود (دسترسی 600).
 - از این پنل می‌توانید مدل‌ها را تست کنید، لاگ ببینید و مصرف را ببینید.
 
 ---
@@ -198,6 +201,7 @@ LITELLM_BOOT_MODE=wslconf bash LiteLLM.sh   # فقط boot command در /etc/wsl.
 | `litellm down` | توقف کانتینر |
 | `litellm restart` | ری‌استارت + انتظار برای سلامت |
 | `litellm status` | وضعیت کانتینر، policy، سلامت، آدرس پنل و مسیر فایل‌ها |
+| `litellm credentials` | نمایش URL/نام‌کاربری/پسورد پنل مدیریت (پسورد = Master Key) |
 | `litellm logs` | دنبال‌کردن زندهٔ لاگ‌ها |
 | `litellm uninstall` | حذف کامل همه‌چیز (با تأیید) — معادل گزینهٔ ۲ نصاب |
 

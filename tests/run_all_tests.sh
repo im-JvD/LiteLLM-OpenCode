@@ -348,6 +348,11 @@ if [ "$MNT_OK" -eq 1 ]; then
   assert_models "${HOME_DIR}/.litellm/config.yaml" "$ALL7_MODELS"
   MK="$(master_key_from)"
   if [ -n "$MK" ] && [ "$MK" = "$(master_key_in_docker_run)" ]; then a_ok "master key consistent (file == docker env)"; else a_bad "master key mismatch"; fi
+  assert_file_exists "${HOME_DIR}/.litellm/dashboard_credentials.txt"
+  assert_contains "${HOME_DIR}/.litellm/dashboard_credentials.txt" "Username : admin"
+  assert_contains "${HOME_DIR}/.litellm/dashboard_credentials.txt" "Password : ${MK}"
+  assert_contains "$CURRENT_LOG" "Password  : ${MK}"
+  assert_contains "${T_WORKSTATE}/docker-calls.log" "-e UI_PASSWORD=${MK}"
   assert_contains "${T_WORKSTATE}/docker-calls.log" "-e UI_USERNAME=admin"
   assert_contains "${T_WORKSTATE}/docker-calls.log" "-e UI_PASSWORD=${MK}"
   assert_file_exists "${FAKE_ROOT}/usr/local/bin/litellm"
@@ -482,6 +487,7 @@ if [ "$MNT_OK" -eq 1 ]; then
   if [ ! -s "${T_WORKSTATE}/containers.txt" ]; then a_ok "container registry empty"; else a_bad "container still registered"; fi
   assert_file_missing "${HOME_DIR}/.litellm/config.yaml"
   assert_file_missing "${HOME_DIR}/.litellm/master_key.txt"
+  assert_file_missing "${HOME_DIR}/.litellm/dashboard_credentials.txt"
   assert_file_missing "/mnt/c/Users/Test User/.config/opencode/opencode.json"
   assert_file_missing "${FAKE_ROOT}/usr/local/bin/litellm"
   assert_file_missing "${FAKE_ROOT}/usr/local/bin/litellm-boot.sh"
@@ -767,6 +773,10 @@ if [ "$MNT_OK" -eq 1 ]; then
   assert_contains "${T_WORKSTATE}/docker-calls.log" "start litellm"
   run_cli restart
   assert_contains "${T_WORKSTATE}/docker-calls.log" "restart litellm"
+  MK="$(master_key_from)"
+  run_cli credentials
+  assert_contains "$CURRENT_LOG" "Username : admin"
+  assert_contains "$CURRENT_LOG" "Password : ${MK}"
   run_cli uninstall --yes
   assert_contains "$CURRENT_LOG" "UNINSTALL COMPLETED."
   if [ ! -s "${T_WORKSTATE}/containers.txt" ]; then a_ok "container registry empty after CLI uninstall"; else a_bad "container still registered after CLI uninstall"; fi

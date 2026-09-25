@@ -40,6 +40,7 @@ LITELLM_PORT="4000"
 LITELLM_DIR="${HOME}/.litellm"
 LITELLM_CONFIG="${LITELLM_DIR}/config.yaml"
 LITELLM_KEYFILE="${LITELLM_DIR}/master_key.txt"
+LITELLM_CRED_FILE="${LITELLM_DIR}/dashboard_credentials.txt"
 DAEMON_JSON="/etc/docker/daemon.json"
 CLI_BIN="/usr/local/bin/litellm"
 BOOT_HELPER="/usr/local/bin/litellm-boot.sh"
@@ -282,7 +283,16 @@ generate_master_key() {
   mkdir -p "$LITELLM_DIR"
   printf '%s\n' "$MASTER_KEY" > "$LITELLM_KEYFILE"
   chmod 600 "$LITELLM_KEYFILE"
+  # dedicated dashboard login file (the UI password IS the master key)
+  {
+    echo "LiteLLM Admin Panel (UI)"
+    echo "  URL      : http://127.0.0.1:${LITELLM_PORT}/ui"
+    echo "  Username : admin"
+    echo "  Password : ${MASTER_KEY}"
+  } > "$LITELLM_CRED_FILE"
+  chmod 600 "$LITELLM_CRED_FILE"
   log_ok "LiteLLM master key generated and saved to: ${LITELLM_KEYFILE}"
+  log_ok "Dashboard login saved to: ${LITELLM_CRED_FILE}"
 }
 
 #-------------------------------------------------------------------------------
@@ -607,6 +617,20 @@ win_home() {
   printf '/mnt/%s%s' "$letter" "$rest"
 }
 
+cmd_credentials() {
+  if [ ! -f "$KEYFILE" ]; then
+    log_error "Master key file not found: ${KEYFILE}"
+    return 1
+  fi
+  local key
+  key="$(tr -d '\n' < "$KEYFILE")"
+  echo "  LiteLLM Admin Panel (UI)"
+  echo "  URL      : http://127.0.0.1:${PORT}/ui"
+  echo "  Username : admin"
+  echo "  Password : ${key}"
+  echo "  (the dashboard password IS the master key)"
+}
+
 cmd_up() {
   ensure_daemon || return 1
   if ! container_exists; then
@@ -659,6 +683,7 @@ cmd_status() {
   echo "  Admin panel     : http://127.0.0.1:${PORT}/ui  (user: admin, password: master key)"
   echo "  Config file     : ${CONFIG_FILE}$([ -f "$CONFIG_FILE" ] && echo ' (present)' || echo ' (missing)')"
   echo "  Master key file : ${KEYFILE}$([ -f "$KEYFILE" ] && echo ' (present)' || echo ' (missing)')"
+  echo "  UI credentials  : ${LITELLM_DIR}/dashboard_credentials.txt$([ -f "${LITELLM_DIR}/dashboard_credentials.txt" ] && echo ' (present)' || echo ' (missing)')"
 }
 
 cmd_logs() {
@@ -730,6 +755,7 @@ case "${1:-}" in
   down)      shift; cmd_down "$@" ;;
   restart)   shift; cmd_restart "$@" ;;
   status)    shift; cmd_status "$@" ;;
+  credentials|ui) shift; cmd_credentials "$@" ;;
   logs)      shift; cmd_logs "$@" ;;
   uninstall) shift; cmd_uninstall "${1:-}"; exit $? ;;
   ""|help|-h|--help)
@@ -738,6 +764,7 @@ case "${1:-}" in
     echo "  down        stop the proxy"
     echo "  restart     restart the proxy and wait until healthy"
     echo "  status      show container state, health and config paths"
+    echo "  credentials show Admin Panel URL / username / password"
     echo "  logs        follow proxy logs (Ctrl+C to exit)"
     echo "  uninstall   remove proxy, configs and this CLI"
     ;;
@@ -924,7 +951,9 @@ print_install_success() {
   echo -e "${C_BOLD}  ADMIN PANEL (UI) - open in the WINDOWS browser:${C_NC}"
   echo "    URL       : http://127.0.0.1:${LITELLM_PORT}/ui"
   echo "    Username  : admin"
-  echo "    Password  : (the Master key below)"
+  echo "    Password  : ${MASTER_KEY}"
+  echo "    (the dashboard password IS the master key - no separate password exists)"
+  echo "    saved to  : ${LITELLM_CRED_FILE}"
   echo
   echo "  Master key (also saved to)      : ${LITELLM_KEYFILE}"
   echo "  Master key                      : ${MASTER_KEY}"

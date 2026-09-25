@@ -5,7 +5,7 @@
 
    Proxy target : ghcr.io/berriai/litellm:main-latest
    Proxy port   : 4000   (restart policy: unless-stopped)
-   Linux config : /tmp/litellm-test.M4qqkY/home/.litellm
+   Linux config : /tmp/litellm-test.0G4ajN/home/.litellm
 
    Please choose an option:
 
@@ -42,8 +42,9 @@
          Google AI  : <skipped>
          Cerebras   : <skipped>
          Mistral    : <skipped>
-[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-test.M4qqkY/home/.litellm/master_key.txt
-[INFO] [5/9] Generating LiteLLM configuration: /tmp/litellm-test.M4qqkY/home/.litellm/config.yaml
+[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-test.0G4ajN/home/.litellm/master_key.txt
+[ OK ] Dashboard login saved to: /tmp/litellm-test.0G4ajN/home/.litellm/dashboard_credentials.txt
+[INFO] [5/9] Generating LiteLLM configuration: /tmp/litellm-test.0G4ajN/home/.litellm/config.yaml
 [ OK ] config.yaml generated (only providers with keys are enabled).
 [INFO] [6/9] Pulling prebuilt LiteLLM image (no build step): ghcr.io/berriai/litellm:main-latest
 [INFO]        This may take several minutes on the first run...
@@ -68,11 +69,13 @@
   ADMIN PANEL (UI) - open in the WINDOWS browser:
     URL       : http://127.0.0.1:4000/ui
     Username  : admin
-    Password  : (the Master key below)
+    Password  : sk-0c396d32f3a93e35c326e5137be0fb2597eee4859879926a59de4d6857522c3b
+    (the dashboard password IS the master key - no separate password exists)
+    saved to  : /tmp/litellm-test.0G4ajN/home/.litellm/dashboard_credentials.txt
 
-  Master key (also saved to)      : /tmp/litellm-test.M4qqkY/home/.litellm/master_key.txt
-  Master key                      : sk-c0502a08d0a15b5be7d0ddd9bbeca4e94a3b57d47a654348df95b26c4ae9d97b
-  LiteLLM config file             : /tmp/litellm-test.M4qqkY/home/.litellm/config.yaml
+  Master key (also saved to)      : /tmp/litellm-test.0G4ajN/home/.litellm/master_key.txt
+  Master key                      : sk-0c396d32f3a93e35c326e5137be0fb2597eee4859879926a59de4d6857522c3b
+  LiteLLM config file             : /tmp/litellm-test.0G4ajN/home/.litellm/config.yaml
   OpenCode config file (Windows)  : /mnt/c/Users/Test User/.config/opencode/opencode.json
   Container name                  : litellm
   Auto-start on WSL boot          : systemd service: litellm.service (enabled)
@@ -86,7 +89,7 @@
     Stop proxy       : sudo docker stop litellm
     Start proxy      : sudo docker start litellm
     Test endpoint    : curl -s http://127.0.0.1:4000/v1/models \
-                         -H "Authorization: Bearer sk-c0502a08d0a15b5be7d0ddd9bbeca4e94a3b57d47a654348df95b26c4ae9d97b"
+                         -H "Authorization: Bearer sk-0c396d32f3a93e35c326e5137be0fb2597eee4859879926a59de4d6857522c3b"
     Re-run this tool : bash "/home/user/LiteLLM-OpenCode/LiteLLM.sh"
 
   NEXT STEPS (on WINDOWS):
@@ -110,7 +113,7 @@ docker info
 docker image inspect ghcr.io/berriai/litellm:main-latest
 docker pull ghcr.io/berriai/litellm:main-latest
 docker ps -a --format {{.Names}}
-docker run -d --name litellm --restart unless-stopped -p 4000:4000 -v /tmp/litellm-test.M4qqkY/home/.litellm/config.yaml:/app/config.yaml:ro -e LITELLM_MASTER_KEY=sk-c0502a08d0a15b5be7d0ddd9bbeca4e94a3b57d47a654348df95b26c4ae9d97b -e UI_USERNAME=admin -e UI_PASSWORD=sk-c0502a08d0a15b5be7d0ddd9bbeca4e94a3b57d47a654348df95b26c4ae9d97b -e GROQ_API_KEY=gsk_predocker_0123456789ab ghcr.io/berriai/litellm:main-latest --config /app/config.yaml --port 4000
+docker run -d --name litellm --restart unless-stopped -p 4000:4000 -v /tmp/litellm-test.0G4ajN/home/.litellm/config.yaml:/app/config.yaml:ro -e LITELLM_MASTER_KEY=sk-0c396d32f3a93e35c326e5137be0fb2597eee4859879926a59de4d6857522c3b -e UI_USERNAME=admin -e UI_PASSWORD=sk-0c396d32f3a93e35c326e5137be0fb2597eee4859879926a59de4d6857522c3b -e GROQ_API_KEY=gsk_predocker_0123456789ab ghcr.io/berriai/litellm:main-latest --config /app/config.yaml --port 4000
 systemctl daemon-reload
 systemctl enable litellm.service
 
@@ -158,7 +161,7 @@ general_settings:
       "name": "LiteLLM Proxy (Local)",
       "options": {
         "baseURL": "http://127.0.0.1:4000/v1",
-        "apiKey": "sk-c0502a08d0a15b5be7d0ddd9bbeca4e94a3b57d47a654348df95b26c4ae9d97b"
+        "apiKey": "sk-0c396d32f3a93e35c326e5137be0fb2597eee4859879926a59de4d6857522c3b"
       },
       "models": {
         "qwen-2.5-coder-32b": { "name": "Qwen 2.5 Coder 32B (Groq, free)" },

@@ -161,7 +161,17 @@ bash LiteLLM.sh
 | فیلد | مقدار |
 |---|---|
 | Username | `admin` |
-| Password | همان **Master Key** (چاپ‌شده در خروجی نصب یا `cat ~/.litellm/master_key.txt`) |
+| Password | همان **Master Key** — پسورد جداگانه‌ای وجود ندارد! |
+
+🔑 **پسورد پنل دقیقاً همان Master Key است.** برای دیدن آن یکی از این راه‌ها:
+
+```bash
+litellm credentials                          # URL + username + password همه با هم
+cat ~/.litellm/master_key.txt                # فقط کلید
+cat ~/.litellm/dashboard_credentials.txt     # فایل مخصوص اطلاعات ورود داشبورد
+```
+
+رشته‌ای که با `sk-` شروع می‌شود را کپی کنید و در فرم لاگین پنل بچسبانید.
 
 ### اجرای خودکار در بوت WSL
 
@@ -178,6 +188,7 @@ bash LiteLLM.sh
 
 ```bash
 litellm status     # وضعیت کانتینر، سلامت و مسیر فایل‌ها
+litellm credentials # نمایش URL، نام کاربری و پسورد پنل مدیریت
 litellm up         # روشن کردن (داکر و کانتینر)
 litellm down       # خاموش کردن
 litellm restart    # ری‌استارت + انتظار برای سلامت
