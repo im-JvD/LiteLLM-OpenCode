@@ -5,7 +5,7 @@
 
    Proxy target : ghcr.io/berriai/litellm:main-latest
    Proxy port   : 4000   (restart policy: unless-stopped)
-   Linux config : /tmp/litellm-test.qjyypC/home/.litellm
+   Linux config : /tmp/litellm-test.nytK4i/home/.litellm
 
    Please choose an option:
 
@@ -45,9 +45,9 @@ apt-get: docker.io installed (stub)
 
 [INFO]        Verifying API keys against the providers...
 [ OK ]          Groq: valid (HTTP 200)
-[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-test.qjyypC/home/.litellm/master_key.txt
-[ OK ] Dashboard login saved to: /tmp/litellm-test.qjyypC/home/.litellm/dashboard_credentials.txt
-[INFO] [5/9] Generating LiteLLM configuration: /tmp/litellm-test.qjyypC/home/.litellm/config.yaml
+[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-test.nytK4i/home/.litellm/master_key.txt
+[ OK ] Dashboard login saved to: /tmp/litellm-test.nytK4i/home/.litellm/dashboard_credentials.txt
+[INFO] [5/9] Generating LiteLLM configuration: /tmp/litellm-test.nytK4i/home/.litellm/config.yaml
 [ OK ] config.yaml generated (only providers with keys are enabled).
 [INFO] [6/9] Pulling prebuilt LiteLLM image (no build step): ghcr.io/berriai/litellm:main-latest
 [INFO]        This may take several minutes on the first run...
@@ -76,13 +76,13 @@ apt-get: docker.io installed (stub)
   ADMIN PANEL (UI) - open in the WINDOWS browser:
     URL       : http://127.0.0.1:4000/ui
     Username  : admin
-    Password  : sk-aa8f57e9239b955b9110cc071196e5131111001ca64a78a789dc558b3f55de9a
+    Password  : sk-edcfadde33fefc6b24a7ebf27b2c02a9201a569c77e5b0ab039b7a914634b9e1
     (the dashboard password IS the master key - no separate password exists)
-    saved to  : /tmp/litellm-test.qjyypC/home/.litellm/dashboard_credentials.txt
+    saved to  : /tmp/litellm-test.nytK4i/home/.litellm/dashboard_credentials.txt
 
-  Master key (also saved to)      : /tmp/litellm-test.qjyypC/home/.litellm/master_key.txt
-  Master key                      : sk-aa8f57e9239b955b9110cc071196e5131111001ca64a78a789dc558b3f55de9a
-  LiteLLM config file             : /tmp/litellm-test.qjyypC/home/.litellm/config.yaml
+  Master key (also saved to)      : /tmp/litellm-test.nytK4i/home/.litellm/master_key.txt
+  Master key                      : sk-edcfadde33fefc6b24a7ebf27b2c02a9201a569c77e5b0ab039b7a914634b9e1
+  LiteLLM config file             : /tmp/litellm-test.nytK4i/home/.litellm/config.yaml
   OpenCode config file (Windows)  : /mnt/c/Users/Test User/.config/opencode/opencode.json
   Container name                  : litellm
   Auto-start on WSL boot          : systemd service: litellm.service (enabled)
@@ -97,7 +97,7 @@ apt-get: docker.io installed (stub)
     Stop proxy       : sudo docker stop litellm
     Start proxy      : sudo docker start litellm
     Test endpoint    : curl -s http://127.0.0.1:4000/v1/models \
-                         -H "Authorization: Bearer sk-aa8f57e9239b955b9110cc071196e5131111001ca64a78a789dc558b3f55de9a"
+                         -H "Authorization: Bearer sk-edcfadde33fefc6b24a7ebf27b2c02a9201a569c77e5b0ab039b7a914634b9e1"
     Re-run this tool : bash "/home/user/LiteLLM-OpenCode/LiteLLM.sh"
 
   NEXT STEPS (on WINDOWS):
@@ -118,9 +118,9 @@ apt-get: docker.io installed (stub)
   OpenAI endpoint : http://127.0.0.1:4000/v1
   Admin panel     : http://127.0.0.1:4000/ui  (user: admin, password: master key)
   Admin database  : litellm-db (running)
-  Config file     : /tmp/litellm-test.qjyypC/home/.litellm/config.yaml (present)
-  Master key file : /tmp/litellm-test.qjyypC/home/.litellm/master_key.txt (present)
-  UI credentials  : /tmp/litellm-test.qjyypC/home/.litellm/dashboard_credentials.txt (present)
+  Config file     : /tmp/litellm-test.nytK4i/home/.litellm/config.yaml (present)
+  Master key file : /tmp/litellm-test.nytK4i/home/.litellm/master_key.txt (present)
+  UI credentials  : /tmp/litellm-test.nytK4i/home/.litellm/dashboard_credentials.txt (present)
     ok: contains: Container state : running
     ok: contains: Restart policy  : unless-stopped
     ok: contains: Admin panel     : http://127.0.0.1:4000/ui
@@ -137,13 +137,13 @@ apt-get: docker.io installed (stub)
   LiteLLM Admin Panel (UI)
   URL      : http://127.0.0.1:4000/ui
   Username : admin
-  Password : sk-aa8f57e9239b955b9110cc071196e5131111001ca64a78a789dc558b3f55de9a
+  Password : sk-edcfadde33fefc6b24a7ebf27b2c02a9201a569c77e5b0ab039b7a914634b9e1
   (the dashboard password IS the master key)
     ok: contains: Username : admin
-    ok: contains: Password : sk-aa8f57e9239b955b9110cc071196e5131111001ca64a78a789dc558b3f55de9a
+    ok: contains: Password : sk-edcfadde33fefc6b24a7ebf27b2c02a9201a569c77e5b0ab039b7a914634b9e1
 [ OK ] Container removed.
 [ OK ] Admin UI database container removed.
-[ OK ] Removed /tmp/litellm-test.qjyypC/home/.litellm
+[ OK ] Removed /tmp/litellm-test.nytK4i/home/.litellm
 [ OK ] Removed /mnt/c/Users/Test User/.config/opencode/opencode.json
 [ OK ] Removed systemd service.
 [ OK ] Removed boot helper.
@@ -153,10 +153,10 @@ apt-get: docker.io installed (stub)
   Kept: Docker Engine, /etc/docker/daemon.json and the pulled images.
     ok: contains: UNINSTALL COMPLETED.
     ok: container registry empty after CLI uninstall
-    ok: file missing: /tmp/litellm-test.qjyypC/home/.litellm/config.yaml
+    ok: file missing: /tmp/litellm-test.nytK4i/home/.litellm/config.yaml
     ok: file missing: /mnt/c/Users/Test User/.config/opencode/opencode.json
-    ok: file missing: /tmp/litellm-test.qjyypC/fakeroot/usr/local/bin/litellm
-    ok: file missing: /tmp/litellm-test.qjyypC/fakeroot/usr/local/bin/litellm-boot.sh
+    ok: file missing: /tmp/litellm-test.nytK4i/fakeroot/usr/local/bin/litellm
+    ok: file missing: /tmp/litellm-test.nytK4i/fakeroot/usr/local/bin/litellm-boot.sh
     ok: not contains: litellm-boot.sh
 
 --- docker-calls.log ---
@@ -168,10 +168,10 @@ docker image inspect ghcr.io/berriai/litellm:main-latest
 docker pull ghcr.io/berriai/litellm:main-latest
 docker network inspect litellm-net
 docker ps -a --format {{.Names}}
-docker run -d --name litellm-db --restart unless-stopped --network litellm-net -e POSTGRES_USER=litellm -e POSTGRES_PASSWORD=9169961f8d3dd8ca6c8a907ad9431354 -e POSTGRES_DB=litellm -v /tmp/litellm-test.qjyypC/home/.litellm/pgdata:/var/lib/postgresql/data postgres:16-alpine
+docker run -d --name litellm-db --restart unless-stopped --network litellm-net -e POSTGRES_USER=litellm -e POSTGRES_PASSWORD=34936cc3b113f3ac1dd830a454849b9a -e POSTGRES_DB=litellm -v /tmp/litellm-test.nytK4i/home/.litellm/pgdata:/var/lib/postgresql/data postgres:16-alpine
 docker exec litellm-db pg_isready -U litellm -d litellm
 docker ps -a --format {{.Names}}
-docker run -d --name litellm --restart unless-stopped -p 4000:4000 -v /tmp/litellm-test.qjyypC/home/.litellm/config.yaml:/app/config.yaml:ro --network litellm-net -e LITELLM_MASTER_KEY=sk-aa8f57e9239b955b9110cc071196e5131111001ca64a78a789dc558b3f55de9a -e UI_USERNAME=admin -e UI_PASSWORD=sk-aa8f57e9239b955b9110cc071196e5131111001ca64a78a789dc558b3f55de9a -e DATABASE_URL=postgresql://litellm:9169961f8d3dd8ca6c8a907ad9431354@litellm-db:5432/litellm -e GROQ_API_KEY=gsk_cli_0123456789abcdef ghcr.io/berriai/litellm:main-latest --config /app/config.yaml --port 4000
+docker run -d --name litellm --restart unless-stopped -p 4000:4000 -v /tmp/litellm-test.nytK4i/home/.litellm/config.yaml:/app/config.yaml:ro --network litellm-net -e LITELLM_MASTER_KEY=sk-edcfadde33fefc6b24a7ebf27b2c02a9201a569c77e5b0ab039b7a914634b9e1 -e UI_USERNAME=admin -e UI_PASSWORD=sk-edcfadde33fefc6b24a7ebf27b2c02a9201a569c77e5b0ab039b7a914634b9e1 -e DATABASE_URL=postgresql://litellm:34936cc3b113f3ac1dd830a454849b9a@litellm-db:5432/litellm -e GROQ_API_KEY=gsk_cli_0123456789abcdef ghcr.io/berriai/litellm:main-latest --config /app/config.yaml --port 4000
 systemctl daemon-reload
 systemctl enable litellm.service
 docker info

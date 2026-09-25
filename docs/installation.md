@@ -195,6 +195,7 @@ cat ~/.litellm/dashboard_credentials.txt     # فایل مخصوص اطلاعا�
 ```bash
 litellm status     # وضعیت کانتینر، سلامت و مسیر فایل‌ها
 litellm credentials # نمایش URL، نام کاربری و پسورد پنل مدیریت
+litellm doctor      # تشخیص عمیق + تست چت واقعی برای تک‌تک مدل‌ها
 litellm up         # روشن کردن (داکر و کانتینر)
 litellm down       # خاموش کردن
 litellm restart    # ری‌استارت + انتظار برای سلامت

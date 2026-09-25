@@ -158,6 +158,18 @@ case "$LOGIN_CODE" in
     ;;
 esac
 
+# [b4] deep diagnosis report (per-provider connectivity + live per-model tests)
+if command -v litellm >/dev/null 2>&1; then
+  if litellm doctor >> "$LOG_FILE" 2>&1; then
+    ok "litellm doctor: ALL model tests passed"
+  else
+    log "    litellm doctor reported failures (expected with placeholder keys /"
+    log "    region-blocked providers). Full report appended to the log file -"
+    log "    it tells exactly which provider blocks what."
+  fi
+  grep -E "^\s+(OK|FAIL|REJECTED|UNREACHABLE|reachable)" "$LOG_FILE" | tail -20 >> "$LOG_FILE" 2>/dev/null || true
+fi
+
 # [c] /v1/models with the generated master key
 MASTER_KEY="$(tr -d '\n' < "${HOME}/.litellm/master_key.txt" 2>/dev/null || true)"
 if [ -z "$MASTER_KEY" ]; then fail "master key file missing"; exit 1; fi

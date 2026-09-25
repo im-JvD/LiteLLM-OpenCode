@@ -205,6 +205,7 @@ LITELLM_BOOT_MODE=wslconf bash LiteLLM.sh   # فقط boot command در /etc/wsl.
 | `litellm restart` | ری‌استارت + انتظار برای سلامت |
 | `litellm status` | وضعیت کانتینر، policy، سلامت، آدرس پنل و مسیر فایل‌ها |
 | `litellm credentials` | نمایش URL/نام‌کاربری/پسورد پنل مدیریت (پسورد = Master Key) |
+| `litellm doctor` | تشخیص عمیق: اتصال هر ارائه‌دهنده + تست چت واقعی برای تک‌تک مدل‌ها |
 | `litellm logs` | دنبال‌کردن زندهٔ لاگ‌ها |
 | `litellm uninstall` | حذف کامل همه‌چیز (با تأیید) — معادل گزینهٔ ۲ نصاب |
 
@@ -224,6 +225,7 @@ LITELLM_BOOT_MODE=wslconf bash LiteLLM.sh   # فقط boot command در /etc/wsl.
 | `LITELLM_PULL_RETRIES` | `3` | تعداد تلاش مجدد pull قبل از fallback |
 | `LITELLM_KEY_CHECK` | `1` | تست زندهٔ هر کلید API به سرویس‌دهنده‌اش قبل از ساخت کانتینر (`0` = غیرفعال) |
 | `LITELLM_KEY_CHECK_TIMEOUT` | `10` | مهلت ثانیه‌ای هر تست کلید |
+| `LITELLM_DOCTOR_TIMEOUT` | `45` | مهلت ثانیه‌ای تست زندهٔ هر مدل در `litellm doctor` |
 | `LITELLM_UI_DB` | `1` | `1` = کانتینر Postgres برای ورود به Admin UI ساخته می‌شود؛ `0` = بدون DB (UI لاگین ندارد، چت سالم است) |
 | `LITELLM_DB_IMAGE` | `postgres:16-alpine` | ایمیج دیتابیس Admin UI (از داکرهاب و از مسیر میرورها) |
 

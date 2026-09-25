@@ -977,6 +977,39 @@ else
 fi
 
 #===============================================================================
+# T28 - litellm doctor: stack + provider + live per-model test output
+#===============================================================================
+start_test "T28_doctor_command"
+if [ "$MNT_OK" -eq 1 ]; then
+  fresh_env
+  printf '1\ngsk_doctor_0123456789abcd\n\n\n\n\n' | run_script
+  CLI="${FAKE_ROOT}/usr/local/bin/litellm"
+  if [ -x "$CLI" ]; then
+    env -u DOCKER_PULL_FAIL -u DOCKER_APT_FAIL -u HEALTH_CODE -u PS_USERNAME \
+      HOME="$HOME_DIR" PATH="${STUBBIN}:${PATH}" \
+      STUBBIN="$STUBBIN" T_WORKSTATE="$T_WORKSTATE" FAKE_ROOT="$FAKE_ROOT" \
+      HEALTH_CODE="200" KEYCHECK_CODE="200" PS_USERNAME="Test User" \
+      bash "$CLI" doctor >> "$CURRENT_LOG" 2>&1
+    T_RC=$?
+    assert_rc 0
+    assert_contains "$CURRENT_LOG" "[STACK]"
+    assert_contains "$CURRENT_LOG" "[PROVIDER CONNECTIVITY + KEYS]"
+    assert_contains "$CURRENT_LOG" "Groq: reachable, key valid (HTTP 200)"
+    assert_contains "$CURRENT_LOG" "OpenRouter: no key configured"
+    assert_contains "$CURRENT_LOG" "[MODEL LIVE TESTS]"
+    assert_contains "$CURRENT_LOG" "OK   qwen-2.5-coder-32b"
+    assert_contains "$CURRENT_LOG" "OK   llama-3.3-70b-versatile"
+    assert_contains "$CURRENT_LOG" "ALL 2 MODEL TESTS PASSED"
+  else
+    a_bad "CLI missing for doctor test"
+  fi
+  dump_state
+  finish_test
+else
+  skip_test "requires writable /mnt/c"
+fi
+
+#===============================================================================
 # Summary
 #===============================================================================
 echo >> "$SUMMARY_FILE"

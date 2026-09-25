@@ -44,10 +44,10 @@ bash <(wget -qO- https://raw.githubusercontent.com/im-JvD/LiteLLM-OpenCode/main/
 | 🔁 اجرای پایدار | کانتینر با `--restart unless-stopped` روی پورت 4000 |
 | 🖥️ پنل مدیریت | رابط وب LiteLLM روی `http://127.0.0.1:4000/ui` با دیتابیس اختصاصی (رفع کامل خطای «Not connected to DB») |
 | ⚙️ استارت خودکار در بوت WSL | سرویس systemd یا boot command در `/etc/wsl.conf` |
-| ⌨️ CLI مدیریت | `litellm up / down / restart / status / credentials / logs / uninstall` |
+| ⌨️ CLI مدیریت | `litellm up / down / restart / status / credentials / doctor / logs / uninstall` |
 | 🪟 تشخیص هوشمند ویندوز | پیدا کردن مسیر پروفایل با PowerShell (حتی با فاصله در نام کاربری) |
 | 🔒 کلید امن | ساخت خودکار Master Key و ذخیرهٔ امن آن |
-| 🧪 تست‌شده | ۲۷ سناریوی شبیه‌سازی‌شده + تست واقعی E2E با خودِ LiteLLM |
+| 🧪 تست‌شده | ۲۸ سناریوی شبیه‌سازی‌شده + تست واقعی E2E با خودِ LiteLLM |
 
 ---
 

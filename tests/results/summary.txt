@@ -1,4 +1,4 @@
-SUITE RUN - 2026-09-25T18:09:41Z
+SUITE RUN - 2026-09-25T18:20:38Z
 host: Linux 6.1.158+ | user: user | bash: 5.2.15(1)-release
 PASS  T00_static_checks
 PASS  T01_full_install_all_keys
@@ -27,6 +27,7 @@ PASS  T23_reinstall_keeps_existing_keys
 PASS  T24_ui_db_disabled
 PASS  T26_key_verification_rejects_bad_keys
 PASS  T27_key_verification_all_valid
+PASS  T28_doctor_command
 
-TOTAL: 27 passed, 0 failed, 0 skipped
+TOTAL: 28 passed, 0 failed, 0 skipped
 E2E litellm_real: PASS

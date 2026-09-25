@@ -868,6 +868,106 @@ cmd_credentials() {
   echo "  (the dashboard password IS the master key)"
 }
 
+cmd_doctor() {
+  # Deep diagnosis: stack status, per-provider connectivity/keys, and a real
+  # chat completion through the local proxy for EVERY configured model.
+  local timeout="${LITELLM_DOCTOR_TIMEOUT:-45}"
+  case "$timeout" in ''|*[!0-9]*) timeout=45 ;; esac
+  ensure_daemon || return 1
+
+  echo "================================================="
+  echo "                 LITELLM DOCTOR"
+  echo "================================================="
+  echo "[STACK]"
+  if is_running; then echo "  proxy container : running"; else echo "  proxy container : STOPPED"; fi
+  echo "  proxy health    : HTTP $(health_code)  (http://127.0.0.1:${PORT}/health/liveliness)"
+  if $SUDO docker ps -a --format '{{.Names}}' 2>/dev/null | grep -qx "$DB_CONTAINER"; then
+    echo "  ui database     : $($SUDO docker inspect -f '{{.State.Status}}' "$DB_CONTAINER" 2>/dev/null || echo unknown)"
+  else
+    echo "  ui database     : not installed (UI login disabled, chat still works)"
+  fi
+  echo
+
+  echo "[PROVIDER CONNECTIVITY + KEYS]   (direct, from inside WSL)"
+  local envs key code
+  envs="$($SUDO docker inspect -f '{{range .Config.Env}}{{println .}}{{end}}' "$CONTAINER_NAME" 2>/dev/null || true)"
+  _doc_provider() { # $1 name $2 envname $3 url $4 auth
+    key="$(printf '%s\n' "$envs" | sed -n "s/^${2}=//p" | head -1)"
+    if [ -z "$key" ]; then
+      echo "  ${1}: no key configured"
+      return 0
+    fi
+    if [ "$4" = "query" ]; then
+      code="$(curl -s -o /dev/null -w '%{http_code}' --max-time "${LITELLM_KEY_CHECK_TIMEOUT:-10}" "$3?key=$key" 2>/dev/null || true)"
+    else
+      code="$(curl -s -o /dev/null -w '%{http_code}' --max-time "${LITELLM_KEY_CHECK_TIMEOUT:-10}" -H "Authorization: Bearer $key" "$3" 2>/dev/null || true)"
+    fi
+    case "$code" in
+      200)      echo "  ${1}: reachable, key valid (HTTP 200)" ;;
+      401|403)  echo "  ${1}: REJECTED (HTTP ${code}) - invalid key OR the provider blocks your region" ;;
+      000|'')   echo "  ${1}: UNREACHABLE from this network (timeout/blocked)" ;;
+      *)        echo "  ${1}: HTTP ${code}" ;;
+    esac
+    return 0
+  }
+  _doc_provider "Groq"       "GROQ_API_KEY"       "https://api.groq.com/openai/v1/models"                    bearer
+  _doc_provider "OpenRouter" "OPENROUTER_API_KEY" "https://openrouter.ai/api/v1/key"                         bearer
+  _doc_provider "Google AI"  "GEMINI_API_KEY"     "https://generativelanguage.googleapis.com/v1beta/models"  query
+  _doc_provider "Cerebras"   "CEREBRAS_API_KEY"   "https://api.cerebras.ai/v1/models"                        bearer
+  _doc_provider "Mistral"    "MISTRAL_API_KEY"    "https://api.mistral.ai/v1/models"                         bearer
+  echo
+
+  echo "[MODEL LIVE TESTS]   (real chat call via http://127.0.0.1:${PORT}/v1)"
+  local mk models_json id start lat body code2 fails=0 total=0
+  mk="$(tr -d '\n' < "$KEYFILE" 2>/dev/null)"
+  if [ -z "$mk" ]; then
+    echo "  master key file missing - cannot test models"
+    return 1
+  fi
+  models_json="$(curl -s --max-time 10 -H "Authorization: Bearer $mk" "http://127.0.0.1:${PORT}/v1/models" 2>/dev/null || true)"
+  ids="$(printf '%s' "$models_json" | grep -o '"id":"[^"]*"' | sed 's/"id":"//; s/"$//')"
+  if [ -z "$ids" ]; then
+    echo "  could not read the model list from the proxy"
+    return 1
+  fi
+  while IFS= read -r id; do
+    [ -n "$id" ] || continue
+    total=$((total + 1))
+    body="$(mktemp)"
+    start="$(date +%s)"
+    code2="$(curl -s -o "$body" -w '%{http_code}' --max-time "$timeout" \
+      -X POST -H "Authorization: Bearer $mk" -H "Content-Type: application/json" \
+      -d "{\"model\":\"$id\",\"messages\":[{\"role\":\"user\",\"content\":\"ping\"}],\"max_tokens\":8}" \
+      "http://127.0.0.1:${PORT}/v1/chat/completions" 2>/dev/null || true)"
+    lat=$(( $(date +%s) - start ))
+    if [ "$code2" = "200" ]; then
+      echo "  OK   ${id} (${lat}s)"
+    else
+      fails=$((fails + 1))
+      echo "  FAIL ${id} (HTTP ${code2:-none}): $(head -c 220 "$body" 2>/dev/null | tr '\n' ' ')"
+    fi
+    rm -f "$body"
+  done <<EOFDOCTOR
+$ids
+EOFDOCTOR
+  echo
+  echo "[SUMMARY]"
+  if [ "$fails" -eq 0 ]; then
+    echo "  ALL ${total} MODEL TESTS PASSED"
+  else
+    echo "  ${fails}/${total} model test(s) FAILED"
+    echo "  Hints:"
+    echo "   - FAIL with 401/403 while [PROVIDER] above says 'reachable, key valid':"
+    echo "     the provider blocks your region/IP (US providers block Iran)."
+    echo "     Run a system-wide VPN on the WINDOWS side, then 'litellm restart'."
+    echo "   - REJECTED in [PROVIDER] section => key wrong for that provider:"
+    echo "     re-run the installer and answer 'n' at 'Keep these keys?'"
+    echo "   - UNREACHABLE => your network cannot reach the provider at all (VPN needed)"
+  fi
+  echo "================================================="
+  [ "$fails" -eq 0 ]
+}
+
 cmd_up() {
   ensure_daemon || return 1
   if ! container_exists; then
@@ -1007,6 +1107,7 @@ case "${1:-}" in
   restart)   shift; cmd_restart "$@" ;;
   status)    shift; cmd_status "$@" ;;
   credentials|ui) shift; cmd_credentials "$@" ;;
+  doctor)    shift; cmd_doctor "$@"; exit $? ;;
   logs)      shift; cmd_logs "$@" ;;
   uninstall) shift; cmd_uninstall "${1:-}"; exit $? ;;
   ""|help|-h|--help)
@@ -1016,6 +1117,7 @@ case "${1:-}" in
     echo "  restart     restart the proxy and wait until healthy"
     echo "  status      show container state, health and config paths"
     echo "  credentials show Admin Panel URL / username / password"
+    echo "  doctor      deep diagnosis: providers + live test of EVERY model"
     echo "  logs        follow proxy logs (Ctrl+C to exit)"
     echo "  uninstall   remove proxy, configs and this CLI"
     ;;

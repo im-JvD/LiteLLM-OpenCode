@@ -16,7 +16,7 @@
 
    Proxy target : ghcr.io/berriai/litellm:main-latest
    Proxy port   : 4000   (restart policy: unless-stopped)
-   Linux config : /tmp/litellm-e2e-run.D1bQMT/home/.litellm
+   Linux config : /tmp/litellm-e2e-run.WvxeqU/home/.litellm
 
    Please choose an option:
 
@@ -60,9 +60,9 @@ apt-get: docker.io installed (stub)
 [ OK ]          Google AI: valid (HTTP 200)
 [ OK ]          Cerebras: valid (HTTP 200)
 [ OK ]          Mistral: valid (HTTP 200)
-[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-e2e-run.D1bQMT/home/.litellm/master_key.txt
-[ OK ] Dashboard login saved to: /tmp/litellm-e2e-run.D1bQMT/home/.litellm/dashboard_credentials.txt
-[INFO] [5/9] Generating LiteLLM configuration: /tmp/litellm-e2e-run.D1bQMT/home/.litellm/config.yaml
+[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-e2e-run.WvxeqU/home/.litellm/master_key.txt
+[ OK ] Dashboard login saved to: /tmp/litellm-e2e-run.WvxeqU/home/.litellm/dashboard_credentials.txt
+[INFO] [5/9] Generating LiteLLM configuration: /tmp/litellm-e2e-run.WvxeqU/home/.litellm/config.yaml
 [ OK ] config.yaml generated (only providers with keys are enabled).
 [INFO] [6/9] Pulling prebuilt LiteLLM image (no build step): ghcr.io/berriai/litellm:main-latest
 [INFO]        This may take several minutes on the first run...
@@ -88,13 +88,13 @@ apt-get: docker.io installed (stub)
   ADMIN PANEL (UI) - open in the WINDOWS browser:
     URL       : http://127.0.0.1:4000/ui
     Username  : admin
-    Password  : sk-2638bf46b31196b3adc0ab0a97b56aeedbb5ada401469e7287e39c025446e4d0
+    Password  : sk-72ce9e6375fe700b9d21223e49ffe18fb51c71902b646ecf78720c5eb6d7ef97
     (the dashboard password IS the master key - no separate password exists)
-    saved to  : /tmp/litellm-e2e-run.D1bQMT/home/.litellm/dashboard_credentials.txt
+    saved to  : /tmp/litellm-e2e-run.WvxeqU/home/.litellm/dashboard_credentials.txt
 
-  Master key (also saved to)      : /tmp/litellm-e2e-run.D1bQMT/home/.litellm/master_key.txt
-  Master key                      : sk-2638bf46b31196b3adc0ab0a97b56aeedbb5ada401469e7287e39c025446e4d0
-  LiteLLM config file             : /tmp/litellm-e2e-run.D1bQMT/home/.litellm/config.yaml
+  Master key (also saved to)      : /tmp/litellm-e2e-run.WvxeqU/home/.litellm/master_key.txt
+  Master key                      : sk-72ce9e6375fe700b9d21223e49ffe18fb51c71902b646ecf78720c5eb6d7ef97
+  LiteLLM config file             : /tmp/litellm-e2e-run.WvxeqU/home/.litellm/config.yaml
   OpenCode config file (Windows)  : /mnt/c/Users/Test User/.config/opencode/opencode.json
   Container name                  : litellm
   Auto-start on WSL boot          : systemd service: litellm.service (enabled)
@@ -109,7 +109,7 @@ apt-get: docker.io installed (stub)
     Stop proxy       : sudo docker stop litellm
     Start proxy      : sudo docker start litellm
     Test endpoint    : curl -s http://127.0.0.1:4000/v1/models \
-                         -H "Authorization: Bearer sk-2638bf46b31196b3adc0ab0a97b56aeedbb5ada401469e7287e39c025446e4d0"
+                         -H "Authorization: Bearer sk-72ce9e6375fe700b9d21223e49ffe18fb51c71902b646ecf78720c5eb6d7ef97"
     Re-run this tool : bash "/home/user/LiteLLM-OpenCode/LiteLLM.sh"
 
   NEXT STEPS (on WINDOWS):
@@ -152,9 +152,9 @@ apt-get: docker.io installed (stub)
     raise e
   File "/tmp/litellm-e2e-venv/lib/python3.11/site-packages/litellm/litellm_core_utils/exception_mapping_utils.py", line 2646, in exception_type
     raise APIConnectionError(
-litellm.exceptions.APIConnectionError: litellm.APIConnectionError: GeminiException - Cannot connect to host generativelanguage.googleapis.com:443 ssl:<ssl.SSLContext object at 0x7fec1a88f9b0> [None]. Received Model Group=gemini-2.0-flash
+litellm.exceptions.APIConnectionError: litellm.APIConnectionError: GeminiException - Cannot connect to host generativelanguage.googleapis.com:443 ssl:<ssl.SSLContext object at 0x7fa92c9e35c0> [None]. Received Model Group=gemini-2.0-flash
 Available Model Group Fallbacks=None LiteLLM Retried: 2 times, LiteLLM Max Retries: 2
-INFO:     127.0.0.1:45426 - "POST /v1/chat/completions HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:45672 - "POST /v1/chat/completions HTTP/1.1" 500 Internal Server Error
 
 [E2E] ===================================================================
 [E2E] E2E RESULT: PASS (all assertions against the REAL proxy passed)

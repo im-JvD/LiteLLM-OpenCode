@@ -5,7 +5,7 @@
 
    Proxy target : ghcr.io/berriai/litellm:main-latest
    Proxy port   : 4000   (restart policy: unless-stopped)
-   Linux config : /tmp/litellm-test.2HjF3P/home/.litellm
+   Linux config : /tmp/litellm-test.N6Eh5X/home/.litellm
 
    Please choose an option:
 
@@ -45,9 +45,9 @@ apt-get: docker.io installed (stub)
 
 [INFO]        Verifying API keys against the providers...
 [ OK ]          Groq: valid (HTTP 200)
-[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-test.2HjF3P/home/.litellm/master_key.txt
-[ OK ] Dashboard login saved to: /tmp/litellm-test.2HjF3P/home/.litellm/dashboard_credentials.txt
-[INFO] [5/9] Generating LiteLLM configuration: /tmp/litellm-test.2HjF3P/home/.litellm/config.yaml
+[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-test.N6Eh5X/home/.litellm/master_key.txt
+[ OK ] Dashboard login saved to: /tmp/litellm-test.N6Eh5X/home/.litellm/dashboard_credentials.txt
+[INFO] [5/9] Generating LiteLLM configuration: /tmp/litellm-test.N6Eh5X/home/.litellm/config.yaml
 [ OK ] config.yaml generated (only providers with keys are enabled).
 [INFO] [6/9] Pulling prebuilt LiteLLM image (no build step): ghcr.io/berriai/litellm:main-latest
 [INFO]        This may take several minutes on the first run...
@@ -76,13 +76,13 @@ apt-get: docker.io installed (stub)
   ADMIN PANEL (UI) - open in the WINDOWS browser:
     URL       : http://127.0.0.1:4000/ui
     Username  : admin
-    Password  : sk-448e262b1ff39ed85c90838c651b497f78e6cde209d08151a1976cf9c5020076
+    Password  : sk-4761be4778d14f3b226caebf05584b925de44020e3e015dba643a948159b943b
     (the dashboard password IS the master key - no separate password exists)
-    saved to  : /tmp/litellm-test.2HjF3P/home/.litellm/dashboard_credentials.txt
+    saved to  : /tmp/litellm-test.N6Eh5X/home/.litellm/dashboard_credentials.txt
 
-  Master key (also saved to)      : /tmp/litellm-test.2HjF3P/home/.litellm/master_key.txt
-  Master key                      : sk-448e262b1ff39ed85c90838c651b497f78e6cde209d08151a1976cf9c5020076
-  LiteLLM config file             : /tmp/litellm-test.2HjF3P/home/.litellm/config.yaml
+  Master key (also saved to)      : /tmp/litellm-test.N6Eh5X/home/.litellm/master_key.txt
+  Master key                      : sk-4761be4778d14f3b226caebf05584b925de44020e3e015dba643a948159b943b
+  LiteLLM config file             : /tmp/litellm-test.N6Eh5X/home/.litellm/config.yaml
   OpenCode config file (Windows)  : /mnt/c/Users/Test User/.config/opencode/opencode.json
   Container name                  : litellm
   Auto-start on WSL boot          : systemd service: litellm.service (enabled)
@@ -97,7 +97,7 @@ apt-get: docker.io installed (stub)
     Stop proxy       : sudo docker stop litellm
     Start proxy      : sudo docker start litellm
     Test endpoint    : curl -s http://127.0.0.1:4000/v1/models \
-                         -H "Authorization: Bearer sk-448e262b1ff39ed85c90838c651b497f78e6cde209d08151a1976cf9c5020076"
+                         -H "Authorization: Bearer sk-4761be4778d14f3b226caebf05584b925de44020e3e015dba643a948159b943b"
     Re-run this tool : bash "/home/user/LiteLLM-OpenCode/LiteLLM.sh"
 
   NEXT STEPS (on WINDOWS):
@@ -117,7 +117,7 @@ apt-get: docker.io installed (stub)
 
    Proxy target : ghcr.io/berriai/litellm:main-latest
    Proxy port   : 4000   (restart policy: unless-stopped)
-   Linux config : /tmp/litellm-test.2HjF3P/home/.litellm
+   Linux config : /tmp/litellm-test.N6Eh5X/home/.litellm
 
    Please choose an option:
 
@@ -165,9 +165,9 @@ apt-get: docker.io installed (stub)
 
 [INFO]        Verifying API keys against the providers...
 [ OK ]          Groq: valid (HTTP 200)
-[ OK ] Master key reused (unchanged): /tmp/litellm-test.2HjF3P/home/.litellm/master_key.txt
-[ OK ] Dashboard login saved to: /tmp/litellm-test.2HjF3P/home/.litellm/dashboard_credentials.txt
-[INFO] [5/9] Generating LiteLLM configuration: /tmp/litellm-test.2HjF3P/home/.litellm/config.yaml
+[ OK ] Master key reused (unchanged): /tmp/litellm-test.N6Eh5X/home/.litellm/master_key.txt
+[ OK ] Dashboard login saved to: /tmp/litellm-test.N6Eh5X/home/.litellm/dashboard_credentials.txt
+[INFO] [5/9] Generating LiteLLM configuration: /tmp/litellm-test.N6Eh5X/home/.litellm/config.yaml
 [ OK ] config.yaml generated (only providers with keys are enabled).
 [INFO] [6/9] Pulling prebuilt LiteLLM image (no build step): ghcr.io/berriai/litellm:main-latest
 [INFO]        This may take several minutes on the first run...
@@ -197,13 +197,13 @@ apt-get: docker.io installed (stub)
   ADMIN PANEL (UI) - open in the WINDOWS browser:
     URL       : http://127.0.0.1:4000/ui
     Username  : admin
-    Password  : sk-448e262b1ff39ed85c90838c651b497f78e6cde209d08151a1976cf9c5020076
+    Password  : sk-4761be4778d14f3b226caebf05584b925de44020e3e015dba643a948159b943b
     (the dashboard password IS the master key - no separate password exists)
-    saved to  : /tmp/litellm-test.2HjF3P/home/.litellm/dashboard_credentials.txt
+    saved to  : /tmp/litellm-test.N6Eh5X/home/.litellm/dashboard_credentials.txt
 
-  Master key (also saved to)      : /tmp/litellm-test.2HjF3P/home/.litellm/master_key.txt
-  Master key                      : sk-448e262b1ff39ed85c90838c651b497f78e6cde209d08151a1976cf9c5020076
-  LiteLLM config file             : /tmp/litellm-test.2HjF3P/home/.litellm/config.yaml
+  Master key (also saved to)      : /tmp/litellm-test.N6Eh5X/home/.litellm/master_key.txt
+  Master key                      : sk-4761be4778d14f3b226caebf05584b925de44020e3e015dba643a948159b943b
+  LiteLLM config file             : /tmp/litellm-test.N6Eh5X/home/.litellm/config.yaml
   OpenCode config file (Windows)  : /mnt/c/Users/Test User/.config/opencode/opencode.json
   Container name                  : litellm
   Auto-start on WSL boot          : systemd service: litellm.service (enabled)
@@ -218,7 +218,7 @@ apt-get: docker.io installed (stub)
     Stop proxy       : sudo docker stop litellm
     Start proxy      : sudo docker start litellm
     Test endpoint    : curl -s http://127.0.0.1:4000/v1/models \
-                         -H "Authorization: Bearer sk-448e262b1ff39ed85c90838c651b497f78e6cde209d08151a1976cf9c5020076"
+                         -H "Authorization: Bearer sk-4761be4778d14f3b226caebf05584b925de44020e3e015dba643a948159b943b"
     Re-run this tool : bash "/home/user/LiteLLM-OpenCode/LiteLLM.sh"
 
   NEXT STEPS (on WINDOWS):
@@ -249,10 +249,10 @@ docker image inspect ghcr.io/berriai/litellm:main-latest
 docker pull ghcr.io/berriai/litellm:main-latest
 docker network inspect litellm-net
 docker ps -a --format {{.Names}}
-docker run -d --name litellm-db --restart unless-stopped --network litellm-net -e POSTGRES_USER=litellm -e POSTGRES_PASSWORD=422b9442be881e55796440d281561107 -e POSTGRES_DB=litellm -v /tmp/litellm-test.2HjF3P/home/.litellm/pgdata:/var/lib/postgresql/data postgres:16-alpine
+docker run -d --name litellm-db --restart unless-stopped --network litellm-net -e POSTGRES_USER=litellm -e POSTGRES_PASSWORD=a0efcda2e0710706b0dcce9d33f6225b -e POSTGRES_DB=litellm -v /tmp/litellm-test.N6Eh5X/home/.litellm/pgdata:/var/lib/postgresql/data postgres:16-alpine
 docker exec litellm-db pg_isready -U litellm -d litellm
 docker ps -a --format {{.Names}}
-docker run -d --name litellm --restart unless-stopped -p 4000:4000 -v /tmp/litellm-test.2HjF3P/home/.litellm/config.yaml:/app/config.yaml:ro --network litellm-net -e LITELLM_MASTER_KEY=sk-448e262b1ff39ed85c90838c651b497f78e6cde209d08151a1976cf9c5020076 -e UI_USERNAME=admin -e UI_PASSWORD=sk-448e262b1ff39ed85c90838c651b497f78e6cde209d08151a1976cf9c5020076 -e DATABASE_URL=postgresql://litellm:422b9442be881e55796440d281561107@litellm-db:5432/litellm -e GROQ_API_KEY=gsk_first_0123456789abcdef ghcr.io/berriai/litellm:main-latest --config /app/config.yaml --port 4000
+docker run -d --name litellm --restart unless-stopped -p 4000:4000 -v /tmp/litellm-test.N6Eh5X/home/.litellm/config.yaml:/app/config.yaml:ro --network litellm-net -e LITELLM_MASTER_KEY=sk-4761be4778d14f3b226caebf05584b925de44020e3e015dba643a948159b943b -e UI_USERNAME=admin -e UI_PASSWORD=sk-4761be4778d14f3b226caebf05584b925de44020e3e015dba643a948159b943b -e DATABASE_URL=postgresql://litellm:a0efcda2e0710706b0dcce9d33f6225b@litellm-db:5432/litellm -e GROQ_API_KEY=gsk_first_0123456789abcdef ghcr.io/berriai/litellm:main-latest --config /app/config.yaml --port 4000
 systemctl daemon-reload
 systemctl enable litellm.service
 service docker restart
@@ -266,7 +266,7 @@ docker ps -a --format {{.Names}}
 docker exec litellm-db pg_isready -U litellm -d litellm
 docker ps -a --format {{.Names}}
 docker rm -f litellm
-docker run -d --name litellm --restart unless-stopped -p 4000:4000 -v /tmp/litellm-test.2HjF3P/home/.litellm/config.yaml:/app/config.yaml:ro --network litellm-net -e LITELLM_MASTER_KEY=sk-448e262b1ff39ed85c90838c651b497f78e6cde209d08151a1976cf9c5020076 -e UI_USERNAME=admin -e UI_PASSWORD=sk-448e262b1ff39ed85c90838c651b497f78e6cde209d08151a1976cf9c5020076 -e DATABASE_URL=postgresql://litellm:422b9442be881e55796440d281561107@litellm-db:5432/litellm -e GROQ_API_KEY=gsk_second_0123456789abcdef ghcr.io/berriai/litellm:main-latest --config /app/config.yaml --port 4000
+docker run -d --name litellm --restart unless-stopped -p 4000:4000 -v /tmp/litellm-test.N6Eh5X/home/.litellm/config.yaml:/app/config.yaml:ro --network litellm-net -e LITELLM_MASTER_KEY=sk-4761be4778d14f3b226caebf05584b925de44020e3e015dba643a948159b943b -e UI_USERNAME=admin -e UI_PASSWORD=sk-4761be4778d14f3b226caebf05584b925de44020e3e015dba643a948159b943b -e DATABASE_URL=postgresql://litellm:a0efcda2e0710706b0dcce9d33f6225b@litellm-db:5432/litellm -e GROQ_API_KEY=gsk_second_0123456789abcdef ghcr.io/berriai/litellm:main-latest --config /app/config.yaml --port 4000
 systemctl daemon-reload
 systemctl enable litellm.service
 
@@ -318,7 +318,7 @@ general_settings:
       "name": "LiteLLM Proxy (Local)",
       "options": {
         "baseURL": "http://127.0.0.1:4000/v1",
-        "apiKey": "sk-448e262b1ff39ed85c90838c651b497f78e6cde209d08151a1976cf9c5020076"
+        "apiKey": "sk-4761be4778d14f3b226caebf05584b925de44020e3e015dba643a948159b943b"
       },
       "models": {
         "qwen-2.5-coder-32b": { "name": "Qwen 2.5 Coder 32B (Groq, free)" },

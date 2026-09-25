@@ -15,6 +15,18 @@ for a in "$@"; do
       ;;
   esac
 done
+# /v1/models list for the doctor command (2 Groq models, matching the
+# groq-only install used in the offline tests)
+for a in "$@"; do
+  case "$a" in
+    http://127.0.0.1:4000/v1/models)
+      echo '{"data":[{"id":"qwen-2.5-coder-32b","object":"model"},{"id":"llama-3.3-70b-versatile","object":"model"}]}'
+      exit 0
+      ;;
+  esac
+done
+# chat completions (doctor live test): falls through to the generic
+# '%{http_code}' handler below (prints HEALTH_CODE, default 200).
 code="${HEALTH_CODE:-200}"
 for a in "$@"; do
   case "$a" in

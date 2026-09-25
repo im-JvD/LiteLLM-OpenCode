@@ -5,7 +5,7 @@
 
    Proxy target : ghcr.io/berriai/litellm:main-latest
    Proxy port   : 4000   (restart policy: unless-stopped)
-   Linux config : /tmp/litellm-test.3LO3oE/home/.litellm
+   Linux config : /tmp/litellm-test.4x19qe/home/.litellm
 
    Please choose an option:
 
@@ -37,7 +37,7 @@ apt-get: docker.io installed (stub)
 
 
 [ OK ] Collected 1 API key(s):
-         Groq       : gsk_****89ab
+         Groq       : gsk_****abcd
          OpenRouter : <skipped>
          Google AI  : <skipped>
          Cerebras   : <skipped>
@@ -45,9 +45,9 @@ apt-get: docker.io installed (stub)
 
 [INFO]        Verifying API keys against the providers...
 [ OK ]          Groq: valid (HTTP 200)
-[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-test.3LO3oE/home/.litellm/master_key.txt
-[ OK ] Dashboard login saved to: /tmp/litellm-test.3LO3oE/home/.litellm/dashboard_credentials.txt
-[INFO] [5/9] Generating LiteLLM configuration: /tmp/litellm-test.3LO3oE/home/.litellm/config.yaml
+[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-test.4x19qe/home/.litellm/master_key.txt
+[ OK ] Dashboard login saved to: /tmp/litellm-test.4x19qe/home/.litellm/dashboard_credentials.txt
+[INFO] [5/9] Generating LiteLLM configuration: /tmp/litellm-test.4x19qe/home/.litellm/config.yaml
 [ OK ] config.yaml generated (only providers with keys are enabled).
 [INFO] [6/9] Pulling prebuilt LiteLLM image (no build step): ghcr.io/berriai/litellm:main-latest
 [INFO]        This may take several minutes on the first run...
@@ -64,8 +64,8 @@ apt-get: docker.io installed (stub)
 [ OK ] Auto-start on WSL boot: systemd service: litellm.service (enabled)
 [ OK ] Management CLI installed: /usr/local/bin/litellm  (try: litellm status)
 [INFO] [9/9] Configuring OpenCode on the Windows side...
-[ OK ] Windows user profile detected: /mnt/c/Users/Ali Rezaei
-[ OK ] OpenCode config written: /mnt/c/Users/Ali Rezaei/.config/opencode/opencode.json
+[ OK ] Windows user profile detected: /mnt/c/Users/Test User
+[ OK ] OpenCode config written: /mnt/c/Users/Test User/.config/opencode/opencode.json
 
 =================================================================
   INSTALLATION COMPLETED SUCCESSFULLY!
@@ -76,14 +76,14 @@ apt-get: docker.io installed (stub)
   ADMIN PANEL (UI) - open in the WINDOWS browser:
     URL       : http://127.0.0.1:4000/ui
     Username  : admin
-    Password  : sk-d48904a1caf2da2306a49b16a0ede5c379436cef643192bc18937dce6d112129
+    Password  : sk-e9a69ae3e84324fa234997370abeb5f750796e9454b8ce86df0d823114c82426
     (the dashboard password IS the master key - no separate password exists)
-    saved to  : /tmp/litellm-test.3LO3oE/home/.litellm/dashboard_credentials.txt
+    saved to  : /tmp/litellm-test.4x19qe/home/.litellm/dashboard_credentials.txt
 
-  Master key (also saved to)      : /tmp/litellm-test.3LO3oE/home/.litellm/master_key.txt
-  Master key                      : sk-d48904a1caf2da2306a49b16a0ede5c379436cef643192bc18937dce6d112129
-  LiteLLM config file             : /tmp/litellm-test.3LO3oE/home/.litellm/config.yaml
-  OpenCode config file (Windows)  : /mnt/c/Users/Ali Rezaei/.config/opencode/opencode.json
+  Master key (also saved to)      : /tmp/litellm-test.4x19qe/home/.litellm/master_key.txt
+  Master key                      : sk-e9a69ae3e84324fa234997370abeb5f750796e9454b8ce86df0d823114c82426
+  LiteLLM config file             : /tmp/litellm-test.4x19qe/home/.litellm/config.yaml
+  OpenCode config file (Windows)  : /mnt/c/Users/Test User/.config/opencode/opencode.json
   Container name                  : litellm
   Auto-start on WSL boot          : systemd service: litellm.service (enabled)
   Admin UI database               : litellm-db (postgres, restart: unless-stopped)
@@ -97,7 +97,7 @@ apt-get: docker.io installed (stub)
     Stop proxy       : sudo docker stop litellm
     Start proxy      : sudo docker start litellm
     Test endpoint    : curl -s http://127.0.0.1:4000/v1/models \
-                         -H "Authorization: Bearer sk-d48904a1caf2da2306a49b16a0ede5c379436cef643192bc18937dce6d112129"
+                         -H "Authorization: Bearer sk-e9a69ae3e84324fa234997370abeb5f750796e9454b8ce86df0d823114c82426"
     Re-run this tool : bash "/home/user/LiteLLM-OpenCode/LiteLLM.sh"
 
   NEXT STEPS (on WINDOWS):
@@ -110,10 +110,37 @@ apt-get: docker.io installed (stub)
         sudo service docker start   (auto if systemd is enabled)
 
 [ OK ] Done. Happy coding!
+=================================================
+                 LITELLM DOCTOR
+=================================================
+[STACK]
+  proxy container : running
+  proxy health    : HTTP 200  (http://127.0.0.1:4000/health/liveliness)
+  ui database     : running
+
+[PROVIDER CONNECTIVITY + KEYS]   (direct, from inside WSL)
+  Groq: reachable, key valid (HTTP 200)
+  OpenRouter: no key configured
+  Google AI: no key configured
+  Cerebras: no key configured
+  Mistral: no key configured
+
+[MODEL LIVE TESTS]   (real chat call via http://127.0.0.1:4000/v1)
+  OK   qwen-2.5-coder-32b (0s)
+  OK   llama-3.3-70b-versatile (0s)
+
+[SUMMARY]
+  ALL 2 MODEL TESTS PASSED
+=================================================
     ok: exit code = 0
-    ok: contains: /mnt/c/Users/Ali Rezaei
-    ok: file exists: /mnt/c/Users/Ali Rezaei/.config/opencode/opencode.json
-    ok: opencode.json valid (/mnt/c/Users/Ali Rezaei/.config/opencode/opencode.json)
+    ok: contains: [STACK]
+    ok: contains: [PROVIDER CONNECTIVITY + KEYS]
+    ok: contains: Groq: reachable, key valid (HTTP 200)
+    ok: contains: OpenRouter: no key configured
+    ok: contains: [MODEL LIVE TESTS]
+    ok: contains: OK   qwen-2.5-coder-32b
+    ok: contains: OK   llama-3.3-70b-versatile
+    ok: contains: ALL 2 MODEL TESTS PASSED
 
 --- docker-calls.log ---
 service docker restart
@@ -124,12 +151,17 @@ docker image inspect ghcr.io/berriai/litellm:main-latest
 docker pull ghcr.io/berriai/litellm:main-latest
 docker network inspect litellm-net
 docker ps -a --format {{.Names}}
-docker run -d --name litellm-db --restart unless-stopped --network litellm-net -e POSTGRES_USER=litellm -e POSTGRES_PASSWORD=f13018e5214c907c0cff31283879c9f6 -e POSTGRES_DB=litellm -v /tmp/litellm-test.3LO3oE/home/.litellm/pgdata:/var/lib/postgresql/data postgres:16-alpine
+docker run -d --name litellm-db --restart unless-stopped --network litellm-net -e POSTGRES_USER=litellm -e POSTGRES_PASSWORD=6144355344bc59509a3e33551661c154 -e POSTGRES_DB=litellm -v /tmp/litellm-test.4x19qe/home/.litellm/pgdata:/var/lib/postgresql/data postgres:16-alpine
 docker exec litellm-db pg_isready -U litellm -d litellm
 docker ps -a --format {{.Names}}
-docker run -d --name litellm --restart unless-stopped -p 4000:4000 -v /tmp/litellm-test.3LO3oE/home/.litellm/config.yaml:/app/config.yaml:ro --network litellm-net -e LITELLM_MASTER_KEY=sk-d48904a1caf2da2306a49b16a0ede5c379436cef643192bc18937dce6d112129 -e UI_USERNAME=admin -e UI_PASSWORD=sk-d48904a1caf2da2306a49b16a0ede5c379436cef643192bc18937dce6d112129 -e DATABASE_URL=postgresql://litellm:f13018e5214c907c0cff31283879c9f6@litellm-db:5432/litellm -e GROQ_API_KEY=gsk_spaceuser_0123456789ab ghcr.io/berriai/litellm:main-latest --config /app/config.yaml --port 4000
+docker run -d --name litellm --restart unless-stopped -p 4000:4000 -v /tmp/litellm-test.4x19qe/home/.litellm/config.yaml:/app/config.yaml:ro --network litellm-net -e LITELLM_MASTER_KEY=sk-e9a69ae3e84324fa234997370abeb5f750796e9454b8ce86df0d823114c82426 -e UI_USERNAME=admin -e UI_PASSWORD=sk-e9a69ae3e84324fa234997370abeb5f750796e9454b8ce86df0d823114c82426 -e DATABASE_URL=postgresql://litellm:6144355344bc59509a3e33551661c154@litellm-db:5432/litellm -e GROQ_API_KEY=gsk_doctor_0123456789abcd ghcr.io/berriai/litellm:main-latest --config /app/config.yaml --port 4000
 systemctl daemon-reload
 systemctl enable litellm.service
+docker info
+docker inspect -f {{.State.Running}} litellm
+docker ps -a --format {{.Names}}
+docker inspect -f {{.State.Status}} litellm-db
+docker inspect -f {{range .Config.Env}}{{println .}}{{end}} litellm
 
 --- apt-calls.log ---
 apt-get update -y
@@ -170,3 +202,21 @@ general_settings:
 }
 
 --- generated opencode.json ---
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "litellm/qwen-2.5-coder-32b",
+  "provider": {
+    "litellm": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "LiteLLM Proxy (Local)",
+      "options": {
+        "baseURL": "http://127.0.0.1:4000/v1",
+        "apiKey": "sk-e9a69ae3e84324fa234997370abeb5f750796e9454b8ce86df0d823114c82426"
+      },
+      "models": {
+        "qwen-2.5-coder-32b": { "name": "Qwen 2.5 Coder 32B (Groq, free)" },
+                "llama-3.3-70b-versatile": { "name": "Llama 3.3 70B Versatile (Groq, free)" }
+      }
+    }
+  }
+}
