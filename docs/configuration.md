@@ -222,6 +222,8 @@ LITELLM_BOOT_MODE=wslconf bash LiteLLM.sh   # فقط boot command در /etc/wsl.
 | `LITELLM_IMAGE` | `ghcr.io/berriai/litellm:main-latest` | ایمیج سفارشی (رجیستری دلخواه) |
 | `LITELLM_GHCR_MIRROR` | خالی | میرور جایگزین ghcr (مثلاً `ghcr.nju.edu.cn`) — فقط وقتی pull مستقیم شکست خورد استفاده می‌شود |
 | `LITELLM_PULL_RETRIES` | `3` | تعداد تلاش مجدد pull قبل از fallback |
+| `LITELLM_KEY_CHECK` | `1` | تست زندهٔ هر کلید API به سرویس‌دهنده‌اش قبل از ساخت کانتینر (`0` = غیرفعال) |
+| `LITELLM_KEY_CHECK_TIMEOUT` | `10` | مهلت ثانیه‌ای هر تست کلید |
 | `LITELLM_UI_DB` | `1` | `1` = کانتینر Postgres برای ورود به Admin UI ساخته می‌شود؛ `0` = بدون DB (UI لاگین ندارد، چت سالم است) |
 | `LITELLM_DB_IMAGE` | `postgres:16-alpine` | ایمیج دیتابیس Admin UI (از داکرهاب و از مسیر میرورها) |
 
@@ -234,6 +236,17 @@ LITELLM_GHCR_MIRROR=ghcr.nju.edu.cn LITELLM_PULL_RETRIES=5 bash LiteLLM.sh
 ---
 
 ## ۱۰. شخصی‌سازی‌های رایج
+
+### آیا باید برای OpenCode جداگانه «کلید مجازی» بسازیم؟
+
+نه. کلیدی که OpenCode به آن وصل می‌شود همان **Master Key** است و نصاب از قبل آن را داخل `opencode.json` (فیلد `apiKey`) نوشته است. برای اطمینان:
+
+```bash
+litellm credentials     # پسورد داشبورد (همان Master Key)
+grep apiKey "$(wslpath "$([ -x /usr/bin/powershell.exe ] && powershell.exe -NoProfile -Command "[Environment]::GetFolderPath('UserProfile')" | tr -d '\r')")/.config/opencode/opencode.json" 2>/dev/null || grep apiKey /mnt/c/Users/*/".config/opencode/opencode.json"
+```
+
+هر دو مقدار یکی هستند. دکمهٔ «Create Key» داخل داشبورد (Virtual Keys) فقط برای حالت‌های پیشرفته است: کلید جدا برای هر کلاینت، سقف مصرف و گزارش‌گیری تفکیکی — برای استفادهٔ تک‌کاربره ضرورتی ندارد.
 
 ### افزودن مدل جدید
 

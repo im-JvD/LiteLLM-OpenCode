@@ -246,6 +246,114 @@ warn_key_prefix() {
   esac
 }
 
+ask_all_keys() {
+  # Prompt for all five provider keys; at least one is mandatory.
+  local attempts=0
+  while true; do
+    attempts=$((attempts + 1))
+    read -r -p "       [1/5] Groq API key        (gsk_...): " GROQ_KEY || true
+    read -r -p "       [2/5] OpenRouter API key (sk-or-...): " OPENROUTER_KEY || true
+    read -r -p "       [3/5] Google AI key      (AIza...): " GEMINI_KEY || true
+    read -r -p "       [4/5] Cerebras API key   (csk-...): " CEREBRAS_KEY || true
+    read -r -p "       [5/5] Mistral API key    (sk-...) : " MISTRAL_KEY || true
+
+    # Strip any accidental whitespace
+    GROQ_KEY="${GROQ_KEY//[[:space:]]/}"
+    OPENROUTER_KEY="${OPENROUTER_KEY//[[:space:]]/}"
+    GEMINI_KEY="${GEMINI_KEY//[[:space:]]/}"
+    CEREBRAS_KEY="${CEREBRAS_KEY//[[:space:]]/}"
+    MISTRAL_KEY="${MISTRAL_KEY//[[:space:]]/}"
+
+    warn_key_prefix "$GROQ_KEY"       "gsk_"   "Groq"
+    warn_key_prefix "$OPENROUTER_KEY" "sk-or-" "OpenRouter"
+    warn_key_prefix "$GEMINI_KEY"     "AIza"   "Google AI"
+    warn_key_prefix "$CEREBRAS_KEY"   "csk-"   "Cerebras"
+
+    KEY_COUNT=0
+    [ -n "$GROQ_KEY" ]       && KEY_COUNT=$((KEY_COUNT + 1)) || true
+    [ -n "$OPENROUTER_KEY" ] && KEY_COUNT=$((KEY_COUNT + 1)) || true
+    [ -n "$GEMINI_KEY" ]     && KEY_COUNT=$((KEY_COUNT + 1)) || true
+    [ -n "$CEREBRAS_KEY" ]   && KEY_COUNT=$((KEY_COUNT + 1)) || true
+    [ -n "$MISTRAL_KEY" ]    && KEY_COUNT=$((KEY_COUNT + 1)) || true
+
+    if [ "$KEY_COUNT" -ge 1 ]; then
+      echo
+      log_ok "Collected ${KEY_COUNT} API key(s):"
+      echo "         Groq       : $(mask_key "$GROQ_KEY")"
+      echo "         OpenRouter : $(mask_key "$OPENROUTER_KEY")"
+      echo "         Google AI  : $(mask_key "$GEMINI_KEY")"
+      echo "         Cerebras   : $(mask_key "$CEREBRAS_KEY")"
+      echo "         Mistral    : $(mask_key "$MISTRAL_KEY")"
+      return 0
+    fi
+    if [ "$attempts" -ge 3 ]; then
+      die "At least ONE API key is required. Exiting after ${attempts} attempts."
+    fi
+    log_error "At least ONE API key is required. Let's try again."
+    echo
+  done
+}
+
+verify_api_keys() {
+  # Live-check every provided key against its provider endpoint.
+  # Non-fatal: unreachable providers are skipped (e.g. blocked networks);
+  # genuinely rejected keys (401/403) are collected in VERIFY_FAILED.
+  VERIFY_FAILED=""
+  [ "${LITELLM_KEY_CHECK:-1}" = "1" ] || return 0
+  command -v curl >/dev/null 2>&1 || return 0
+
+  echo
+  log_info "       Verifying API keys against the providers..."
+  local timeout="${LITELLM_KEY_CHECK_TIMEOUT:-10}"
+  case "$timeout" in ''|*[!0-9]*) timeout=10 ;; esac
+
+  _verify_one() { # $1 name  $2 key  $3 url  $4 auth(bearer|query)
+    [ -n "$2" ] || return 0
+    local code
+    if [ "$4" = "query" ]; then
+      code="$(curl -s -o /dev/null -w '%{http_code}' --max-time "$timeout" "$3?key=$2" 2>/dev/null || true)"
+    else
+      code="$(curl -s -o /dev/null -w '%{http_code}' --max-time "$timeout" -H "Authorization: Bearer $2" "$3" 2>/dev/null || true)"
+    fi
+    case "$code" in
+      200)
+        log_ok "         ${1}: valid (HTTP 200)"
+        ;;
+      401|403)
+        log_warn "         ${1}: REJECTED (HTTP ${code}) - wrong/unknown key for this provider"
+        VERIFY_FAILED="${VERIFY_FAILED}${1} "
+        ;;
+      000|'')
+        log_warn "         ${1}: could not verify (network unreachable/blocked) - continuing"
+        ;;
+      *)
+        log_warn "         ${1}: HTTP ${code} - continuing"
+        VERIFY_FAILED="${VERIFY_FAILED}${1} "
+        ;;
+    esac
+    return 0
+  }
+
+  _verify_one "Groq"       "$GROQ_KEY"       "https://api.groq.com/openai/v1/models"                   bearer
+  _verify_one "OpenRouter" "$OPENROUTER_KEY" "https://openrouter.ai/api/v1/key"                        bearer
+  _verify_one "Google AI"  "$GEMINI_KEY"     "https://generativelanguage.googleapis.com/v1beta/models" query
+  _verify_one "Cerebras"   "$CEREBRAS_KEY"   "https://api.cerebras.ai/v1/models"                       bearer
+  _verify_one "Mistral"    "$MISTRAL_KEY"    "https://api.mistral.ai/v1/models"                        bearer
+  return 0
+}
+
+offer_key_reentry() {
+  [ -n "$VERIFY_FAILED" ] || return 1
+  echo
+  printf "       Re-enter the rejected keys now? [y/N]: "
+  local answer=""
+  read -r answer || answer=""
+  case "$answer" in
+    y|Y|yes|YES) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
 collect_api_keys() {
   echo
   log_info "[4/9] API keys setup (5 providers)"
@@ -277,6 +385,13 @@ collect_api_keys() {
           [ -n "$MISTRAL_KEY" ]    && KEY_COUNT=$((KEY_COUNT + 1)) || true
           echo
           log_ok "Keeping the existing ${KEY_COUNT} API key(s)."
+          verify_api_keys
+          if offer_key_reentry; then
+            echo "       OK - enter the replacement keys below."
+            echo
+            ask_all_keys
+            verify_api_keys
+          fi
           return 0
           ;;
         n|N|no|No|NO)
@@ -299,52 +414,14 @@ collect_api_keys() {
   echo "       Press ENTER to skip a provider you do not use."
   echo "       At least ONE key is required."
   echo
-
-  local attempts=0
-  while true; do
-    attempts=$((attempts + 1))
-    read -r -p "       [1/5] Groq API key        (gsk_...): " GROQ_KEY || true
-    read -r -p "       [2/5] OpenRouter API key (sk-or-...): " OPENROUTER_KEY || true
-    read -r -p "       [3/5] Google AI key      (AIza...): " GEMINI_KEY || true
-    read -r -p "       [4/5] Cerebras API key   (csk-...): " CEREBRAS_KEY || true
-    read -r -p "       [5/5] Mistral API key    (sk-...) : " MISTRAL_KEY || true
-
-    # Strip any accidental whitespace
-    GROQ_KEY="${GROQ_KEY//[[:space:]]/}"
-    OPENROUTER_KEY="${OPENROUTER_KEY//[[:space:]]/}"
-    GEMINI_KEY="${GEMINI_KEY//[[:space:]]/}"
-    CEREBRAS_KEY="${CEREBRAS_KEY//[[:space:]]/}"
-    MISTRAL_KEY="${MISTRAL_KEY//[[:space:]]/}"
-
-    # Mistral has no stable public key prefix, so it is not checked.
-    warn_key_prefix "$GROQ_KEY"       "gsk_"   "Groq"
-    warn_key_prefix "$OPENROUTER_KEY" "sk-or-" "OpenRouter"
-    warn_key_prefix "$GEMINI_KEY"     "AIza"   "Google AI"
-    warn_key_prefix "$CEREBRAS_KEY"   "csk-"   "Cerebras"
-
-    KEY_COUNT=0
-    [ -n "$GROQ_KEY" ]       && KEY_COUNT=$((KEY_COUNT + 1)) || true
-    [ -n "$OPENROUTER_KEY" ] && KEY_COUNT=$((KEY_COUNT + 1)) || true
-    [ -n "$GEMINI_KEY" ]     && KEY_COUNT=$((KEY_COUNT + 1)) || true
-    [ -n "$CEREBRAS_KEY" ]   && KEY_COUNT=$((KEY_COUNT + 1)) || true
-    [ -n "$MISTRAL_KEY" ]    && KEY_COUNT=$((KEY_COUNT + 1)) || true
-
-    if [ "$KEY_COUNT" -ge 1 ]; then
-      echo
-      log_ok "Collected ${KEY_COUNT} API key(s):"
-      echo "         Groq       : $(mask_key "$GROQ_KEY")"
-      echo "         OpenRouter : $(mask_key "$OPENROUTER_KEY")"
-      echo "         Google AI  : $(mask_key "$GEMINI_KEY")"
-      echo "         Cerebras   : $(mask_key "$CEREBRAS_KEY")"
-      echo "         Mistral    : $(mask_key "$MISTRAL_KEY")"
-      break
-    fi
-    if [ "$attempts" -ge 3 ]; then
-      die "At least ONE API key is required. Exiting after ${attempts} attempts."
-    fi
-    log_error "At least ONE API key is required. Let's try again."
+  ask_all_keys
+  verify_api_keys
+  if offer_key_reentry; then
+    echo "       OK - enter the keys again below."
     echo
-  done
+    ask_all_keys
+    verify_api_keys
+  fi
   return 0
 }
 

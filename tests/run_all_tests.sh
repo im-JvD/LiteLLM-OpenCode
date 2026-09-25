@@ -135,6 +135,7 @@ run_script() { # optional $1 = path of the script copy to run (default: the real
     LITELLM_PULL_RETRIES="${T_PULL_RETRIES:-3}" \
     LITELLM_UI_DB="${T_UI_DB:-1}" \
     LITELLM_HEALTH_WAIT_SEC="${T_HEALTH_WAIT_SEC:-}" \
+    KEYCHECK_CODE="${T_KEYCHECK_CODE:-200}" \
     bash "$script_file" >> "$CURRENT_LOG" 2>&1
 }
 
@@ -928,6 +929,47 @@ if [ "$MNT_OK" -eq 1 ]; then
   assert_not_contains "${T_WORKSTATE}/docker-calls.log" "--network litellm-net"
   assert_contains "$CURRENT_LOG" "Admin UI database               : disabled"
   assert_file_exists "/mnt/c/Users/Test User/.config/opencode/opencode.json"
+  dump_state
+  finish_test
+else
+  skip_test "requires writable /mnt/c"
+fi
+
+#===============================================================================
+# T26 - live key verification: rejected keys are flagged and re-entry offered
+#===============================================================================
+start_test "T26_key_verification_rejects_bad_keys"
+if [ "$MNT_OK" -eq 1 ]; then
+  fresh_env
+  T_KEYCHECK_CODE="403"
+  printf '1\ngsk_prefix_ok_but_rejected\n\n\n\n\nn\n' | run_script
+  T_RC=$?
+  T_KEYCHECK_CODE=""
+  assert_rc 0
+  assert_contains "$CURRENT_LOG" "Verifying API keys against the providers"
+  assert_contains "$CURRENT_LOG" "Groq: REJECTED (HTTP 403)"
+  assert_contains "$CURRENT_LOG" "Re-enter the rejected keys now?"
+  assert_contains "$CURRENT_LOG" "INSTALLATION COMPLETED SUCCESSFULLY"
+  # all-valid default flow must NOT show the re-entry prompt
+  dump_state
+  finish_test
+else
+  skip_test "requires writable /mnt/c"
+fi
+
+#===============================================================================
+# T27 - verification passes by default (no re-entry prompt on normal flows)
+#===============================================================================
+start_test "T27_key_verification_all_valid"
+if [ "$MNT_OK" -eq 1 ]; then
+  fresh_env
+  printf '1\ngsk_valid_flow_0123456789\n\n\n\n\n' | run_script
+  T_RC=$?
+  assert_rc 0
+  assert_contains "$CURRENT_LOG" "Groq: valid (HTTP 200)"
+  assert_not_contains "$CURRENT_LOG" "Re-enter the rejected keys now?"
+  assert_not_contains "$CURRENT_LOG" "REJECTED"
+  assert_contains "$CURRENT_LOG" "INSTALLATION COMPLETED SUCCESSFULLY"
   dump_state
   finish_test
 else
