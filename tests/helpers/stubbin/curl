@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+#-------------------------------------------------------------------------------
+# Test stub: curl
+#
+# Only emulates the health-check invocation pattern used by the main script:
+#   curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:4000/health/liveliness
+#
+# Env:
+#   HEALTH_CODE - HTTP code to report (default: 200; use 000 to simulate a
+#                 dead server and exercise the health-timeout code path)
+#-------------------------------------------------------------------------------
+code="${HEALTH_CODE:-200}"
+for a in "$@"; do
+  case "$a" in
+    *%{http_code}*)
+      printf '%s' "$code"
+      exit 0
+      ;;
+  esac
+done
+exit 0

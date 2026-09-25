@@ -1,0 +1,43 @@
+name: Tests
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  offline-suite:
+    name: Offline simulated suite (17 scenarios)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run offline test suite
+        run: bash tests/run_all_tests.sh
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: offline-suite-results
+          path: tests/results/
+          if-no-files-found: warn
+
+  real-litellm-e2e:
+    name: Real LiteLLM E2E (PyPI)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run real LiteLLM end-to-end test
+        run: bash tests/e2e_litellm_real.sh
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-litellm-results
+          path: tests/results/E2E_litellm_real.log
+          if-no-files-found: warn

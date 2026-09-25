@@ -1,29 +1,108 @@
-# LiteLLM-OpenCode
-LiteLLM Installation and Configuration for OpenCode
+<div align="tight" dir="rtl">
 
-## Quick Start (WSL2 Ubuntu)
+# 🚀 LiteLLM ↔ OpenCode Bridge
+
+نصب‌کننده و پیکربندی‌کنندهٔ یک‌مرحله‌ای **پروکسی LiteLLM** داخل **WSL2 Ubuntu** و اتصال آن به ابزار برنامه‌نویسی هوش مصنوعی **OpenCode** در ویندوز — بدون نیاز به build، با ایمیج آماده و میرورهای ایرانی برای دور زدن تحریم‌ها.
+
+---
+
+## ⚡ اجرای سریع (یک دستور)
+
+داخل ترمینال **WSL2 Ubuntu** کافی است اجرا کنید:
 
 ```bash
-bash litellm_opencode_setup.sh
+bash <(curl -fsSL https://raw.githubusercontent.com/im-JvD/LiteLLM-OpenCode/main/LiteLLM)
 ```
 
-Interactive menu:
+یا با `wget`:
 
-- `1) Full Install` — installs Docker from the Ubuntu apt repository (`docker.io`,
-  no `get.docker.com`), configures Iranian Docker Hub mirrors in
-  `/etc/docker/daemon.json`, pulls the prebuilt image
-  `ghcr.io/berriai/litellm:main-latest` (never builds), asks for up to 5 API keys
-  (Groq / OpenRouter / Google AI / Cerebras / Mistral — at least one required),
-  generates `~/.litellm/config.yaml`, starts the proxy on port `4000` with
-  `--restart unless-stopped`, and writes the OpenCode provider config to
-  `%USERPROFILE%\.config\opencode\opencode.json` pointing at
-  `http://127.0.0.1:4000/v1`.
-- `2) Full Uninstall` — stops and removes the container, deletes the Linux
-  config folder and the Windows `opencode.json`.
+```bash
+bash <(wget -qO- https://raw.githubusercontent.com/im-JvD/LiteLLM-OpenCode/main/LiteLLM)
+```
 
-The Windows user profile is detected through PowerShell only
-(`[Environment]::GetFolderPath('UserProfile')`), so usernames containing
-spaces are handled safely.
+> ⚠️ **نکتهٔ مهم:** حتماً از حالت `bash <( curl ... )` استفاده کنید، نه `curl ... | bash`؛ چون اسکریپت تعاملی است و باید بتواند از شما سؤال بپرسد. اگر خواستید اول دانلود کنید:
+>
+> ```bash
+> curl -fsSL https://raw.githubusercontent.com/im-JvD/LiteLLM-OpenCode/main/LiteLLM -o /tmp/LiteLLM
+> bash /tmp/LiteLLM
+> ```
 
-All script output is plain English ASCII (RTL-safe in Windows terminals).
-Run the script WITHOUT `sudo`; it escalates only where needed.
+---
+
+## ✨ ویژگی‌ها
+
+| ویژگی | توضیح |
+|---|---|
+| 🖥️ منوی تعاملی | گزینهٔ `1` نصب کامل، گزینهٔ `2` حذف کامل |
+| 🐳 نصب داکر بدون تحریم | از مخازن `apt` اوبونتو (`docker.io`) — بدون `get.docker.com` |
+| 🇮🇷 میرورهای ایرانی | ArvanCloud، Liara و IranServer در `/etc/docker/daemon.json` برای رفع خطای 403 |
+| 📦 بدون build | فقط ایمیج آمادهٔ `ghcr.io/berriai/litellm:main-latest` |
+| 🔑 ۵ کلید API | Groq، OpenRouter، Google AI، Cerebras، Mistral (حداقل یک کلید اجباری) |
+| 🧠 ۷ مدل کدنویسی | ساخت خودکار `config.yaml` فقط بر اساس کلیدهایی که داده‌اید |
+| 🔁 اجرای پایدار | کانتینر با `--restart unless-stopped` روی پورت 4000 |
+| 🪟 تشخیص هوشمند ویندوز | پیدا کردن مسیر پروفایل با PowerShell (حتی با فاصله در نام کاربری) |
+| 🔒 کلید امن | ساخت خودکار Master Key و ذخیرهٔ امن آن |
+| 🧪 تست‌شده | ۱۷ سناریوی شبیه‌سازی‌شده + تست واقعی E2E با خودِ LiteLLM |
+
+---
+
+## 🧠 مدل‌های پشتیبانی‌شده
+
+| مدل | ارائه‌دهنده | کاربرد |
+|---|---|---|
+| `qwen-2.5-coder-32b` | Groq | کدنویسی سریع (رایگان) |
+| `llama-3.3-70b-versatile` | Groq | مدل عمومی قدرتمند (رایگان) |
+| `deepseek/deepseek-chat-v3:free` | OpenRouter | چت و کدنویسی (رایگان) |
+| `deepseek/deepseek-r1:free` | OpenRouter | استدلال عمیق (رایگان) |
+| `gemini-2.0-flash` | Google AI | سرعت بالا + کانتکست بزرگ (رایگان) |
+| `llama3.1-70b` | Cerebras | استنتاج فوق‌سریع (رایگان) |
+| `codestral-latest` | Mistral | تخصصی کدنویسی |
+
+---
+
+## 📋 پیش‌نیازها
+
+- ویندوز ۱۰/۱۱ با **WSL2** و توزیع **Ubuntu** (تست‌شده روی Ubuntu 22.04+)
+- نصب‌شده بودن **OpenCode** در سمت ویندوز
+- دسترسی `sudo` در اوبونتو
+- اتصال اینترنت (برای `apt` و `ghcr.io` — داکرهاب تحریم است ولی ghcr معمولاً باز است)
+
+---
+
+## 📁 ساختار مخزن
+
+```
+LiteLLM-OpenCode/
+├── LiteLLM                  ← اسکریپت اصلی (قابل اجرای مستقیم از GitHub)
+├── docs/                    ← مستندات کامل فارسی
+│   ├── README.md            ← فهرست مستندات
+│   ├── installation.md      ← راهنمای گام‌به‌گام نصب
+│   ├── configuration.md     ← شرح کامل فایل‌های پیکربندی
+│   ├── uninstall.md         ← راهنمای حذف کامل
+│   └── troubleshooting.md   ← عیب‌یابی خطاهای رایج
+└── tests/                   ← تست‌های خودکار + نتایج اجرا
+    ├── README.md            ← مستندات تست‌ها
+    ├── run_all_tests.sh     ← سوئیت ۱۷ سناریویی آفلاین
+    ├── e2e_litellm_real.sh  ← تست واقعی E2E با LiteLLM
+    ├── e2e_real_docker.sh   ← تست واقعی E2E با Docker (روی WSL2)
+    ├── helpers/stubbin/     ← بدل‌های ایزوله برای تست
+    └── results/             ← نتایج ثبت‌شدهٔ اجراها
+```
+
+---
+
+## 📚 مستندات
+
+- [راهنمای نصب گام‌به‌گام](docs/installation.md)
+- [پیکربندی و فایل‌ها](docs/configuration.md)
+- [حذف کامل (Uninstall)](docs/uninstall.md)
+- [عیب‌یابی خطاهای رایج](docs/troubleshooting.md)
+- [مستندات تست‌ها](tests/README.md)
+
+---
+
+## 🔒 نکتهٔ امنیتی
+
+کلیدهای API شما فقط به‌صورت متغیر محیطی به کانتینر LiteLLM تزریق می‌شوند و داخل `config.yaml` نوشته **نمی‌شوند**. Master Key هم در `~/.litellm/master_key.txt` با دسترسی `600` ذخیره می‌شود. هرگز این فایل‌ها را در مخازن عمومی قرار ندهید.
+
+</div>

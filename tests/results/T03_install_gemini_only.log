@@ -1,0 +1,148 @@
+
+=================================================================
+     LiteLLM  <->  OpenCode  Bridge  |  WSL2 Ubuntu Setup
+=================================================================
+
+   Proxy target : ghcr.io/berriai/litellm:main-latest
+   Proxy port   : 4000   (restart policy: unless-stopped)
+   Linux config : /tmp/litellm-test.OhArR6/home/.litellm
+
+   Please choose an option:
+
+     1) Full Install    (Docker + LiteLLM proxy + OpenCode config)
+     2) Full Uninstall  (remove container + all generated configs)
+     q) Quit
+
+
+
+[INFO] === FULL INSTALL: starting ===
+
+[INFO] [1/8] Checking WSL2 environment...
+[WARN] This does not look like a WSL kernel (/proc/version).
+[WARN] Continuing anyway - Windows/PowerShell integration may fail.
+[ OK ] WSL2 environment looks good.
+[INFO] [2/8] Installing Docker Engine (docker.io from Ubuntu apt repository)...
+apt-get: docker.io installed (stub)
+[INFO] [3/8] Configuring Iranian Docker Hub mirrors (/etc/docker/daemon.json)...
+[ OK ] Registry mirrors written:
+       - https://docker.arvancloud.ir
+       - https://docker.hub.iran.liara.run
+       - https://docker.iranserver.com
+[INFO]        Starting/restarting the Docker daemon...
+[ OK ] Docker daemon is up and running.
+
+[INFO] [4/8] API keys setup (5 providers)
+       Press ENTER to skip a provider you do not use.
+       At least ONE key is required.
+
+
+[ OK ] Collected 1 API key(s):
+         Groq       : <skipped>
+         OpenRouter : <skipped>
+         Google AI  : AIza****89ab
+         Cerebras   : <skipped>
+         Mistral    : <skipped>
+[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-test.OhArR6/home/.litellm/master_key.txt
+[INFO] [5/8] Generating LiteLLM configuration: /tmp/litellm-test.OhArR6/home/.litellm/config.yaml
+[ OK ] config.yaml generated (only providers with keys are enabled).
+[INFO] [6/8] Pulling prebuilt LiteLLM image (no build step): ghcr.io/berriai/litellm:main-latest
+[INFO]        This may take several minutes on the first run...
+[ OK ] Image pulled successfully.
+[INFO] [7/8] Starting LiteLLM container on port 4000...
+[ OK ] Container 'litellm' started (restart policy: unless-stopped).
+[INFO]        Waiting for LiteLLM to become healthy (up to 60s)...
+[ OK ] LiteLLM is healthy: http://127.0.0.1:4000
+[INFO] [8/8] Configuring OpenCode on the Windows side...
+[ OK ] Windows user profile detected: /mnt/c/Users/Test User
+[ OK ] OpenCode config written: /mnt/c/Users/Test User/.config/opencode/opencode.json
+
+=================================================================
+  INSTALLATION COMPLETED SUCCESSFULLY!
+=================================================================
+
+  LiteLLM endpoint (from Windows) : http://127.0.0.1:4000/v1
+  Master key (also saved to)      : /tmp/litellm-test.OhArR6/home/.litellm/master_key.txt
+  Master key                      : sk-15566ef137e829838fc705eb21d0fec4bf75418c8774245edefc4d4d08c45c48
+  LiteLLM config file             : /tmp/litellm-test.OhArR6/home/.litellm/config.yaml
+  OpenCode config file (Windows)  : /mnt/c/Users/Test User/.config/opencode/opencode.json
+  Container name                  : litellm
+
+  USEFUL COMMANDS (run inside WSL):
+    Live logs        : sudo docker logs -f litellm
+    Restart proxy    : sudo docker restart litellm
+    Stop proxy       : sudo docker stop litellm
+    Start proxy      : sudo docker start litellm
+    Test endpoint    : curl -s http://127.0.0.1:4000/v1/models \
+                         -H "Authorization: Bearer sk-15566ef137e829838fc705eb21d0fec4bf75418c8774245edefc4d4d08c45c48"
+    Re-run this tool : bash "/home/user/LiteLLM-OpenCode/LiteLLM"
+
+  NEXT STEPS (on WINDOWS):
+    1. Open a NEW terminal (PowerShell or CMD).
+    2. cd into any project folder.
+    3. Run: opencode
+    4. Pick the provider 'LiteLLM Proxy (Local)' and a model.
+
+  NOTE: If you ever run 'wsl --shutdown', start Docker again with:
+        sudo service docker start   (auto if systemd is enabled)
+
+[ OK ] Done. Happy coding!
+    ok: exit code = 0
+    ok: models match (gemini-2.0-flash)
+    ok: opencode.json valid (/mnt/c/Users/Test User/.config/opencode/opencode.json)
+
+--- docker-calls.log ---
+service docker restart
+systemctl enable docker.service
+docker info
+docker pull ghcr.io/berriai/litellm:main-latest
+docker ps -a --format {{.Names}}
+docker run -d --name litellm --restart unless-stopped -p 4000:4000 -v /tmp/litellm-test.OhArR6/home/.litellm/config.yaml:/app/config.yaml:ro -e LITELLM_MASTER_KEY=sk-15566ef137e829838fc705eb21d0fec4bf75418c8774245edefc4d4d08c45c48 -e GEMINI_API_KEY=AIzaOnlyTest0123456789ab ghcr.io/berriai/litellm:main-latest --config /app/config.yaml --port 4000
+
+--- apt-calls.log ---
+apt-get update -y
+apt-get install -y docker.io
+
+--- containers.txt ---
+litellm
+
+--- generated config.yaml ---
+model_list:
+  # ---------------- Google AI Studio (Gemini) ----------------
+  - model_name: gemini-2.0-flash
+    litellm_params:
+      model: gemini/gemini-2.0-flash
+      api_key: os.environ/GEMINI_API_KEY
+
+litellm_settings:
+  drop_params: true        # silently drop unsupported provider params
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
+
+--- generated daemon.json (virtual) ---
+{
+  "registry-mirrors": [
+    "https://docker.arvancloud.ir",
+    "https://docker.hub.iran.liara.run",
+    "https://docker.iranserver.com"
+  ]
+}
+
+--- generated opencode.json ---
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "litellm/gemini-2.0-flash",
+  "provider": {
+    "litellm": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "LiteLLM Proxy (Local)",
+      "options": {
+        "baseURL": "http://127.0.0.1:4000/v1",
+        "apiKey": "sk-15566ef137e829838fc705eb21d0fec4bf75418c8774245edefc4d4d08c45c48"
+      },
+      "models": {
+        "gemini-2.0-flash": { "name": "Gemini 2.0 Flash (Google AI, free)" }
+      }
+    }
+  }
+}

@@ -16,7 +16,7 @@
 #     - Auto-generated opencode.json on the Windows user profile
 #
 #   Usage (run WITHOUT sudo - the script escalates where needed):
-#     bash litellm_opencode_setup.sh
+#     bash LiteLLM
 #
 #===============================================================================
 set -euo pipefail

@@ -1,0 +1,208 @@
+
+=================================================================
+     LiteLLM  <->  OpenCode  Bridge  |  WSL2 Ubuntu Setup
+=================================================================
+
+   Proxy target : ghcr.io/berriai/litellm:main-latest
+   Proxy port   : 4000   (restart policy: unless-stopped)
+   Linux config : /tmp/litellm-test.eDVHme/home/.litellm
+
+   Please choose an option:
+
+     1) Full Install    (Docker + LiteLLM proxy + OpenCode config)
+     2) Full Uninstall  (remove container + all generated configs)
+     q) Quit
+
+
+
+[INFO] === FULL INSTALL: starting ===
+
+[INFO] [1/8] Checking WSL2 environment...
+[WARN] This does not look like a WSL kernel (/proc/version).
+[WARN] Continuing anyway - Windows/PowerShell integration may fail.
+[ OK ] WSL2 environment looks good.
+[INFO] [2/8] Installing Docker Engine (docker.io from Ubuntu apt repository)...
+apt-get: docker.io installed (stub)
+[INFO] [3/8] Configuring Iranian Docker Hub mirrors (/etc/docker/daemon.json)...
+[ OK ] Registry mirrors written:
+       - https://docker.arvancloud.ir
+       - https://docker.hub.iran.liara.run
+       - https://docker.iranserver.com
+[INFO]        Starting/restarting the Docker daemon...
+[ OK ] Docker daemon is up and running.
+
+[INFO] [4/8] API keys setup (5 providers)
+       Press ENTER to skip a provider you do not use.
+       At least ONE key is required.
+
+[FAIL] At least ONE API key is required. Let's try again.
+
+
+[ OK ] Collected 5 API key(s):
+         Groq       : gsk_****abcd
+         OpenRouter : sk-o****abcd
+         Google AI  : AIza****abcd
+         Cerebras   : csk_****abcd
+         Mistral    : sk_m****5678
+[ OK ] LiteLLM master key generated and saved to: /tmp/litellm-test.eDVHme/home/.litellm/master_key.txt
+[INFO] [5/8] Generating LiteLLM configuration: /tmp/litellm-test.eDVHme/home/.litellm/config.yaml
+[ OK ] config.yaml generated (only providers with keys are enabled).
+[INFO] [6/8] Pulling prebuilt LiteLLM image (no build step): ghcr.io/berriai/litellm:main-latest
+[INFO]        This may take several minutes on the first run...
+[ OK ] Image pulled successfully.
+[INFO] [7/8] Starting LiteLLM container on port 4000...
+[ OK ] Container 'litellm' started (restart policy: unless-stopped).
+[INFO]        Waiting for LiteLLM to become healthy (up to 60s)...
+[ OK ] LiteLLM is healthy: http://127.0.0.1:4000
+[INFO] [8/8] Configuring OpenCode on the Windows side...
+[ OK ] Windows user profile detected: /mnt/c/Users/Test User
+[ OK ] OpenCode config written: /mnt/c/Users/Test User/.config/opencode/opencode.json
+
+=================================================================
+  INSTALLATION COMPLETED SUCCESSFULLY!
+=================================================================
+
+  LiteLLM endpoint (from Windows) : http://127.0.0.1:4000/v1
+  Master key (also saved to)      : /tmp/litellm-test.eDVHme/home/.litellm/master_key.txt
+  Master key                      : sk-eeadf02f39b2dd1d6e54c1a1ce843f08a3716e9dcc7baf9884e804a4422b0d56
+  LiteLLM config file             : /tmp/litellm-test.eDVHme/home/.litellm/config.yaml
+  OpenCode config file (Windows)  : /mnt/c/Users/Test User/.config/opencode/opencode.json
+  Container name                  : litellm
+
+  USEFUL COMMANDS (run inside WSL):
+    Live logs        : sudo docker logs -f litellm
+    Restart proxy    : sudo docker restart litellm
+    Stop proxy       : sudo docker stop litellm
+    Start proxy      : sudo docker start litellm
+    Test endpoint    : curl -s http://127.0.0.1:4000/v1/models \
+                         -H "Authorization: Bearer sk-eeadf02f39b2dd1d6e54c1a1ce843f08a3716e9dcc7baf9884e804a4422b0d56"
+    Re-run this tool : bash "/home/user/LiteLLM-OpenCode/LiteLLM"
+
+  NEXT STEPS (on WINDOWS):
+    1. Open a NEW terminal (PowerShell or CMD).
+    2. cd into any project folder.
+    3. Run: opencode
+    4. Pick the provider 'LiteLLM Proxy (Local)' and a model.
+
+  NOTE: If you ever run 'wsl --shutdown', start Docker again with:
+        sudo service docker start   (auto if systemd is enabled)
+
+[ OK ] Done. Happy coding!
+    ok: exit code = 0
+    ok: contains: INSTALLATION COMPLETED SUCCESSFULLY
+    ok: contains: install -y docker.io
+    ok: contains: pull ghcr.io/berriai/litellm:main-latest
+    ok: contains: run -d --name litellm --restart unless-stopped -p 4000:4000
+    ok: contains: -v /tmp/litellm-test.eDVHme/home/.litellm/config.yaml:/app/config.yaml:ro
+    ok: contains: --config /app/config.yaml --port 4000
+    ok: contains: -e GROQ_API_KEY=gsk_test_groq_0123456789abcd
+    ok: contains: -e OPENROUTER_API_KEY=sk-or-test_0123456789abcd
+    ok: contains: -e GEMINI_API_KEY=AIzaTest0123456789abcd
+    ok: contains: -e CEREBRAS_API_KEY=csk_test_0123456789abcd
+    ok: contains: -e MISTRAL_API_KEY=sk_mistral_test012345678
+    ok: container registered
+    ok: file exists: /tmp/litellm-test.eDVHme/home/.litellm/config.yaml
+    ok: file exists: /tmp/litellm-test.eDVHme/home/.litellm/master_key.txt
+    ok: models match (qwen-2.5-coder-32b, llama-3.3-70b-versatile, deepseek/deepseek-chat-v3:free, deepseek/deepseek-r1:free, gemini-2.0-flash, llama3.1-70b, codestral-latest)
+    ok: master key consistent (file == docker env)
+    ok: daemon.json mirrors exact (/tmp/litellm-test.eDVHme/fakeroot/etc/docker/daemon.json)
+    ok: not contains: backed up
+    ok: file exists: /mnt/c/Users/Test User/.config/opencode/opencode.json
+    ok: opencode.json valid (/mnt/c/Users/Test User/.config/opencode/opencode.json)
+
+--- docker-calls.log ---
+service docker restart
+systemctl enable docker.service
+docker info
+docker pull ghcr.io/berriai/litellm:main-latest
+docker ps -a --format {{.Names}}
+docker run -d --name litellm --restart unless-stopped -p 4000:4000 -v /tmp/litellm-test.eDVHme/home/.litellm/config.yaml:/app/config.yaml:ro -e LITELLM_MASTER_KEY=sk-eeadf02f39b2dd1d6e54c1a1ce843f08a3716e9dcc7baf9884e804a4422b0d56 -e GROQ_API_KEY=gsk_test_groq_0123456789abcd -e OPENROUTER_API_KEY=sk-or-test_0123456789abcd -e GEMINI_API_KEY=AIzaTest0123456789abcd -e CEREBRAS_API_KEY=csk_test_0123456789abcd -e MISTRAL_API_KEY=sk_mistral_test012345678 ghcr.io/berriai/litellm:main-latest --config /app/config.yaml --port 4000
+
+--- apt-calls.log ---
+apt-get update -y
+apt-get install -y docker.io
+
+--- containers.txt ---
+litellm
+
+--- generated config.yaml ---
+model_list:
+  # ---------------- Groq (fast inference) ----------------
+  - model_name: qwen-2.5-coder-32b
+    litellm_params:
+      model: groq/qwen-2.5-coder-32b
+      api_key: os.environ/GROQ_API_KEY
+      api_base: https://api.groq.com/openai/v1
+  - model_name: llama-3.3-70b-versatile
+    litellm_params:
+      model: groq/llama-3.3-70b-versatile
+      api_key: os.environ/GROQ_API_KEY
+      api_base: https://api.groq.com/openai/v1
+  # ---------------- OpenRouter (free coding models) ----------------
+  - model_name: deepseek/deepseek-chat-v3:free
+    litellm_params:
+      model: openrouter/deepseek/deepseek-chat-v3:free
+      api_key: os.environ/OPENROUTER_API_KEY
+      api_base: https://openrouter.ai/api/v1
+  - model_name: deepseek/deepseek-r1:free
+    litellm_params:
+      model: openrouter/deepseek/deepseek-r1:free
+      api_key: os.environ/OPENROUTER_API_KEY
+      api_base: https://openrouter.ai/api/v1
+  # ---------------- Google AI Studio (Gemini) ----------------
+  - model_name: gemini-2.0-flash
+    litellm_params:
+      model: gemini/gemini-2.0-flash
+      api_key: os.environ/GEMINI_API_KEY
+  # ---------------- Cerebras ----------------
+  - model_name: llama3.1-70b
+    litellm_params:
+      model: cerebras/llama3.1-70b
+      api_key: os.environ/CEREBRAS_API_KEY
+      api_base: https://api.cerebras.ai/v1
+  # ---------------- Mistral ----------------
+  - model_name: codestral-latest
+    litellm_params:
+      model: mistral/codestral-latest
+      api_key: os.environ/MISTRAL_API_KEY
+      api_base: https://api.mistral.ai/v1
+
+litellm_settings:
+  drop_params: true        # silently drop unsupported provider params
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
+
+--- generated daemon.json (virtual) ---
+{
+  "registry-mirrors": [
+    "https://docker.arvancloud.ir",
+    "https://docker.hub.iran.liara.run",
+    "https://docker.iranserver.com"
+  ]
+}
+
+--- generated opencode.json ---
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "litellm/qwen-2.5-coder-32b",
+  "provider": {
+    "litellm": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "LiteLLM Proxy (Local)",
+      "options": {
+        "baseURL": "http://127.0.0.1:4000/v1",
+        "apiKey": "sk-eeadf02f39b2dd1d6e54c1a1ce843f08a3716e9dcc7baf9884e804a4422b0d56"
+      },
+      "models": {
+        "qwen-2.5-coder-32b": { "name": "Qwen 2.5 Coder 32B (Groq, free)" },
+                "llama-3.3-70b-versatile": { "name": "Llama 3.3 70B Versatile (Groq, free)" },
+                "deepseek/deepseek-chat-v3:free": { "name": "DeepSeek Chat V3 (OpenRouter, free)" },
+                "deepseek/deepseek-r1:free": { "name": "DeepSeek R1 (OpenRouter, free)" },
+                "gemini-2.0-flash": { "name": "Gemini 2.0 Flash (Google AI, free)" },
+                "llama3.1-70b": { "name": "Llama 3.1 70B (Cerebras, free)" },
+                "codestral-latest": { "name": "Codestral (Mistral)" }
+      }
+    }
+  }
+}

@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+#-------------------------------------------------------------------------------
+# Test stub: sudo
+#
+# Runs commands WITHOUT any privilege escalation (tests never run as root).
+# Any path under /etc/docker is transparently rewritten into $FAKE_ROOT so
+# the test never touches the host's /etc/docker directory.
+#
+# Required env:
+#   FAKE_ROOT   - virtual root directory for /etc/docker files
+#-------------------------------------------------------------------------------
+args=()
+for a in "$@"; do
+  case "$a" in
+    /etc/docker|/etc/docker/*) a="${FAKE_ROOT:?FAKE_ROOT not set}${a}" ;;
+  esac
+  args+=("$a")
+done
+exec "${args[@]}"

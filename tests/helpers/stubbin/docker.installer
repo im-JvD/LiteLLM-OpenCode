@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+#-------------------------------------------------------------------------------
+# Test stub: docker (this file is a template - the apt-get stub copies it to
+# $STUBBIN/docker when the main script "installs" docker.io)
+#
+# A stateful docker CLI emulator:
+#   - records every command line into $T_WORKSTATE/docker-calls.log
+#   - tracks container names in $T_WORKSTATE/containers.txt (like `docker ps -a`)
+#
+# Env:
+#   T_WORKSTATE     - per-test state dir (required)
+#   DOCKER_PULL_FAIL- when non-empty, `docker pull` fails with exit code 1
+#-------------------------------------------------------------------------------
+LOG="${T_WORKSTATE:?T_WORKSTATE not set}/docker-calls.log"
+STATE="${T_WORKSTATE:?}/containers.txt"
+echo "docker $*" >> "$LOG"
+
+cmd="${1:-}"
+if [ "$#" -gt 0 ]; then shift; fi
+
+case "$cmd" in
+  info)
+    exit 0
+    ;;
+  ps)
+    # only used by the script as: docker ps -a --format '{{.Names}}'
+    [ -f "$STATE" ] && cat "$STATE"
+    exit 0
+    ;;
+  pull)
+    if [ -n "${DOCKER_PULL_FAIL:-}" ]; then
+      echo "Error response from daemon: simulated pull failure (test stub)" >&2
+      exit 1
+    fi
+    exit 0
+    ;;
+  run)
+    name=""
+    prev=""
+    for a in "$@"; do
+      if [ "$prev" = "--name" ]; then name="$a"; fi
+      prev="$a"
+    done
+    if [ -n "$name" ]; then
+      grep -vxF "$name" "$STATE" 2>/dev/null > "${STATE}.tmp" || true
+      [ -f "${STATE}.tmp" ] && mv "${STATE}.tmp" "$STATE"
+      echo "$name" >> "$STATE"
+    fi
+    echo "fake-container-id"
+    exit 0
+    ;;
+  rm)
+    name=""
+    for a in "$@"; do
+      case "$a" in
+        -*) ;;
+        *) name="$a" ;;
+      esac
+    done
+    if [ -f "$STATE" ]; then
+      grep -vxF "$name" "$STATE" > "${STATE}.tmp" 2>/dev/null || true
+      [ -f "${STATE}.tmp" ] && mv "${STATE}.tmp" "$STATE"
+    fi
+    exit 0
+    ;;
+  stop|restart|start|logs|images)
+    exit 0
+    ;;
+  *)
+    exit 0
+    ;;
+esac

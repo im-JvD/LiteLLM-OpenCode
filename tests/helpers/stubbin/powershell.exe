@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+#-------------------------------------------------------------------------------
+# Test stub: powershell.exe
+#
+# Emulates the Windows user profile query performed by the main script:
+#   powershell.exe -NoProfile -Command "[Environment]::GetFolderPath('UserProfile')"
+#
+# Env:
+#   PS_USERNAME - Windows user name to report. Defaults to "Test User"
+#                 which contains a SPACE on purpose (the tricky case).
+#-------------------------------------------------------------------------------
+user="${PS_USERNAME:-Test User}"
+printf 'C:\\Users\\%s\r\n' "$user"
+exit 0

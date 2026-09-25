@@ -1,0 +1,23 @@
+SUITE RUN - 2026-09-25T12:29:53Z
+host: Linux 6.1.158+ | user: user | bash: 5.2.15(1)-release
+PASS  T00_static_checks
+PASS  T01_full_install_all_keys
+PASS  T02_install_groq_only
+PASS  T03_install_gemini_only
+PASS  T04_no_keys_retry_then_success
+PASS  T05_no_keys_three_attempts_fails
+PASS  T06_reinstall_replaces_container
+PASS  T07_full_uninstall
+PASS  T08_uninstall_idempotent
+PASS  T09_invalid_menu_choice
+PASS  T10_menu_quit
+PASS  T11_username_with_space
+PASS  T12_daemon_json_backup
+PASS  T13_powershell_fallback_path
+PASS  T14_health_check_timeout
+PASS  T15_pull_failure
+PASS  T16_docker_already_installed
+
+TOTAL: 17 passed, 0 failed, 0 skipped
+E2E litellm_real: PASS
+E2E real_docker: SKIP (not WSL)
